@@ -1052,20 +1052,7 @@ export function PortfolioTemplate({
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section id="testimonials" className="py-16 md:py-24 relative overflow-hidden transition-colors duration-300">
-        <div className="mx-auto max-w-6xl w-full px-6 md:px-10">
-          <div className="mb-16 text-center">
-            <span className="mb-4 block font-mono text-xs font-medium uppercase tracking-wider text-[#a855f7]">
-              Recommendations
-            </span>
-            <h2 className="font-sans text-4xl font-light text-neutral-900 dark:text-white md:text-5xl">
-              What People Say
-            </h2>
-          </div>
-          <TestimonialCarousel />
-        </div>
-      </section>
+
 
       {/* About Section Removed - Merged into Hero */}
 
@@ -1121,31 +1108,7 @@ export function PortfolioTemplate({
                     <CoolProjectPlaceholder />
                   )}
 
-                  {/* Hover Overlay */}
-                  <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/50 opacity-0 backdrop-blur-[2px] transition-opacity duration-300 group-hover:opacity-100">
-                    <div className="flex gap-4">
-                      {project.live && (
-                        <a
-                          href={project.live}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 rounded-full bg-white px-5 py-2 text-sm font-medium text-black hover:bg-neutral-200 transition-colors"
-                        >
-                          Live Demo <ArrowUpRight className="h-4 w-4" />
-                        </a>
-                      )}
-                      {project.github && (
-                        <a
-                          href={project.github}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 rounded-full bg-[#111] border border-white/20 px-5 py-2 text-sm font-medium text-white hover:bg-[#222] transition-colors"
-                        >
-                          Code <Github className="h-4 w-4" />
-                        </a>
-                      )}
-                    </div>
-                  </div>
+                  {/* No hover overlay buttons - removed Live Demo and Code buttons */}
                 </div>
 
                 {/* Info */}
@@ -1187,83 +1150,63 @@ export function PortfolioTemplate({
       {/* LinkedIn Posts Section */}
       {linkedinPosts && linkedinPosts.length > 0 && (
         <section id="posts" className="py-16 md:py-24 bg-background dark:bg-[#050505] transition-colors duration-300 relative overflow-hidden">
-          {/* Subtle Background Glow */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] bg-[#8b5cf6]/5 blur-[120px] rounded-full pointer-events-none" />
-
           <div className="mx-auto max-w-6xl w-full px-6 md:px-10 relative z-10">
-            <div className="mb-16">
-              <span className="mb-4 block font-mono text-xs font-medium uppercase tracking-wider text-[#8b5cf6]">
+            <div className="mb-10">
+              <span className="mb-3 block font-mono text-xs font-medium uppercase tracking-wider text-[#8b5cf6]">
                 Insights & Thoughts
               </span>
-              <h2 className="font-sans text-4xl font-light text-neutral-900 dark:text-white md:text-5xl">
+              <h2 className="font-sans text-3xl md:text-4xl font-light text-neutral-900 dark:text-white">
                 LinkedIn Posts
               </h2>
             </div>
-
-            <div className="grid gap-8 md:grid-cols-2 lg:gap-12">
-              {linkedinPosts.map((post, index) => (
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              {linkedinPosts.slice(0, 4).map((post, index) => (
                 <motion.article
                   key={post.id}
-                  initial={{ opacity: 0, y: 30 }}
+                  initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
+                  transition={{ delay: index * 0.08 }}
                   viewport={{ once: true }}
-                  className="group flex flex-col overflow-hidden rounded-2xl border border-neutral-300 dark:border-white/10 bg-card dark:bg-[#0e0e0e] hover:border-[#8b5cf6] dark:hover:border-[#8b5cf6]/50 transition-all duration-300 shadow-lg hover:shadow-xl"
+                  className="group flex flex-col overflow-hidden rounded-xl border border-neutral-300 dark:border-white/10 bg-card dark:bg-[#0e0e0e] hover:border-[#8b5cf6] dark:hover:border-[#8b5cf6]/50 transition-all duration-300 shadow-md hover:shadow-lg"
                 >
                   {/* Post Image */}
                   {post.image && (
                     <div className="relative aspect-[16/9] w-full overflow-hidden bg-neutral-200 dark:bg-[#0a0a0a]">
                       <img
-                        src={post.image}
+                        src={`${import.meta.env.BASE_URL}${post.image.startsWith('/') ? post.image.slice(1) : post.image}`}
                         alt={post.title}
                         className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                       />
-                      {/* Gradient Overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     </div>
                   )}
-
                   {/* Post Content */}
-                  <div className="flex flex-1 flex-col p-6">
-                    {/* Date */}
-                    <div className="mb-3 flex items-center gap-2">
-                      <Linkedin className="h-4 w-4 text-[#0077b5]" />
-                      <span className="font-mono text-xs text-neutral-600 dark:text-neutral-400">
-                        {post.date}
-                      </span>
+                  <div className="flex flex-1 flex-col p-4">
+                    <div className="mb-2 flex items-center gap-2">
+                      <Linkedin className="h-3 w-3 text-[#0077b5]" />
+                      <span className="font-mono text-[10px] text-neutral-500">{post.date}</span>
                     </div>
-
-                    {/* Title */}
-                    <h3 className="text-xl font-medium text-neutral-900 dark:text-white mb-4 leading-tight group-hover:text-[#8b5cf6] transition-colors">
+                    <h3 className="text-sm font-medium text-neutral-900 dark:text-white mb-2 leading-snug line-clamp-2 group-hover:text-[#8b5cf6] transition-colors">
                       {post.title}
                     </h3>
-
-                    {/* Content Preview */}
-                    <p className="mb-6 line-clamp-4 text-sm leading-relaxed text-neutral-700 dark:text-neutral-300 font-light">
+                    <p className="mb-3 line-clamp-3 text-xs leading-relaxed text-neutral-600 dark:text-neutral-400 font-light">
                       {post.content}
                     </p>
-
-                    {/* Tags */}
-                    <div className="flex flex-wrap gap-2 mb-6">
-                      {post.tags.slice(0, 4).map((tag) => (
-                        <span
-                          key={tag}
-                          className="text-[10px] font-mono uppercase tracking-wider text-[#8b5cf6] bg-[#8b5cf6]/10 px-2 py-1 rounded border border-[#8b5cf6]/20"
-                        >
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {post.tags.slice(0, 3).map((tag) => (
+                        <span key={tag} className="text-[9px] font-mono uppercase tracking-wider text-[#8b5cf6] bg-[#8b5cf6]/10 px-1.5 py-0.5 rounded border border-[#8b5cf6]/20">
                           #{tag}
                         </span>
                       ))}
                     </div>
-
-                    {/* Read More Link */}
                     <a
                       href={post.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-auto inline-flex items-center gap-2 text-sm font-medium text-[#8b5cf6] hover:gap-3 transition-all group/link"
+                      className="mt-auto inline-flex items-center gap-1 text-xs font-medium text-[#8b5cf6] hover:gap-2 transition-all"
                     >
-                      Read on LinkedIn
-                      <ArrowUpRight className="h-4 w-4 transition-transform group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5" />
+                      Read <ArrowUpRight className="h-3 w-3" />
                     </a>
                   </div>
                 </motion.article>

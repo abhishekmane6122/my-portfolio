@@ -278,6 +278,56 @@ Here are 3 core types of guardrails every RAG system should consider:
             link: "https://www.linkedin.com/posts/abhishek-mane-aiml_genai-rag-llmops-activity-7375665135085936641-y0nu",
             image: "/linkedin-posts/rag-guardrails.png",
             tags: ["GenAI", "RAG", "LLMOps", "AI", "MachineLearning"]
+        },
+        {
+            id: "3",
+            title: "Multi-Agent AI Systems: The Architecture Behind Enterprise Automation 🤖",
+            content: `Single LLMs are powerful — but multi-agent systems are transformative.
+
+Here's how I architect multi-agent pipelines for enterprise automation:
+
+🧠 Supervisor Agent: Routes queries, classifies intent, and delegates to specialist agents
+⚙️ Worker Agents: Each handles a specific domain — compliance, analytics, document generation
+🔄 State Management: Shared memory ensures context flows across all agents
+🛡️ Validation Layer: Every output is sanitized before reaching the user
+
+At CognitBotz, I designed a multi-agent system for Adani Group that:
+• Routes regulatory queries to the right compliance module
+• Auto-generates board meeting minutes from structured data
+• Runs insider trading surveillance across 3.9M+ investor records
+
+The result? 250+ FTE hours saved per quarter — fully automated.
+
+Key takeaway: The power isn't in one smart model. It's in orchestration, specialization, and trust boundaries.`,
+            date: "February 2026",
+            link: "https://www.linkedin.com/in/abhishek-mane-aiml/recent-activity/all/",
+            image: "/linkedin-posts/multi-agent.png",
+            tags: ["MultiAgent", "LLMOps", "GenAI", "AIAutomation"]
+        },
+        {
+            id: "4",
+            title: "Text-to-SQL at Scale: Building Trust Between Business Users and Databases 🗄️",
+            content: `Natural language → SQL sounds simple. But in production, it's one of the hardest engineering challenges.
+
+Here's what I learned building a Text-to-SQL system on SAP HANA for Adani Group:
+
+❌ The naive approach fails because:
+• LLMs hallucinate column names
+• Schema drift breaks queries silently
+• Ambiguous questions generate dangerous SQL
+
+✅ What actually works:
+1️⃣ Schema Context Injection — feed the LLM the exact table definitions at query time
+2️⃣ Multi-Agent Routing — a supervisor classifies intent before SQL generation
+3️⃣ Deterministic Handler — handle known query patterns with pre-built templates
+4️⃣ Validation Layer — sanitize all LLM output, enforce read-only, prevent injection
+5️⃣ Confidence Scoring — fall back to deterministic paths when LLM confidence is low
+
+The result: Accurate, safe SQL generation trusted by finance analysts daily.`,
+            date: "March 2026",
+            link: "https://www.linkedin.com/in/abhishek-mane-aiml/recent-activity/all/",
+            image: "/linkedin-posts/text-to-sql.png",
+            tags: ["TextToSQL", "LLM", "DataEngineering", "GenAI"]
         }
     ]
 };

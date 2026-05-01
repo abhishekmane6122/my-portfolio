@@ -91,47 +91,74 @@ const Mermaid: React.FC<MermaidProps> = ({ chart, id = 'mermaid-diagram', classN
     useEffect(() => {
         let isMounted = true;
 
-        const sanitizeMermaid = (content: string) => {
-            const lines = content.split('\n');
-            const sanitizedLines: string[] = [];
+        const sanitizeMermaid = (content: string): string => {
+            // Step 1: Global pre-processing — remove things that always break Mermaid v11
+            let cleaned = content
+                .replace(/<br\s*\/?>/gi, ' ')       // <br/> → space
+                .replace(/&amp;/g, '&')               // HTML entities
+                .replace(/&lt;/g, '<')
+                .replace(/&gt;/g, '>');
 
-            // Focus on graph/flowchart blocks as they are sensitive to unquoted labels
-            const isFlowchart = lines[0] && (lines[0].includes('graph') || lines[0].includes('flowchart'));
+            const lines = cleaned.split('\n');
+            const firstLine = lines[0]?.trim() ?? '';
+            const isFlowchart = /^(graph|flowchart)\s/i.test(firstLine);
 
-            for (const line of lines) {
-                if (!isFlowchart) {
-                    sanitizedLines.push(line);
-                    continue;
+            if (!isFlowchart) return cleaned;
+
+            return lines.map((line, idx) => {
+                if (idx === 0) return line; // keep directive line as-is
+                const trimmed = line.trim();
+                if (!trimmed || trimmed.startsWith('%%')) return line; // blank/comment
+
+                // Skip style / classDef / class declarations — leave as-is
+                if (/^\s*(style|classDef|class)\s/.test(line)) return line;
+
+                // subgraph title: ensure quoted
+                if (/^\s*subgraph\s+/i.test(line)) {
+                    return line.replace(/^(\s*subgraph\s+)(.+)$/, (_m, prefix, title) => {
+                        const t = title.trim();
+                        return t.startsWith('"') ? line : `${prefix}"${t.replace(/"/g, "'")}"`;
+                    });
                 }
+                if (/^\s*(end)\s*$/i.test(trimmed)) return line;
 
-                let tempLine = line;
+                // Process each shape pattern in order (most-specific first)
+                let out = line;
 
-                // Patterns to wrap labels in quotes if not already quoted
-                const patterns = [
-                    { reg: /(\w+)(\[)([^"\]]+)(\])/g, rep: '$1$2"$3"$4' },       // [Label]
-                    { reg: /(\w+)(\(\[)([^"\]]+)(\]\))/g, rep: '$1$2"$3"$4' },     // ([Label])
-                    { reg: /(\w+)(\[\[)([^"\]]+)(\]\])/g, rep: '$1$2"$3"$4' },     // [[Label]]
-                    { reg: /(\w+)(\(\()([^"\)]+)(\)\))/g, rep: '$1$2"$3"$4' },     // ((Label))
-                    { reg: /(\w+)(\()([^"\)]+)(\))/g, rep: '$1$2"$3"$4' },       // (Label)
-                    { reg: /(\w+)(\{)([^"\}]+)(\})/g, rep: '$1$2"$3"$4' },       // {Label}
-                    { reg: /(\w+)(>)([^"\]]+)(\])/g, rep: '$1$2"$3"$4' },       // >Label]
-                    { reg: /(-->|---|-\.>|==>)\s*\|([^"|]+)\|/g, rep: '$1|"$2"|' }, // -->|Label|
-                ];
-
-                patterns.forEach(({ reg, rep }) => {
-                    tempLine = tempLine.replace(reg, rep);
+                // ([...]) stadium
+                out = out.replace(/\b(\w[\w-]*)\s*\(\[([^\]]*)\]\)/g, (_m, id, lbl) => `${id}(["${lbl.replace(/"/g, "'")}"])`);
+                // ((...)): circle
+                out = out.replace(/\b(\w[\w-]*)\s*\(\(([^)]*)\)\)/g, (_m, id, lbl) => `${id}(("${lbl.replace(/"/g, "'")}"))`);
+                // [[ ]] subroutine
+                out = out.replace(/\b(\w[\w-]*)\s*\[\[([^\]]*)\]\]/g, (_m, id, lbl) => `${id}[["${lbl.replace(/"/g, "'")}"`+ `]]`);
+                // >...] asymmetric
+                out = out.replace(/\b(\w[\w-]*)\s*>\s*([^\]"[({]+)\]/g, (_m, id, lbl) => `${id}>"${lbl.trim()}"]`);
+                // {...} rhombus/hex
+                out = out.replace(/\b(\w[\w-]*)\s*\{([^}]*)\}/g, (_m, id, lbl) => {
+                    if (lbl.trim().startsWith('"')) return _m;
+                    return `${id}{"${lbl.replace(/"/g, "'")}"}`;
+                });
+                // (...) rounded
+                out = out.replace(/\b(\w[\w-]*)\s*\(([^)]*)\)/g, (_m, id, lbl) => {
+                    if (lbl.trim().startsWith('"')) return _m;
+                    return `${id}("${lbl.replace(/"/g, "'")}")`;
+                });
+                // [...] rectangle — applied last
+                out = out.replace(/\b(\w[\w-]*)\s*\[([^\]"[]*)\]/g, (_m, id, lbl) => {
+                    if (lbl.trim().startsWith('"')) return _m;
+                    return `${id}["${lbl.replace(/"/g, "'")}"]`;
                 });
 
-                // Clean up any double-double quotes created
-                while (tempLine.includes('""')) {
-                    tempLine = tempLine.replace('""', '"');
-                }
+                // Edge labels: -->|label| — quote if not already
+                out = out.replace(/(-->|--[->]|===>|-.->)\s*\|([^"|]+)\|/g, (_m, arrow, lbl) => `${arrow}|"${lbl.trim()}"|`);
 
-                sanitizedLines.push(tempLine);
-            }
+                // Remove any doubled quotes created
+                out = out.replace(/""/g, '"');
 
-            return sanitizedLines.join('\n');
+                return out;
+            }).join('\n');
         };
+
 
         const renderDiagram = async () => {
             if (!elementRef.current || !chart) return;
