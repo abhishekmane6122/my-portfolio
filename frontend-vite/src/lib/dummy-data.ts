@@ -45,26 +45,34 @@ export const dummyPortfolio: Partial<Portfolio> = {
         {
             id: "1",
             company: "CognitBotz Solutions",
-            position: "AI Engineer (Intern)",
-            duration: "Nov 2024 - Present",
+            position: "Artificial Intelligence Engineer",
+            duration: "Sep 2025 – Present · Full-time | Ahmedabad, Gujarat, India",
             description:
-                "Developing real-world AI solutions focusing on NLP and Agentic systems. Built an AI-powered document verification system for Naipunya.AI and automated report analyzers for Adani Labs using Python and LLM-based analysis.",
+                "Designed and developed three full-stack enterprise platforms for a large-scale conglomerate, owning end-to-end architecture, backend engineering, AI integration, and cloud infrastructure.\n\n▸ Architected modular full-stack web applications using React and Python with independently deployable modules behind a unified UI\n▸ Built scheduled data ingestion pipelines that scrape, parse, and normalize data from multiple external portals and stock exchange APIs into a structured cloud database\n▸ Designed an ETL pipeline running on a scheduled VM to extract, validate, transform, and load daily data into Azure PostgreSQL\n▸ Built a backend computation engine to derive financial indicators — moving averages, volatility metrics, delivery ratios, and relative performance indices — from raw market data\n▸ Designed an automated document generation engine using structured templates, reducing manual report authoring to near zero\n▸ Designed a multi-agent Text-to-SQL system where a routing agent classifies intent and delegates to either a deterministic query handler or GPT-powered dynamic SQL generation agent\n▸ Engineered prompt templates with schema context injection to guide the LLM toward producing accurate, SAP HANA-compatible SQL\n▸ Built a query validation layer to sanitize LLM output, prevent SQL injection, and enforce read-only execution against SAP HANA\n▸ Integrated LLM-powered RAG chatbot enabling natural language querying over ingested documents\n▸ Implemented conversation memory to maintain query context across multi-turn interactions\n▸ Architected role-scoped data access with self-service approval workflows and Azure AD SSO with RBAC across all platforms\n▸ Secured all secrets via Azure Key Vault, enforced TLS in transit and AES-256 encryption at rest",
         },
         {
             id: "2",
-            company: "Infosys Springboard",
-            position: "Artificial Intelligence Intern",
-            duration: "Oct 2024 - Dec 2024",
+            company: "CognitBotz Solutions",
+            position: "Artificial Intelligence Engineer",
+            duration: "Nov 2024 – Sep 2025 · Internship | Hyderabad, Telangana, India",
             description:
-                "Designed predictive models using TabNet and Generative AI (Google Gemini), achieving 85% accuracy. Focused on personalized health suggestions and Streamlit deployments.",
+                "◉ Develop and fine-tune LLMs using various NLP tools and frameworks (LangChain, Agno, etc.) to meet specific business needs, optimizing performance with techniques like few-shot and transfer learning.\n◉ Design and implement APIs for seamless LLM integration into applications and deploy LLM-powered solutions (chatbots, Q&A systems, web agents) for production.\n◉ Build user-friendly applications leveraging LLMs for tasks like conversational AI and identity verification, capable of handling diverse input types (text, documents, multi-modal data).\n◉ Evaluate LLM performance (accuracy, relevance, fairness) using relevant metrics and implement strategies to mitigate biases and improve reliability.\n◉ Collaborate across teams to align AI solutions with business goals and stay updated on LLM advancements to drive innovation.\n◉ Ensure ethical AI practices, focusing on data privacy, security, responsible LLM use, and developing safeguards against misuse and harmful content generation.",
         },
         {
             id: "3",
-            company: "Cyber Police Station",
-            position: "Data Analyst Intern",
-            duration: "Oct 2023 - Jan 2024",
+            company: "Infosys Springboard",
+            position: "Artificial Intelligence Developer",
+            duration: "Sep 2024 – Dec 2024 · Internship | India",
             description:
-                "Managed National Cyber Crime Portal data, improving analysis efficiency by 40% and reducing pending cases by 60%. Highly focused on data integrity and victim support.",
+                "Built AI/ML applications under the Infosys Springboard program, gaining hands-on experience with enterprise AI workflows and NLP pipelines.",
+        },
+        {
+            id: "4",
+            company: "Cyber Crime Police Station",
+            position: "Data Analyst",
+            duration: "Oct 2023 – Jan 2024 | Osmanabad, India",
+            description:
+                "Managed user credentials for the National Cyber Crime Reporting Portal. Extracted and organized complaint data in Excel to improve case handling efficiency. Maintained portal by updating complaint statuses and coordinating directly with victims on case resolutions.",
         },
     ],
     education: [

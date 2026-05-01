@@ -1344,7 +1344,7 @@ export function PortfolioTemplate({
                         <h4 className="text-neutral-700 dark:text-neutral-300 text-base font-light font-sans tracking-wide mb-4">
                           {exp.company}
                         </h4>
-                        <p className="text-neutral-700 dark:text-neutral-300 text-base leading-relaxed max-w-2xl font-light">
+                        <p className="text-neutral-700 dark:text-neutral-300 text-sm leading-relaxed max-w-2xl font-light whitespace-pre-line">
                           {exp.description}
                         </p>
                       </div>

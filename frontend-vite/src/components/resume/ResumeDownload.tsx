@@ -31,131 +31,209 @@ export default function ResumeDownload({ variant = 'button', showLabel = true }:
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+                    className="fixed inset-0 z-[200] flex items-center justify-center p-2 sm:p-4 bg-black/70 backdrop-blur-sm"
                     onClick={(e) => { if (e.target === e.currentTarget) setShowModal(false) }}
                 >
                     <motion.div
                         initial={{ scale: 0.9, opacity: 0, y: 20 }}
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         exit={{ scale: 0.9, opacity: 0 }}
-                        className="relative w-full max-w-3xl max-h-[90vh] bg-white dark:bg-[#0f0f0f] rounded-3xl shadow-2xl border border-neutral-200 dark:border-white/10 overflow-hidden flex flex-col"
+                        className="relative w-full max-w-3xl max-h-[95vh] bg-white dark:bg-[#0f0f0f] rounded-2xl shadow-2xl border border-neutral-200 dark:border-white/10 overflow-hidden flex flex-col"
                     >
                         {/* Header */}
-                        <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-black/30 shrink-0">
-                            <div className="flex items-center gap-3">
-                                <FileText className="w-5 h-5 text-[#d4a373]" />
-                                <span className="font-mono text-sm font-medium uppercase tracking-widest text-neutral-700 dark:text-neutral-300">Abhishek Mane — Resume</span>
+                        <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-black/30 shrink-0">
+                            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                                <FileText className="w-4 h-4 text-[#d4a373] shrink-0" />
+                                <span className="font-mono text-xs font-medium uppercase tracking-widest text-neutral-700 dark:text-neutral-300 truncate">
+                                    Abhishek Mane — Resume
+                                </span>
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1 sm:gap-2 shrink-0">
                                 <button
                                     onClick={handleDownload}
-                                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#d4a373] text-white text-xs font-mono uppercase tracking-widest hover:bg-[#c49363] transition-all"
+                                    className="flex items-center gap-1.5 px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-[#d4a373] text-white text-xs font-mono uppercase tracking-widest hover:bg-[#c49363] transition-all"
                                 >
-                                    <Download className="w-3.5 h-3.5" />
-                                    Download PDF
+                                    <Download className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                                    <span className="hidden sm:inline">Download PDF</span>
+                                    <span className="sm:hidden">PDF</span>
                                 </button>
                                 <a
                                     href={`${import.meta.env.BASE_URL}resume/Abhishek_Mane_Resume.pdf`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-neutral-100 dark:bg-white/10 text-neutral-700 dark:text-white text-xs font-mono uppercase tracking-widest hover:bg-neutral-200 dark:hover:bg-white/20 transition-all"
+                                    className="flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-neutral-100 dark:bg-white/10 text-neutral-700 dark:text-white text-xs hover:bg-neutral-200 dark:hover:bg-white/20 transition-all"
                                 >
-                                    <ExternalLink className="w-3.5 h-3.5" />
-                                    Open
+                                    <ExternalLink className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                                    <span className="hidden sm:inline font-mono uppercase tracking-widest">Open</span>
                                 </a>
-                                <button onClick={() => setShowModal(false)} className="p-2 rounded-xl hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors">
-                                    <X className="w-5 h-5 text-neutral-500" />
+                                <button onClick={() => setShowModal(false)} className="p-1.5 sm:p-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors">
+                                    <X className="w-4 h-4 text-neutral-500" />
                                 </button>
                             </div>
                         </div>
 
-                        {/* Resume Content - Rendered from .tex data */}
-                        <div className="overflow-y-auto flex-1 p-6 md:p-10 font-serif text-neutral-800 dark:text-neutral-200 text-sm leading-relaxed">
-                            {/* Header */}
-                            <div className="text-center mb-6 pb-4 border-b border-neutral-200 dark:border-white/10">
-                                <h1 className="text-2xl md:text-3xl font-bold text-neutral-900 dark:text-white mb-2">Abhishek Mane</h1>
-                                <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                        {/* Resume Content */}
+                        <div className="overflow-y-auto flex-1 px-4 sm:px-8 md:px-12 py-6 sm:py-8 text-neutral-800 dark:text-neutral-200 text-xs sm:text-sm leading-relaxed">
+
+                            {/* HEADING */}
+                            <div className="text-center mb-5 pb-4 border-b border-neutral-300 dark:border-white/15">
+                                <h1 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white tracking-tight mb-1">Abhishek Mane</h1>
+                                <p className="text-xs text-neutral-600 dark:text-neutral-400 flex flex-wrap justify-center gap-x-2 gap-y-1">
                                     <a href="mailto:abhishek.mane.work@gmail.com" className="text-[#d4a373] hover:underline">abhishek.mane.work@gmail.com</a>
-                                    {' '}|{' '}+91-7020870063 | Ahmedabad, Gujarat, India
+                                    <span className="text-neutral-400">|</span>
+                                    <span>+91-7020870063</span>
+                                    <span className="text-neutral-400">|</span>
+                                    <span>Ahmedabad, Gujarat, India</span>
                                 </p>
-                                <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1 flex flex-wrap justify-center gap-2">
-                                    <a href="https://www.linkedin.com/in/abhishek-mane-aiml" target="_blank" className="text-[#d4a373] hover:underline">LinkedIn</a>
-                                    <span>|</span>
-                                    <a href="https://substack.com/@abhimane" target="_blank" className="text-[#d4a373] hover:underline">Substack</a>
-                                    <span>|</span>
-                                    <a href="https://github.com/abhishekmane6122" target="_blank" className="text-[#d4a373] hover:underline">GitHub</a>
+                                <p className="text-xs text-neutral-600 dark:text-neutral-400 flex flex-wrap justify-center gap-x-2 gap-y-1 mt-1">
+                                    <a href="https://www.linkedin.com/in/abhishek-mane-aiml" target="_blank" rel="noopener noreferrer" className="text-[#d4a373] hover:underline">linkedin.com/in/abhishek-mane-aiml</a>
+                                    <span className="text-neutral-400">|</span>
+                                    <a href="https://substack.com/@abhimane" target="_blank" rel="noopener noreferrer" className="text-[#d4a373] hover:underline">substack.com/@abhimane</a>
+                                    <span className="text-neutral-400">|</span>
+                                    <a href="https://github.com/abhishekmane6122" target="_blank" rel="noopener noreferrer" className="text-[#d4a373] hover:underline">github.com/abhishekmane6122</a>
                                 </p>
                             </div>
 
-                            {/* Education */}
-                            <Section title="Education">
-                                <Entry title="Terna Engineering College" subtitle="B.Tech — Artificial Intelligence and Data Science" right1="Osmanabad, India" right2="Dec. 2021 – 2025" />
-                            </Section>
+                            {/* EDUCATION */}
+                            <RSection title="Education">
+                                <RSubheading
+                                    title="Terna Engineering College"
+                                    right1="Osmanabad, India"
+                                    subtitle="Bachelor of Technology — Artificial Intelligence and Data Science"
+                                    right2="Dec. 2021 — 2025"
+                                />
+                            </RSection>
 
-                            {/* Experience */}
-                            <Section title="Experience">
-                                <Entry title="CognitBotz Solutions" subtitle="AI Engineer — Client: Adani Green Energy & Adani Group" right1="Ahmedabad, India" right2="Sep. 2025 – Present">
-                                    <BulletList items={[
-                                        { bold: "Aegis — Enterprise Compliance Platform", text: ": Full-stack compliance intelligence platform with 6 modules — BSE Intelligence, RBI Compliance, SEBI Hub, Director Disclosure, Insider Trading, and Minutes Preparation. Saved 250+ FTE hours/quarter." },
-                                        { bold: "Regulatory RAG Pipeline", text: ": Automated scraping (Playwright), PDF extraction (PyMuPDF + OCR), AI summaries (Phi-3-mini), ChromaDB + Azure PostgreSQL. Eliminated 6+ hours of daily monitoring." },
-                                        { bold: "Multi-Agent NL-to-SQL System", text: ": Routing agent + GPT-powered SQL generation with schema context injection and query validation layer." },
-                                        { bold: "Equity Pulse", text: ": End-to-end equity analytics for 7 Adani BUs — BSE/NSE ETL, candlestick charts, competitor analysis, 3.9M+ investor records." },
-                                        { bold: "Platform Infrastructure", text: ": Azure AD SSO, RBAC, Key Vault, TLS, AI Agent Observability Platform. API response time: 8s → 500ms." },
+                            {/* EXPERIENCE */}
+                            <RSection title="Experience">
+                                <RSubheading
+                                    title="CognitBotz Solutions"
+                                    right1="Ahmedabad, India"
+                                    subtitle="Artificial Intelligence Engineer — Client: Adani Green Energy & Adani Group"
+                                    right2="Sep. 2025 — Present"
+                                >
+                                    <RItemList items={[
+                                        { bold: "Aegis — Enterprise Compliance Platform", text: ": Designed and developed a full-stack, production-grade compliance intelligence platform for Adani Group's Secretarial & Legal teams. Built six independently deployable modules — BSE Intelligence, RBI Compliance, SEBI Hub, Director Disclosure Management, Insider Trading Surveillance, and Minutes Preparation — behind a unified React UI. Platform saved 250+ FTE hours per quarter and is live in production." },
+                                        { bold: "Regulatory RAG Pipeline (BSE, SEBI, RBI)", text: ": Engineered automated scraping and ingestion pipelines (using Playwright and Requests) that collect daily notifications from BSE, SEBI, and RBI portals, extract content from PDFs via PyMuPDF and OCR, and generate AI summaries using Phi-3-mini LLM. Indexed documents into ChromaDB vector store for semantic search and pushed structured data to Azure PostgreSQL. Delivered automated daily email reports via SMTP. Eliminated 6+ hours of manual daily monitoring and reduced SEBI notification noise by 71%." },
+                                        { bold: "Multi-Agent NL-to-SQL System", text: ": Designed a multi-agent architecture where a routing agent classifies user intent and delegates to either a deterministic query handler or a GPT-powered dynamic SQL generation agent. Engineered prompt templates with schema context injection for SAP HANA-compatible SQL generation. Built a query validation layer to sanitize LLM output, prevent SQL injection, and enforce read-only access." },
+                                        { bold: "Equity Pulse — Market Analytics Platform", text: ": Built an end-to-end equity analytics platform for Adani Group's finance and portfolio teams. Designed ETL pipelines on a scheduled VM to extract, validate, and load daily bhavcopy data from BSE and NSE into Azure PostgreSQL. Developed a backend computation engine to calculate moving averages, volatility metrics, delivery ratios, and relative performance indices. Built the React frontend with interactive dashboards, candlestick charts, competitor analysis, and shareholding pattern tracking across 7 Adani business units and 3.9M+ investor records. Eliminated 4–6 hours of daily manual analyst work." },
+                                        { bold: "Platform Infrastructure & Observability", text: ": Implemented Azure AD SSO with RBAC across all platforms. Secured all secrets via Azure Key Vault, enforced TLS in transit and AES-256 encryption at rest. Built a custom AI Agent Observability Platform to monitor all deployed agents in real time — covering health checks, execution logs, latency tracking, and failure alerts. Configured Azure VM scheduling for automated pipeline execution and optimized API response times from 8 seconds to 500ms. Integrated email-based triggers and automated reporting via SMTP for daily operational summaries." },
+                                        { bold: "Cross-Functional Technical Leadership", text: ": Act as de facto technical lead across all enterprise AI projects at CognitBotz. Lead daily Scrum meetings with a 15+ member cross-functional team spanning Data Engineers, Python Developers, AI/ML Engineers, and Frontend Developers. Directly engaged in stakeholder management with Adani Group leadership — conducting project progress updates, requirements gathering sessions, and sprint reviews to ensure delivery alignment with business objectives." },
                                     ]} />
-                                </Entry>
-                                <Entry title="CognitBotz Solutions" subtitle="AI Engineer" right1="Hyderabad, India" right2="Nov. 2024 – Sep. 2025">
-                                    <BulletList items={[
-                                        { bold: "LLM Engineering", text: ": Fine-tuned LLMs with LangChain/Agno, deployed production chatbots and Q&A systems." },
-                                        { bold: "Responsible AI", text: ": Bias mitigation, data privacy, and responsible AI practices." },
-                                    ]} />
-                                </Entry>
-                                <Entry title="Infosys Springboard" subtitle="AI Developer Internship" right1="India" right2="Sep. 2024 – Dec. 2024">
-                                    <BulletList items={[{ bold: "AI Application Development", text: ": Hands-on experience with enterprise AI workflows and NLP pipelines." }]} />
-                                </Entry>
-                                <Entry title="Cyber Crime Police Station" subtitle="Data Analyst" right1="Osmanabad, India" right2="Oct. 2023 – Jan. 2024">
-                                    <BulletList items={[{ bold: "Data Management", text: ": Managed National Cyber Crime Reporting Portal user credentials and complaint data." }]} />
-                                </Entry>
-                            </Section>
+                                </RSubheading>
 
-                            {/* Projects */}
-                            <Section title="Projects">
+                                <RSubheading
+                                    title="CognitBotz Solutions"
+                                    right1="Hyderabad, India"
+                                    subtitle="Artificial Intelligence Engineer"
+                                    right2="Nov. 2024 — Sep. 2025"
+                                >
+                                    <RItemList items={[
+                                        { bold: "LLM Engineering & Deployment", text: ": Developed and fine-tuned LLMs using LangChain and Agno with few-shot and transfer learning. Designed APIs for LLM integration and deployed production chatbots, Q&A systems, and web agents handling text, documents, and multi-modal inputs." },
+                                        { bold: "AI Evaluation & Responsible AI", text: ": Evaluated LLM performance on accuracy, relevance, and fairness metrics. Implemented bias mitigation, data privacy safeguards, and responsible AI practices to prevent misuse and harmful content generation." },
+                                    ]} />
+                                </RSubheading>
+
+                                <RSubheading
+                                    title="Infosys Springboard"
+                                    right1="India"
+                                    subtitle="Artificial Intelligence Developer (Internship)"
+                                    right2="Sep. 2024 — Dec. 2024"
+                                >
+                                    <RItemList items={[
+                                        { bold: "AI Application Development", text: ": Built AI/ML applications under the Infosys Springboard program, gaining hands-on experience with enterprise AI workflows and NLP pipelines." },
+                                    ]} />
+                                </RSubheading>
+
+                                <RSubheading
+                                    title="Cyber Crime Police Station — India"
+                                    right1="Osmanabad, India"
+                                    subtitle="Data Analyst"
+                                    right2="Oct. 2023 — Jan. 2024"
+                                >
+                                    <RItemList items={[
+                                        { bold: "Data Management", text: ": Managed user credentials for the National Cyber Crime Reporting Portal. Extracted and organized complaint data in Excel to improve case handling efficiency. Maintained portal by updating complaint statuses and coordinating directly with victims on case resolutions." },
+                                    ]} />
+                                </RSubheading>
+                            </RSection>
+
+                            {/* PROJECTS */}
+                            <RSection title="Projects">
                                 {[
-                                    { name: "Aegis — Regulatory Compliance Intelligence Suite", stack: "React, FastAPI, LangChain, LangGraph, Azure OpenAI, pgvector, Docker", desc: "Production multi-module platform automating BSE/SEBI/RBI monitoring. Saved 250+ FTE hours/quarter." },
-                                    { name: "Equity Pulse — Enterprise Equity Analytics", stack: "React, TypeScript, FastAPI, Azure PostgreSQL, APScheduler, Recharts", desc: "End-to-end equity analytics tracking 5 Adani BUs with automated ETL and 3.9M+ investor records." },
-                                    { name: "Quantus Med — Multimodal AI Diagnostic", stack: "React-Vite, FastAPI, LangChain, Groq LPU, Llama-3, Whisper", desc: "Clinical AI platform fusing DICOM imagery with voice dictation to generate SOAP reports in <500ms." },
-                                    { name: "Doc Capture — Intelligent Document API", stack: "Python, FastAPI, Groq LLM, PyMuPDF, Docker", desc: "Automated extraction from Aadhaar, PAN, DL, Voter ID, invoices with Excel/JSON export." },
-                                    { name: "OmniQA-Agent — Autonomous QA Orchestrator", stack: "Streamlit, Playwright, LangChain, Groq (Llama-4), Openpyxl", desc: "Autonomous QA platform auto-generating user stories, test plans and Jira-ready workbooks." },
+                                    {
+                                        name: "Aegis — Regulatory Compliance Intelligence Suite",
+                                        context: "CognitBotz, Client: Adani Group",
+                                        desc: "Production-grade multi-module platform automating BSE/SEBI/RBI monitoring, director disclosure management, insider trading surveillance across 3.9M+ investor records, and board meeting minutes generation. Saved 250+ FTE hours/quarter.",
+                                        stack: "React, FastAPI, Python, LangChain, LangGraph, Azure OpenAI, Cohere Embeddings, pgvector (Azure PostgreSQL), Azure Key Vault, Azure VM, Nginx, Docker, GitLab."
+                                    },
+                                    {
+                                        name: "Equity Pulse — Enterprise Equity Analytics Platform",
+                                        context: "CognitBotz, Client: Adani Group",
+                                        desc: "End-to-end equity analytics platform tracking 5 Adani business units with automated ETL from BSE/NSE, real-time dashboards, candlestick charts, competitor analysis, and shareholding pattern portal across 3.9M+ investor records. Eliminated 4–6 hrs of daily manual analyst work.",
+                                        stack: "React, TypeScript, FastAPI, Python, Azure PostgreSQL, pgvector, Azure VM, APScheduler, Recharts, Docker, GitLab."
+                                    },
+                                    {
+                                        name: "Quantus Med — Multimodal AI Clinical Diagnostic Intelligence",
+                                        context: "CognitBotz",
+                                        desc: "Clinical AI platform fusing medical imagery (DICOM/JPG/PNG) with real-time physician voice dictation to generate structured SOAP diagnostic reports in under 500ms. Uses Llama-3 and Gemini 1.5-Flash for vision, Whisper-large-v3 for transcription, and Edge-TTS for hands-free playback. HIPAA/GDPR-compliant zero-knowledge inference.",
+                                        stack: "React-Vite, FastAPI, LangChain, Groq LPU, Llama-3, Gemini 1.5-Flash, Whisper-large-v3, Edge-TTS."
+                                    },
+                                    {
+                                        name: "Doc Capture — Intelligent Document Extraction API",
+                                        context: "CognitBotz",
+                                        desc: "FastAPI backend for automated extraction and export of structured data from multi-type documents (Aadhaar, PAN, Driving License, Voter ID, invoices). Supports template-based invoice mapping, batch processing, and Excel/JSON export. Docker Compose deployed.",
+                                        stack: "Python, FastAPI, Groq LLM, PyMuPDF, Camelot, Openpyxl, Docker."
+                                    },
+                                    {
+                                        name: "OmniQA-Agent — Autonomous Requirements & Test Engineering Orchestrator",
+                                        context: "Personal",
+                                        desc: "Autonomous QA platform crawling websites via Playwright headless Chromium, parsing DOM with BeautifulSoup, and orchestrating LangChain pipelines through Groq Llama-4 to auto-generate user stories, test plans, and test cases. Exports color-formatted Excel workbooks ready for Jira/ALM integration.",
+                                        stack: "Python, Streamlit, Playwright, BeautifulSoup4, LangChain, Groq (Llama-4), Openpyxl."
+                                    },
                                 ].map((p, i) => (
-                                    <div key={i} className="mb-3">
-                                        <p className="text-sm"><span className="font-bold text-neutral-900 dark:text-white">{p.name}</span> — <span className="italic text-neutral-500 text-xs">{p.stack}</span></p>
-                                        <p className="text-xs text-neutral-600 dark:text-neutral-400 ml-2">• {p.desc}</p>
+                                    <div key={i} className="mb-3 pl-1">
+                                        <p className="text-xs leading-snug">
+                                            <span className="font-bold text-neutral-900 dark:text-white">{p.name}</span>
+                                            <span className="text-neutral-500 italic"> | {p.context}</span>
+                                        </p>
+                                        <p className="text-xs text-neutral-700 dark:text-neutral-300 mt-0.5 leading-relaxed">
+                                            {p.desc} <span className="italic text-neutral-500">Stack: {p.stack}</span>
+                                        </p>
                                     </div>
                                 ))}
-                            </Section>
+                            </RSection>
 
-                            {/* Skills */}
-                            <Section title="Technical Skills">
+                            {/* TECHNICAL SKILLS */}
+                            <RSection title="Technical Skills">
                                 {[
-                                    { cat: "AI/ML", val: "LangChain, LangGraph, RAG, Multi-Agent Architectures, Azure OpenAI, Groq LPU, Llama-3/4, Phi-3, Whisper, Cohere, Prompt Engineering, Fine-Tuning" },
-                                    { cat: "Vector DBs", val: "pgvector (Azure PostgreSQL), ChromaDB, FAISS" },
-                                    { cat: "Backend", val: "Python, FastAPI, PostgreSQL, SQLite, REST APIs, Async, Nginx, Docker, Playwright" },
+                                    { cat: "AI/ML", val: "LangChain, LangGraph, RAG Systems, Multi-Agent Architectures, Azure OpenAI, Groq LPU, Llama-3/4, Phi-3, Whisper, Cohere Embeddings, Prompt Engineering, Fine-Tuning, Open Source LLMs, VLLMs" },
+                                    { cat: "Vector Databases & Search", val: "pgvector (Azure PostgreSQL), ChromaDB, FAISS" },
+                                    { cat: "Backend", val: "Python, FastAPI, PostgreSQL, SQLite, REST APIs, Async Programming, Nginx, Docker, Playwright" },
                                     { cat: "Frontend", val: "React, TypeScript, Tailwind CSS, Streamlit" },
-                                    { cat: "Cloud & DevOps", val: "Azure (OpenAI, AD SSO, Key Vault, PostgreSQL, VM, AI Foundry), Docker, APScheduler, GitLab" },
-                                    { cat: "Security", val: "RBAC, Azure Key Vault, TLS, AES-256, SQL Injection Prevention, AI Agent Observability" },
+                                    { cat: "Cloud & DevOps", val: "Azure (OpenAI, AD SSO, Key Vault, PostgreSQL, VM Scheduling, AI Foundry, Microsoft Foundry), Docker, APScheduler, GitLab, Git, SMTP Automation" },
+                                    { cat: "Security & Observability", val: "RBAC, Azure Key Vault, TLS, AES-256, SQL Injection Prevention, AI Agent Observability, AI Security" },
                                 ].map((s, i) => (
-                                    <p key={i} className="text-sm mb-1"><span className="font-bold">{s.cat}:</span> {s.val}</p>
+                                    <p key={i} className="text-xs mb-1 leading-relaxed">
+                                        <span className="font-bold text-neutral-900 dark:text-white">{s.cat}: </span>
+                                        <span className="text-neutral-700 dark:text-neutral-300">{s.val}</span>
+                                    </p>
                                 ))}
-                            </Section>
+                            </RSection>
 
-                            {/* Awards */}
-                            <Section title="Awards & Recognition">
-                                <p className="text-sm"><span className="font-bold">GreenRatna — Performance of the Month</span> (December 2025), Adani Green Energy Limited: Recognized by AGEL leadership for designing impactful AI portals. Appreciated by Hon'ble Chairman Shri Gautam Adani.</p>
-                            </Section>
+                            {/* AWARDS */}
+                            <RSection title="Awards & Recognition">
+                                <p className="text-xs leading-relaxed text-neutral-700 dark:text-neutral-300 pl-1">
+                                    <span className="font-bold text-neutral-900 dark:text-white">GreenRatna — Performance of the Month Award</span> (December 2025), Adani Green Energy Limited: Recognized by AGEL leadership and stakeholders for designing and delivering impactful AI-driven portals and solutions. Work was appreciated by Hon'ble Chairman Shri Gautam Adani and received positive feedback across multiple teams at the organization.
+                                </p>
+                            </RSection>
 
-                            {/* Certifications */}
-                            <Section title="Certifications">
-                                <p className="text-sm">CCSK v4.1 Foundation Training — Cloud Security | Cloud Computing Fundamentals | AICTE-Cisco Cyber Security Virtual Internship | Google for Developers Cloud Bootcamp (GeeksforGeeks)</p>
-                            </Section>
+                            {/* CERTIFICATIONS */}
+                            <RSection title="Certifications">
+                                <p className="text-xs leading-relaxed text-neutral-700 dark:text-neutral-300 pl-1">
+                                    CCSK v4.1 Foundation Training — Cloud Security | Cloud Computing Fundamentals | AICTE-Cisco Cyber Security Virtual Internship | Google for Developers Cloud Bootcamp (GeeksforGeeks)
+                                </p>
+                            </RSection>
+
                         </div>
                     </motion.div>
                 </motion.div>
@@ -221,38 +299,49 @@ export default function ResumeDownload({ variant = 'button', showLabel = true }:
     )
 }
 
-// Helper Components
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+// ── Helper Components ──────────────────────────────────────────────────────────
+
+function RSection({ title, children }: { title: string; children: React.ReactNode }) {
     return (
         <div className="mb-5">
-            <h2 className="text-base font-bold uppercase tracking-widest text-neutral-900 dark:text-white border-b border-neutral-300 dark:border-white/20 pb-1 mb-3">{title}</h2>
+            <h2 className="text-xs sm:text-sm font-bold uppercase tracking-[0.15em] text-neutral-900 dark:text-white border-b border-neutral-300 dark:border-white/20 pb-0.5 mb-2">
+                {title}
+            </h2>
             {children}
         </div>
     )
 }
 
-function Entry({ title, subtitle, right1, right2, children }: { title: string; subtitle: string; right1: string; right2: string; children?: React.ReactNode }) {
+function RSubheading({
+    title, right1, subtitle, right2, children
+}: {
+    title: string; right1: string; subtitle: string; right2: string; children?: React.ReactNode
+}) {
     return (
-        <div className="mb-4">
-            <div className="flex flex-wrap justify-between items-start gap-1">
-                <span className="font-bold text-neutral-900 dark:text-white text-sm">{title}</span>
-                <span className="text-xs text-neutral-500">{right1}</span>
+        <div className="mb-3 pl-1">
+            <div className="flex flex-wrap justify-between items-baseline gap-x-2 gap-y-0.5">
+                <span className="font-bold text-neutral-900 dark:text-white text-xs sm:text-sm">{title}</span>
+                <span className="text-xs text-neutral-500 shrink-0">{right1}</span>
             </div>
-            <div className="flex flex-wrap justify-between items-start gap-1">
+            <div className="flex flex-wrap justify-between items-baseline gap-x-2 gap-y-0.5">
                 <span className="italic text-xs text-neutral-600 dark:text-neutral-400">{subtitle}</span>
-                <span className="text-xs text-neutral-500">{right2}</span>
+                <span className="text-xs text-neutral-500 italic shrink-0">{right2}</span>
             </div>
             {children}
         </div>
     )
 }
 
-function BulletList({ items }: { items: { bold: string; text: string }[] }) {
+function RItemList({ items }: { items: { bold: string; text: string }[] }) {
     return (
-        <ul className="mt-1 ml-2 space-y-0.5">
+        <ul className="mt-1 space-y-1 pl-2">
             {items.map((item, i) => (
-                <li key={i} className="text-xs text-neutral-700 dark:text-neutral-300">
-                    • <strong>{item.bold}</strong>{item.text}
+                <li key={i} className="text-xs text-neutral-700 dark:text-neutral-300 leading-relaxed flex gap-1.5">
+                    <span className="mt-0.5 shrink-0 text-neutral-400">•</span>
+                    <span>
+                        <span className="font-semibold text-neutral-800 dark:text-neutral-100">{item.bold}</span>
+                        {item.text}
+                    </span>
                 </li>
             ))}
         </ul>
