@@ -128,39 +128,39 @@ const Mermaid: React.FC<MermaidProps> = ({ chart, id = 'mermaid-diagram', classN
 
                 // 1. stadium  ([label])
                 out = out.replace(/\b(\w[\w-]*)\s*\(\[([^\]]*)\]\)/g,
-                    (_m, id, lbl) => isQ(lbl) ? _m : `${id}([${q(lbl)}])`);
+                    (_m, id, lbl) => isQ(lbl) || lbl.includes('(') ? _m : `${id}([${q(lbl)}])`);
 
-                // 2. circle  ((label))  — negative lookahead prevents matching inner ()
+                // 2. circle  ((label))
                 out = out.replace(/\b(\w[\w-]*)\s*\(\(([^)]*)\)\)/g,
-                    (_m, id, lbl) => isQ(lbl) ? _m : `${id}((${q(lbl)}))`);
+                    (_m, id, lbl) => isQ(lbl) || lbl.includes('(') ? _m : `${id}((${q(lbl)}))`);
 
                 // 3. cylinder  [(label)]
                 out = out.replace(/\b(\w[\w-]*)\s*\[\(([^)]*)\)\]/g,
-                    (_m, id, lbl) => isQ(lbl) ? _m : `${id}[(${q(lbl)})]`);
+                    (_m, id, lbl) => isQ(lbl) || lbl.includes('(') ? _m : `${id}[(${q(lbl)})]`);
 
                 // 4. subroutine  [[label]]
                 out = out.replace(/\b(\w[\w-]*)\s*\[\[([^\]]*)\]\]/g,
-                    (_m, id, lbl) => isQ(lbl) ? _m : `${id}[[${q(lbl)}]]`);
+                    (_m, id, lbl) => isQ(lbl) || lbl.includes('[') ? _m : `${id}[[${q(lbl)}]]`);
 
                 // 5. asymmetric  >label]
                 out = out.replace(/\b(\w[\w-]*)\s*>\s*([^\]"[({]+)\]/g,
-                    (_m, id, lbl) => `${id}>${q(lbl)}]`);
+                    (_m, id, lbl) => isQ(lbl) ? _m : `${id}>${q(lbl)}]`);
 
                 // 6. hex/rhombus  {label}
                 out = out.replace(/\b(\w[\w-]*)\s*\{([^}]*)\}/g,
-                    (_m, id, lbl) => isQ(lbl) ? _m : `${id}{${q(lbl)}}`);
+                    (_m, id, lbl) => isQ(lbl) || lbl.includes('{') ? _m : `${id}{${q(lbl)}}`);
 
-                // 7. rounded  (label) — (?!\() prevents matching (( circles
-                out = out.replace(/\b(\w[\w-]*)\s*\((?!\()([^)]*)\)/g,
-                    (_m, id, lbl) => isQ(lbl) ? _m : `${id}(${q(lbl)})`);
+                // 7. rounded  (label) — (?!\() ensures we don't match (( or ([
+                out = out.replace(/\b(\w[\w-]*)\s*\((?![([])([^)]*)\)/g,
+                    (_m, id, lbl) => isQ(lbl) || lbl.includes('(') ? _m : `${id}(${q(lbl)})`);
 
-                // 8. rectangle  [label] — (?!\[) prevents matching [[ and [( shapes
-                out = out.replace(/\b(\w[\w-]*)\s*\[(?!\[|\()([^\]"[]*)\]/g,
-                    (_m, id, lbl) => isQ(lbl) ? _m : `${id}[${q(lbl)}]`);
+                // 8. rectangle  [label] — (?!\[|\() ensures we don't match [[ or [(
+                out = out.replace(/\b(\w[\w-]*)\s*\[(?![[(])([^\]"[]*)\]/g,
+                    (_m, id, lbl) => isQ(lbl) || lbl.includes('[') ? _m : `${id}[${q(lbl)}]`);
 
                 // 9. edge labels  -->|label|
                 out = out.replace(/(-->|--[->]|===>|-.->)\s*\|([^"|]+)\|/g,
-                    (_m, arr, lbl) => `${arr}|${q(lbl)}|`);
+                    (_m, arr, lbl) => isQ(lbl) ? _m : `${arr}|${q(lbl)}|`);
 
                 // clean up any accidental double-quotes
                 out = out.replace(/""/g, '"');

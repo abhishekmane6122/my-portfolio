@@ -301,7 +301,7 @@ The result? 250+ FTE hours saved per quarter — fully automated.
 Key takeaway: The power isn't in one smart model. It's in orchestration, specialization, and trust boundaries.`,
             date: "February 2026",
             link: "https://www.linkedin.com/pulse/beyond-prompting-building-context-stack-abhishek-mane-ny6if/",
-            image: "",
+            image: "/linkedin-posts/multi-agent.png",
             tags: ["MultiAgent", "LLMOps", "GenAI", "AIAutomation"]
         },
         {
@@ -326,7 +326,7 @@ Here's what I learned building a Text-to-SQL system on SAP HANA for Adani Group:
 The result: Accurate, safe SQL generation trusted by finance analysts daily.`,
             date: "March 2026",
             link: "https://www.linkedin.com/pulse/autonomous-control-loop-heartbeat-agentic-ai-abhishek-mane-5mlyf/",
-            image: "",
+            image: "/linkedin-posts/text-to-sql.png",
             tags: ["TextToSQL", "LLM", "DataEngineering", "GenAI"]
         }
     ]
