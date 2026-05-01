@@ -149,26 +149,26 @@ export const dummyPortfolio: Partial<Portfolio> = {
             github: "https://github.com/abhishekmane-ai",
             featured: true,
             mermaidDiagram: `graph TD
-    User((User)) --> Interface[Web Dashboard]
-    Interface --> Auth[Azure AD SSO]
-    Auth --> APIGateway[FastAPI Backend]
-    
-    subgraph Multi-Agent System
-        APIGateway --> Agent1[Regulatory Intelligence Agent]
-        APIGateway --> Agent2[Directors Disclosure Agent]
-        APIGateway --> Agent3[Insider Trading Monitor]
-        APIGateway --> Agent4[Meeting Minutes Generator]
+    User(("User")) --> Interface["Web Dashboard"]
+    Interface --> Auth["Azure AD SSO"]
+    Auth --> APIGateway["FastAPI Backend"]
+
+    subgraph "Multi-Agent System"
+        APIGateway --> Agent1["Regulatory Intelligence Agent"]
+        APIGateway --> Agent2["Directors Disclosure Agent"]
+        APIGateway --> Agent3["Insider Trading Monitor"]
+        APIGateway --> Agent4["Meeting Minutes Generator"]
     end
-    
-    subgraph Data Layer
-        Agent1 --> BSE[BSE/SEBI/RBI APIs]
-        Agent2 --> SQLite[(Director DB)]
-        Agent3 --> Shareholding[(Shareholding DB)]
-        Agent4 --> WordEngine[python-docx]
+
+    subgraph "Data Layer"
+        Agent1 --> BSE["BSE / SEBI / RBI APIs"]
+        Agent2 --> SQLite[("Director DB")]
+        Agent3 --> Shareholding[("Shareholding DB")]
+        Agent4 --> WordEngine["python-docx"]
     end
-    
-    Agent1 --> RAG[RAG Pipeline]
-    RAG --> LLM[Groq LLM]`
+
+    Agent1 --> RAG["RAG Pipeline"]
+    RAG --> LLM["Groq LLM"]`
         },
         {
             id: "text-insights",
@@ -300,8 +300,8 @@ The result? 250+ FTE hours saved per quarter — fully automated.
 
 Key takeaway: The power isn't in one smart model. It's in orchestration, specialization, and trust boundaries.`,
             date: "February 2026",
-            link: "https://www.linkedin.com/in/abhishek-mane-aiml/recent-activity/all/",
-            image: "/linkedin-posts/multi-agent.png",
+            link: "https://www.linkedin.com/pulse/beyond-prompting-building-context-stack-abhishek-mane-ny6if/",
+            image: "",
             tags: ["MultiAgent", "LLMOps", "GenAI", "AIAutomation"]
         },
         {
@@ -325,8 +325,8 @@ Here's what I learned building a Text-to-SQL system on SAP HANA for Adani Group:
 
 The result: Accurate, safe SQL generation trusted by finance analysts daily.`,
             date: "March 2026",
-            link: "https://www.linkedin.com/in/abhishek-mane-aiml/recent-activity/all/",
-            image: "/linkedin-posts/text-to-sql.png",
+            link: "https://www.linkedin.com/pulse/autonomous-control-loop-heartbeat-agentic-ai-abhishek-mane-5mlyf/",
+            image: "",
             tags: ["TextToSQL", "LLM", "DataEngineering", "GenAI"]
         }
     ]
