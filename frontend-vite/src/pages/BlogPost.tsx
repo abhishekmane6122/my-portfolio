@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, Link, Navigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { motion } from 'framer-motion'
-import { Calendar, Clock, ArrowLeft, Tag, Share2, Home, ArrowUp } from 'lucide-react'
+import { Calendar, Clock, ArrowLeft, Tag, Share2, Home, ArrowUp, ArrowDown } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { getPostBySlug } from '../data/blog-posts'
@@ -16,6 +16,7 @@ export default function BlogPost() {
     const post = slug ? getPostBySlug(slug) : undefined
 
     const [showTopButton, setShowTopButton] = useState(false)
+    const [showBottomButton, setShowBottomButton] = useState(true)
     const [scrollProgress, setScrollProgress] = useState(0)
 
     useEffect(() => {
@@ -24,10 +25,15 @@ export default function BlogPost() {
 
     useEffect(() => {
         const handleScroll = () => {
-            setShowTopButton(window.scrollY > 400)
-            const totalScroll = document.documentElement.scrollHeight - window.innerHeight
-            const progress = (window.scrollY / totalScroll) * 100
+            const currentScroll = window.scrollY
+            setShowTopButton(currentScroll > 400)
+            
+            const totalHeight = document.documentElement.scrollHeight - window.innerHeight
+            const progress = (currentScroll / totalHeight) * 100
             setScrollProgress(progress)
+            
+            // Show bottom button if we are not at the bottom
+            setShowBottomButton(totalHeight - currentScroll > 400)
         }
         window.addEventListener('scroll', handleScroll)
         return () => window.removeEventListener('scroll', handleScroll)
@@ -35,6 +41,10 @@ export default function BlogPost() {
 
     const scrollToTop = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+
+    const scrollToBottom = () => {
+        window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' })
     }
 
     if (!post) {
@@ -91,6 +101,20 @@ export default function BlogPost() {
                             aria-label="Scroll to top of page"
                         >
                             <ArrowUp className="w-5 h-5 sm:w-6 sm:h-6" />
+                        </motion.button>
+                    )}
+
+                    {/* Scroll to Bottom */}
+                    {showBottomButton && (
+                        <motion.button
+                            initial={{ opacity: 0, scale: 0.5 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            onClick={scrollToBottom}
+                            className="p-3 sm:p-4 rounded-full bg-white dark:bg-card border border-neutral-200 dark:border-white/10 text-[#d4a373] shadow-xl hover:scale-110 transition-all flex items-center justify-center group"
+                            title="Scroll to Bottom"
+                            aria-label="Scroll to bottom of page"
+                        >
+                            <ArrowDown className="w-5 h-5 sm:w-6 sm:h-6" />
                         </motion.button>
                     )}
 
