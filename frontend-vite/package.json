@@ -1,6 +1,7 @@
 {
   "name": "frontend-vite",
   "private": true,
+  "description": "Portfolio Website",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
