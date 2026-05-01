@@ -26,7 +26,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install --force
+        run: npm install --force --no-package-lock
         working-directory: frontend-vite
 
       - name: Build
