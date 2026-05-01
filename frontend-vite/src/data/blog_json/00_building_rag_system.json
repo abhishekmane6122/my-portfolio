@@ -1,0 +1,23 @@
+{
+    "id": "6",
+    "slug": "building-rag-system-python-chromadb",
+    "title": "Building a Production-Ready RAG System with Python and ChromaDB",
+    "excerpt": "Learn how to build an intelligent document processing system using Retrieval-Augmented Generation, ChromaDB vector database, and Phi-3 LLM for accurate AI-powered summaries.",
+    "content": "# Building a Production-Ready RAG System\n\n## \u26a0\ufe0f Problem Statement\n\nOrganizations face a massive influx of daily regulatory notifications and corporate announcements. Manual monitoring and analysis of these documents (often 1000+ PDFs/day) is:\n- **Time-Intensive**: Analysts spend 3-4 hours daily just downloading and reading.\n- **Risk-Prone**: Critical insights can be missed due to human fatigue.\n- **Inconsistent**: Summaries vary in quality and depth between analysts.\n\n## \ud83c\udfaf Objective\n\nThe goal was to engineer an intelligent automation platform that could download, extract, and analyze BSE announcements in real-time using Retrieval-Augmented Generation (RAG), providing analysts with concise, actionable summaries within seconds.\n\n## \ud83c\udfd7\ufe0f Architecture & Pipeline\n\nThe system follows a modular RAG pipeline:\n\n```python\n# Core RAG Pipeline\n1. PDF Download \u2192 Playwright automation (Daily scraping)\n2. Extraction \u2192 Dual-mode (PyPDF2 + Tesseract OCR fallback)\n3. Chunking \u2192 Semantic boundary detection for context preservation\n4. Embedding \u2192 Sentence Transformers (Local inference)\n5. Storage \u2192 ChromaDB Vector Store\n6. Generation \u2192 Phi-3 LLM (Grounded by retrieved context)\n```\n\n### Key Implementation: Dual Text Extraction\n\n```python\ndef extract_text_from_pdf(pdf_path: str) -> str:\n    try:\n        # Primary: Digital extraction\n        with open(pdf_path, 'rb') as file:\n            pdf_reader = PyPDF2.PdfReader(file)\n            text = \"\".join(page.extract_text() for page in pdf_reader.pages[:6])\n        \n        if len(text.strip()) < 100:\n            raise ValueError(\"Insufficient text\")\n        return text\n    except Exception:\n        # Fallback: OCR for scanned/image-based PDFs\n        return extract_text_with_ocr(pdf_path)\n```\n\n### Key Implementation: Grounded Generation\n\n```python\ndef query_rag_system(query_text: str, context_chunks: List[str]) -> str:\n    # Build a strictly grounded prompt\n    context = \"\\n\\n\".join(context_chunks)\n    prompt = f\"\"\"Based ONLY on the context below, answer the question.\n    If the information is not in the context, state that clearly.\n\n    Context: {context}\n    Question: {query_text}\n    Answer:\"\"\"\n    \n    return llm.generate(prompt, max_tokens=500)\n```\n\n## \ud83d\udcc8 Outcome & Results\n\nThe deployment of this RAG system resulted in:\n- **Efficiency**: Reduced daily monitoring time from **4 hours to < 5 minutes**.\n- **Accuracy**: Achieved **92% retrieval accuracy** using semantic search.\n- **Scalability**: Capable of processing 5000+ documents per day without additional overhead.\n- **Reliability**: 100% extraction success rate via the dual-OCR pipeline.\n\n## \ud83d\udca1 Conclusion\n\nBuilding a production RAG system is less about the model and more about the **Data Pipeline**. Success depends on high-quality text extraction, semantic chunking, and strict prompt grounding. This investment in AI automation has saved thousands of analyst hours and significantly reduced regulatory risk.\n",
+    "featuredImage": "/blog/rag-system.png",
+    "author": {
+        "name": "Abhishek Mane",
+        "photo": "/Abhishek_Profile.png"
+    },
+    "publishedAt": "2024-12-20",
+    "readTime": 8,
+    "category": "AI/ML",
+    "tags": [
+        "RAG",
+        "Python",
+        "ChromaDB",
+        "LLM",
+        "AI"
+    ],
+    "featured": false
+}

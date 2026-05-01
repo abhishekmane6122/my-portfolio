@@ -1,0 +1,149 @@
+{
+  "fullName": "Abhishek Mane",
+  "title": "AI Engineer @ CognitBotz | NLP & Deep Learning Enthusiast",
+  "tagline": "Building real-world AI solutions with a focus on Ethical AI, LLM fine-tuning, and scalable cloud deployments.",
+  "bio": "I’m an AI Engineer harnessing the power of Python, ML, Deep Learning, and NLP to address real-world challenges. Experienced in LLM fine-tuning, building and integrating APIs, and making AI accessible and reliable. I am a strong advocate for ethical AI, striving to mitigate bias and foster fairness. Skilled in deploying scalable solutions with AWS and Azure.",
+  "skills": [
+    "Python",
+    "SQL",
+    "Azure",
+    "Databricks",
+    "Gen AI",
+    "RAG",
+    "LLMs",
+    "LangChain",
+    "LangGraph",
+    "n8n",
+    "Microsoft Agent Framework",
+    "LMOPS",
+    "MLOPS",
+    "Multi Agent Systems",
+    "A2A (Anything to Action)",
+    "PyTorch",
+    "TensorFlow",
+    "NLP",
+    "BERT",
+    "GPT",
+    "FastAPI",
+    "Jupyter Notebook",
+    "Git",
+    "Docker"
+  ],
+  "socialLinks": {
+    "github": "https://github.com/abhishekmane-ai",
+    "linkedin": "https://www.linkedin.com/in/abhishek-mane-aiml/",
+    "email": "abhishek.mane.work@gmail.com",
+    "resume": "#"
+  },
+  "profileImage": "/Abhishek_Profile.png",
+  "experience": [
+    {
+      "id": "1",
+      "company": "CognitBotz Solutions",
+      "position": "AI Engineer (Intern)",
+      "duration": "Nov 2024 - Present",
+      "description": "Developing real-world AI solutions focusing on NLP and Agentic systems. Built an AI-powered document verification system for Naipunya.AI and automated report analyzers for Adani Labs using Python and LLM-based analysis."
+    },
+    {
+      "id": "2",
+      "company": "Infosys Springboard",
+      "position": "Artificial Intelligence Intern",
+      "duration": "Oct 2024 - Dec 2024",
+      "description": "Designed predictive models using TabNet and Generative AI (Google Gemini), achieving 85% accuracy. Focused on personalized health suggestions and Streamlit deployments."
+    },
+    {
+      "id": "3",
+      "company": "Cyber Police Station",
+      "position": "Data Analyst Intern",
+      "duration": "Oct 2023 - Jan 2024",
+      "description": "Managed National Cyber Crime Portal data, improving analysis efficiency by 40% and reducing pending cases by 60%. Highly focused on data integrity and victim support."
+    }
+  ],
+  "education": [
+    {
+      "id": "1",
+      "institution": "Terna Public Charitable Trusts College of Engineering",
+      "degree": "B.Tech in Artificial Intelligence and Data Science",
+      "duration": "2021 - 2025",
+      "description": "CGPA: 7.52 | Focus on ML, Deep Learning, and NLP."
+    },
+    {
+      "id": "2",
+      "institution": "Shripatrao Bhosale Jr College",
+      "degree": "Higher Secondary Computer Science",
+      "duration": "2019 - 2021",
+      "description": "Percentage: 85%"
+    }
+  ],
+  "positionsOfResponsibility": [
+    "Speaker at local AI workshops & Community Mentor.",
+    "Led teams for Smart India Hackathon Internal Selections.",
+    "First Place, Avishkar Hackathon (University Level).",
+    "Active Member, National Service Scheme (NSS).",
+    "Collaborated on leading recitations and grading for AI coursework."
+  ],
+  "funFacts": [
+    "Always curious about new tech, digital art, and global cuisine.",
+    "Motto: 'Make AI understandable, ethical, and impactful!'",
+    "Open to AI collaborations, insightful discussions, and conferences.",
+    "I love sharing about Open Source, Ethical AI, and AI4Good."
+  ],
+  "projects": [
+    {
+      "id": "1",
+      "title": "SmartBot",
+      "description": "Designed and deployed a conversational AI model using BERT to enable seamless, bias-aware customer interactions.",
+      "tags": [
+        "BERT",
+        "NLP",
+        "Python",
+        "Ethical AI"
+      ],
+      "live": "#",
+      "github": "https://github.com/abhishekmane-ai",
+      "featured": true
+    },
+    {
+      "id": "2",
+      "title": "AI4Health",
+      "description": "Built diagnostic ML tools on cloud platforms (AWS/Azure) to accelerate healthcare insights delivery.",
+      "tags": [
+        "ML",
+        "Cloud",
+        "AWS",
+        "Azure",
+        "Healthcare"
+      ],
+      "live": "#",
+      "github": "https://github.com/abhishekmane-ai",
+      "featured": true
+    },
+    {
+      "id": "3",
+      "title": "Text Insights API",
+      "description": "Created robust, plug-and-play APIs for NLP workflows and business analytics using FastAPI.",
+      "tags": [
+        "FastAPI",
+        "NLP",
+        "API",
+        "Business Analytics"
+      ],
+      "live": "#",
+      "github": "https://github.com/abhishekmane-ai",
+      "featured": true
+    },
+    {
+      "id": "4",
+      "title": "MLflow Wine Quality Prediction",
+      "description": "Regression model with ElasticNet and complete experiment tracking using MLflow.",
+      "tags": [
+        "MLflow",
+        "Scikit-learn",
+        "Python"
+      ],
+      "live": "#",
+      "github": "https://github.com/abhishekmane-ai/wine-quality-prediction",
+      "featured": true
+    }
+  ]
+}
