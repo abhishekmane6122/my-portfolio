@@ -26,7 +26,7 @@ export default function BlogCard({ post, index }: BlogCardProps) {
                     <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-blue-50 via-purple-50 to-cyan-50 dark:from-accent-blue/20 dark:via-accent-purple/20 dark:to-accent-cyan/20">
                         {post.featuredImage ? (
                             <img
-                                src={post.featuredImage}
+                                src={`${import.meta.env.BASE_URL}${post.featuredImage.startsWith('/') ? post.featuredImage.slice(1) : post.featuredImage}`}
                                 alt={post.title}
                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-slow"
                             />
@@ -100,7 +100,7 @@ export default function BlogCard({ post, index }: BlogCardProps) {
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <img
-                                    src={post.author.photo}
+                                    src={`${import.meta.env.BASE_URL}${post.author.photo.startsWith('/') ? post.author.photo.slice(1) : post.author.photo}`}
                                     alt={post.author.name}
                                     className="w-6 h-6 rounded-full object-cover"
                                 />

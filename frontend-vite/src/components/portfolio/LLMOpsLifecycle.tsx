@@ -40,7 +40,7 @@ export default function LLMOpsLifecycle() {
                 >
                     <div className="flex items-center justify-center gap-6 mb-6">
                         <img
-                            src="/Abhishek_Profile.png"
+                            src={`${import.meta.env.BASE_URL}Abhishek_Profile.png`}
                             alt="Abhishek Mane"
                             className="w-20 h-20 rounded-full border-4 border-[#d4a373] shadow-xl object-cover"
                         />

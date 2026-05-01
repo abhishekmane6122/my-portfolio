@@ -91,11 +91,53 @@ const Mermaid: React.FC<MermaidProps> = ({ chart, id = 'mermaid-diagram', classN
     useEffect(() => {
         let isMounted = true;
 
+        const sanitizeMermaid = (content: string) => {
+            const lines = content.split('\n');
+            const sanitizedLines: string[] = [];
+
+            // Focus on graph/flowchart blocks as they are sensitive to unquoted labels
+            const isFlowchart = lines[0] && (lines[0].includes('graph') || lines[0].includes('flowchart'));
+
+            for (const line of lines) {
+                if (!isFlowchart) {
+                    sanitizedLines.push(line);
+                    continue;
+                }
+
+                let tempLine = line;
+
+                // Patterns to wrap labels in quotes if not already quoted
+                const patterns = [
+                    { reg: /(\w+)(\[)([^"\]]+)(\])/g, rep: '$1$2"$3"$4' },       // [Label]
+                    { reg: /(\w+)(\(\[)([^"\]]+)(\]\))/g, rep: '$1$2"$3"$4' },     // ([Label])
+                    { reg: /(\w+)(\[\[)([^"\]]+)(\]\])/g, rep: '$1$2"$3"$4' },     // [[Label]]
+                    { reg: /(\w+)(\(\()([^"\)]+)(\)\))/g, rep: '$1$2"$3"$4' },     // ((Label))
+                    { reg: /(\w+)(\()([^"\)]+)(\))/g, rep: '$1$2"$3"$4' },       // (Label)
+                    { reg: /(\w+)(\{)([^"\}]+)(\})/g, rep: '$1$2"$3"$4' },       // {Label}
+                    { reg: /(\w+)(>)([^"\]]+)(\])/g, rep: '$1$2"$3"$4' },       // >Label]
+                    { reg: /(-->|---|-\.>|==>)\s*\|([^"|]+)\|/g, rep: '$1|"$2"|' }, // -->|Label|
+                ];
+
+                patterns.forEach(({ reg, rep }) => {
+                    tempLine = tempLine.replace(reg, rep);
+                });
+
+                // Clean up any double-double quotes created
+                while (tempLine.includes('""')) {
+                    tempLine = tempLine.replace('""', '"');
+                }
+
+                sanitizedLines.push(tempLine);
+            }
+
+            return sanitizedLines.join('\n');
+        };
+
         const renderDiagram = async () => {
             if (!elementRef.current || !chart) return;
 
-            // Clean the chart string: trim whitespace and ensure consistent newlines
-            const cleanedChart = chart.trim().replace(/\r\n/g, '\n');
+            // Clean the chart string and sanitize it
+            const cleanedChart = sanitizeMermaid(chart.trim().replace(/\r\n/g, '\n'));
 
             try {
                 // Generate a truly unique ID for this specific render instance
@@ -171,7 +213,7 @@ const Mermaid: React.FC<MermaidProps> = ({ chart, id = 'mermaid-diagram', classN
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
-            className={`mermaid-wrapper group relative overflow-hidden rounded-2xl bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-xl transition-all duration-500 ${isFullscreen ? 'fixed inset-0 z-[100] bg-white dark:bg-black p-4 md:p-12' : 'h-[400px] md:h-[600px] lg:h-[700px] xl:h-[800px] 2xl:h-[1000px]'} ${className}`}
+            className={`mermaid-wrapper group relative overflow-hidden rounded-2xl bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-xl transition-all duration-500 ${isFullscreen ? 'fixed inset-0 z-[100] bg-white dark:bg-black p-4 md:p-12' : 'h-[300px] sm:h-[400px] md:h-[550px] lg:h-[700px] xl:h-[800px]'} ${className}`}
         >
             {/* Control Bar (Top Right) */}
             <div className="absolute top-6 right-6 z-20 flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300">

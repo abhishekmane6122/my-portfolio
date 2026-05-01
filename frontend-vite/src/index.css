@@ -195,6 +195,21 @@
   .container-wide {
     @apply max-w-wide mx-auto px-6 md:px-8;
   }
+
+  /* Hide scrollbar on mobile */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Responsive images */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
 }
 
 /* Custom Scrollbar */

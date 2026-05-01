@@ -142,7 +142,7 @@ export default function BlogPost() {
                             </div>
 
                             {/* Title */}
-                            <h1 className="text-3xl md:text-5xl lg:text-5xl font-serif font-light text-gray-900 dark:text-text-primary mb-4 leading-[1.1] tracking-tight">
+                            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif font-light text-gray-900 dark:text-text-primary mb-4 leading-[1.15] tracking-tight">
                                 {post.title}
                             </h1>
 
@@ -152,7 +152,7 @@ export default function BlogPost() {
                                 <div className="flex items-center gap-4">
                                     <div className="relative">
                                         <img
-                                            src={post.author.photo}
+                                            src={`${import.meta.env.BASE_URL}${post.author.photo.startsWith('/') ? post.author.photo.slice(1) : post.author.photo}`}
                                             alt={post.author.name}
                                             className="w-9 h-8 rounded-lg object-cover grayscale hover:grayscale-0 transition-all duration-500"
                                         />
@@ -204,6 +204,7 @@ export default function BlogPost() {
                 <div className="bg-[#fcf1e3] dark:bg-bg-primary">
                     <div className="max-w-4xl mx-auto px-8 pt-10 pb-20 bg-[#fcf1e3] dark:bg-bg-primary">
                         {/* Featured Image */}
+                        {/* Featured Image */}
                         {post.featuredImage && (
                             <motion.div
                                 initial={{ opacity: 0, y: 30 }}
@@ -212,7 +213,7 @@ export default function BlogPost() {
                                 className="mb-12 rounded-[2rem] overflow-hidden bg-white/50 dark:bg-black/20 border border-neutral-200 dark:border-white/5"
                             >
                                 <img
-                                    src={post.featuredImage}
+                                    src={`${import.meta.env.BASE_URL}${post.featuredImage.startsWith('/') ? post.featuredImage.slice(1) : post.featuredImage}`}
                                     alt={post.title}
                                     className="w-full h-auto object-cover max-h-[600px] hover:scale-[1.02] transition-transform duration-slow"
                                 />
@@ -258,6 +259,12 @@ export default function BlogPost() {
                                                 {children}
                                             </code>
                                         )
+                                    },
+                                    img({ src, alt, ...props }) {
+                                        if (!src) return null;
+                                        const isExternal = src.startsWith('http') || src.startsWith('https');
+                                        const finalSrc = isExternal ? src : `${import.meta.env.BASE_URL}${src.startsWith('/') ? src.slice(1) : src}`;
+                                        return <img src={finalSrc} alt={alt} {...props} />;
                                     }
                                 }}
                             >
@@ -285,7 +292,7 @@ export default function BlogPost() {
                             <div className="flex flex-col md:flex-row items-center gap-8 text-center md:text-left">
                                 <div className="relative shrink-0">
                                     <img
-                                        src={post.author.photo}
+                                        src={`${import.meta.env.BASE_URL}${post.author.photo.startsWith('/') ? post.author.photo.slice(1) : post.author.photo}`}
                                         alt={post.author.name}
                                         className="w-24 h-24 rounded-3xl object-cover border-2 border-white dark:border-neutral-800"
                                     />

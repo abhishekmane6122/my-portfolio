@@ -69,10 +69,10 @@ export default function ProjectDetail() {
                             transition={{ duration: 0.5 }}
                             className="text-center"
                         >
-                            <h1 className="text-4xl md:text-6xl font-serif font-light text-foreground mb-6 tracking-tight">
+                            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-light text-foreground mb-4 md:mb-6 tracking-tight">
                                 {project.title}
                             </h1>
-                            <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto font-light leading-relaxed">
+                            <p className="text-base md:text-lg lg:text-xl text-muted-foreground mb-8 md:mb-10 max-w-2xl mx-auto font-light leading-relaxed">
                                 {project.tagline}
                             </p>
 
@@ -323,7 +323,7 @@ export default function ProjectDetail() {
                                         className="group relative aspect-video rounded-3xl overflow-hidden border border-black/10 dark:border-white/10 shadow-2xl transition-all hover:scale-[1.02] hover:border-[#d4a373]/30"
                                     >
                                         <img
-                                            src={image}
+                                            src={`${import.meta.env.BASE_URL}${image.startsWith('/') ? image.slice(1) : image}`}
                                             alt={`${project.title} screenshot ${index + 1}`}
                                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                         />

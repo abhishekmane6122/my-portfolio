@@ -126,22 +126,22 @@ const getSkillStyle = (skill: string) => {
 
   // Local Icon Mapping (Priority)
   const localIconMap: Record<string, string> = {
-    "python": "/icons/python.svg",
-    "sql": "/icons/sql.svg",
-    "azure": "/icons/azure.svg",
-    "databricks": "/icons/databricks.svg",
-    "n8n": "/icons/n8n.svg",
-    "langchain": "/icons/langchain.svg",
-    "langgraph": "/icons/langchain.svg",
-    "jupyter notebook": "/icons/jupyter.svg",
-    "gen ai": "/icons/genai.svg",
-    "ai": "/icons/genai.svg",
-    "mlops": "/icons/mlops.svg",
-    "lmops": "/icons/mlops.svg",
-    "rag": "/icons/langchain.svg",
-    "microsoft agent framework": "/icons/microsoft.svg",
-    "a2a (anything to action)": "/icons/genai.svg",
-    "multi agent systems": "/icons/genai.svg"
+    "python": `${import.meta.env.BASE_URL}icons/python.svg`,
+    "sql": `${import.meta.env.BASE_URL}icons/sql.svg`,
+    "azure": `${import.meta.env.BASE_URL}icons/azure.svg`,
+    "databricks": `${import.meta.env.BASE_URL}icons/databricks.svg`,
+    "n8n": `${import.meta.env.BASE_URL}icons/n8n.svg`,
+    "langchain": `${import.meta.env.BASE_URL}icons/langchain.svg`,
+    "langgraph": `${import.meta.env.BASE_URL}icons/langchain.svg`,
+    "jupyter notebook": `${import.meta.env.BASE_URL}icons/jupyter.svg`,
+    "gen ai": `${import.meta.env.BASE_URL}icons/genai.svg`,
+    "ai": `${import.meta.env.BASE_URL}icons/genai.svg`,
+    "mlops": `${import.meta.env.BASE_URL}icons/mlops.svg`,
+    "lmops": `${import.meta.env.BASE_URL}icons/mlops.svg`,
+    "rag": `${import.meta.env.BASE_URL}icons/langchain.svg`,
+    "microsoft agent framework": `${import.meta.env.BASE_URL}icons/microsoft.svg`,
+    "a2a (anything to action)": `${import.meta.env.BASE_URL}icons/genai.svg`,
+    "multi agent systems": `${import.meta.env.BASE_URL}icons/genai.svg`
   };
 
   if (localIconMap[normalizedSkill]) {
@@ -535,14 +535,24 @@ export function PortfolioTemplate({
     window.location.href = mailtoUrl;
   };
 
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   const navItems = [
-    { name: "Home", color: "#3b82f6" },
-    { name: "Projects", color: "#d4a373" },
-    { name: "Skills", color: "#10b981" },
-    { name: "Experience", color: "#a855f7" },
+    { name: "Home", color: "#3b82f6", anchor: "home" },
+    { name: "Projects", color: "#d4a373", anchor: "projects" },
+    { name: "Skills", color: "#10b981", anchor: "skills" },
+    { name: "Experience", color: "#a855f7", anchor: "experience" },
     { name: "Blog", color: "#f97316", isExternal: true, path: "/blog" },
-    { name: "Contact", color: "#ec4899", isExternal: true, path: "/contact" },
+    { name: "Contact", color: "#ec4899", anchor: "contact" },
   ];
+
+  const scrollToSection = (anchor: string) => {
+    const el = document.getElementById(anchor);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    setIsMobileMenuOpen(false);
+  };
 
   return (
     <div className="min-h-screen w-full bg-background dark:bg-[#050505] text-neutral-900 dark:text-neutral-200 selection:bg-[#d4a37333] selection:text-[#d4a373] font-sans flex flex-col transition-colors duration-300">
@@ -574,35 +584,33 @@ export function PortfolioTemplate({
 
       {/* Navbar - Sticky with Glassmorphism on Scroll */}
       <nav className={cn(
-        "fixed top-0 left-0 right-0 z-50 w-full pt-4 pb-4 transition-all duration-300",
+        "fixed top-0 left-0 right-0 z-50 w-full pt-3 pb-3 transition-all duration-300",
         isScrolled
-          ? "bg-background/80 dark:bg-black/80 backdrop-blur-xl shadow-lg border-b border-white/10"
+          ? "bg-background/90 dark:bg-black/90 backdrop-blur-xl shadow-lg border-b border-white/10"
           : "bg-transparent"
       )}>
-        <div className="mx-auto flex max-w-[90%] w-full items-center justify-between px-6 md:px-10">
-          <div className="flex items-center gap-6">
-            <div
-              className="group relative flex cursor-pointer items-center gap-3"
-              onClick={() => setIsProfileCardOpen(true)}
-            >
-              {profileImage && (
-                <div className="h-10 w-10 overflow-hidden rounded-full border-2 border-white/10 dark:border-white/10 border-neutral-200 transition-transform group-hover:scale-110 group-hover:border-[#d4a373]">
-                  <img src={profileImage || ''} alt={fullName} className="h-full w-full object-cover" />
-                </div>
-              )}
-              <div className="flex flex-col">
-                <span
-                  className="italic text-xl font-medium tracking-tight md:text-2xl text-neutral-900 dark:text-white"
-                  style={{ fontFamily: "var(--font-instrument)" }}
-                >
-                  {fullName?.split(" ")[0]}
-                </span>
-                <span className="text-[10px] font-mono text-[#d4a373] opacity-0 transition-opacity group-hover:opacity-100 uppercase tracking-tighter">View Profile</span>
+        <div className="mx-auto flex max-w-[95%] w-full items-center justify-between px-4 md:px-8">
+          {/* Logo / Profile */}
+          <div
+            className="group relative flex cursor-pointer items-center gap-2 md:gap-3"
+            onClick={() => setIsProfileCardOpen(true)}
+          >
+            {profileImage && (
+              <div className="h-8 w-8 md:h-10 md:w-10 overflow-hidden rounded-full border-2 border-white/10 dark:border-white/10 border-neutral-200 transition-transform group-hover:scale-110 group-hover:border-[#d4a373]">
+                <img src={profileImage ? `${import.meta.env.BASE_URL}${profileImage.startsWith('/') ? profileImage.slice(1) : profileImage}` : ''} alt={fullName} className="h-full w-full object-cover" />
               </div>
-            </div>
+            )}
+            <span
+              className="italic text-lg md:text-2xl font-medium tracking-tight text-neutral-900 dark:text-white"
+              style={{ fontFamily: "var(--font-instrument)" }}
+            >
+              {fullName?.split(" ")[0]}
+            </span>
           </div>
-          <div className="flex items-center gap-10">
-            <div className="flex gap-10">
+
+          {/* Desktop Nav */}
+          <div className="hidden md:flex items-center gap-6 lg:gap-10">
+            <div className="flex gap-6 lg:gap-10">
               {navItems.map((item: any) => (
                 item.isExternal ? (
                   <RouterLink
@@ -610,53 +618,82 @@ export function PortfolioTemplate({
                     to={item.path}
                     onMouseEnter={() => setHoveredNav(item.name)}
                     onMouseLeave={() => setHoveredNav(null)}
-                    className="hidden text-sm font-light tracking-wide text-neutral-500 dark:text-neutral-400 transition-all duration-300 hover:text-black dark:hover:text-white md:block relative top-[2px]"
-                    style={{
-                      color:
-                        hoveredNav === item.name || activeNav === item.name
-                          ? item.color
-                          : undefined,
-                    }}
+                    className="text-sm font-light tracking-wide text-neutral-500 dark:text-neutral-400 transition-all duration-300 hover:text-black dark:hover:text-white relative top-[2px]"
+                    style={{ color: hoveredNav === item.name || activeNav === item.name ? item.color : undefined }}
                   >
                     {item.name}
                   </RouterLink>
                 ) : (
-                  <a
+                  <button
                     key={item.name}
-                    href={`#${item.name.toLowerCase()}`}
-                    onClick={() => {
-                      setActiveNav(item.name);
-                    }}
+                    onClick={() => { setActiveNav(item.name); scrollToSection(item.anchor); }}
                     onMouseEnter={() => setHoveredNav(item.name)}
                     onMouseLeave={() => setHoveredNav(null)}
-                    className="hidden text-sm font-light tracking-wide text-neutral-500 dark:text-neutral-400 transition-all duration-300 hover:text-black dark:hover:text-white md:block relative top-[2px]"
-                    style={{
-                      color:
-                        hoveredNav === item.name || activeNav === item.name
-                          ? item.color
-                          : undefined,
-                    }}
+                    className="text-sm font-light tracking-wide text-neutral-500 dark:text-neutral-400 transition-all duration-300 hover:text-black dark:hover:text-white relative top-[2px] bg-transparent border-none cursor-pointer"
+                    style={{ color: hoveredNav === item.name || activeNav === item.name ? item.color : undefined }}
                   >
                     {item.name}
-                    {(hoveredNav === item.name ||
-                      (activeNav === item.name && !hoveredNav)) && (
-                        <motion.div
-                          layoutId="nav-underline"
-                          className="absolute -bottom-2 left-0 right-0 h-px"
-                          style={{ backgroundColor: item.color }}
-                        />
-                      )}
-                  </a>
+                    {(hoveredNav === item.name || (activeNav === item.name && !hoveredNav)) && (
+                      <motion.div layoutId="nav-underline" className="absolute -bottom-2 left-0 right-0 h-px" style={{ backgroundColor: item.color }} />
+                    )}
+                  </button>
                 )
               ))}
             </div>
-            {/* Resume Download Button */}
             <ResumeDownload variant="button" showLabel={true} />
-
-            {/* Theme Toggle */}
             {mounted && <FloatingThemeToggle />}
           </div>
+
+          {/* Mobile: Resume + Theme + Hamburger */}
+          <div className="flex md:hidden items-center gap-2">
+            {mounted && <FloatingThemeToggle />}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2 rounded-xl bg-neutral-100 dark:bg-white/10 text-neutral-700 dark:text-white"
+              aria-label="Toggle menu"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {isMobileMenuOpen
+                  ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />}
+              </svg>
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Menu Dropdown */}
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="md:hidden bg-background/95 dark:bg-black/95 backdrop-blur-xl border-t border-neutral-200 dark:border-white/10 px-6 py-4 flex flex-col gap-3"
+          >
+            {navItems.map((item: any) => (
+              item.isExternal ? (
+                <RouterLink
+                  key={item.name}
+                  to={item.path}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="text-base font-light py-2 text-neutral-600 dark:text-neutral-300"
+                  style={{ color: undefined }}
+                >
+                  {item.name}
+                </RouterLink>
+              ) : (
+                <button
+                  key={item.name}
+                  onClick={() => { setActiveNav(item.name); scrollToSection(item.anchor); }}
+                  className="text-base font-light py-2 text-neutral-600 dark:text-neutral-300 text-left bg-transparent border-none cursor-pointer"
+                >
+                  {item.name}
+                </button>
+              )
+            ))}
+            <div className="pt-2">
+              <ResumeDownload variant="button" showLabel={true} />
+            </div>
+          </motion.div>
+        )}
       </nav>
 
       {/* Hero Section */}
@@ -1619,7 +1656,7 @@ export function PortfolioTemplate({
 
             <div className="flex flex-col items-center text-center">
               <div className="mb-6 h-32 w-32 overflow-hidden rounded-full border-4 border-[#d4a373]/20 shadow-lg">
-                <img src={profileImage || ''} alt={fullName} className="h-full w-full object-cover" />
+                <img src={profileImage ? `${import.meta.env.BASE_URL}${profileImage.startsWith('/') ? profileImage.slice(1) : profileImage}` : ''} alt={fullName} className="h-full w-full object-cover" />
               </div>
               <h3 className="mb-2 font-serif text-3xl font-light text-neutral-900 dark:text-white" style={{ fontFamily: "var(--font-cormorant)" }}>
                 {fullName}
