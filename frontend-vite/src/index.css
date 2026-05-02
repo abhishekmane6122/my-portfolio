@@ -270,3 +270,48 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* React Flow Node Customization */
+.react-flow__node {
+  @apply transition-all duration-300;
+  color: inherit;
+}
+
+.react-flow__node-default,
+.react-flow__node-input,
+.react-flow__node-output {
+  @apply rounded-xl border-2 shadow-lg !bg-white dark:!bg-[#0e0e0e] !text-neutral-900 dark:!text-white font-medium p-4 !w-auto !min-w-[140px] text-center border-neutral-200 dark:border-white/10 !transition-all;
+}
+
+.react-flow__node-group {
+  @apply rounded-2xl border-2 border-dashed border-[#d4a373]/50 bg-[#d4a373]/5 dark:bg-[#d4a373]/10 !text-[#8b5a2b] dark:!text-[#d4a373] font-mono text-[11px] uppercase tracking-widest p-3;
+}
+
+/* Ensure text inside nodes is always readable */
+.react-flow__node div {
+  @apply text-neutral-900 dark:text-neutral-100;
+  white-space: pre-wrap;
+  line-height: 1.4;
+}
+
+/* Custom classes used in JSON diagrams */
+.react-flow__node.bg-accent-blue\/10 {
+  @apply !bg-blue-500/10 dark:!bg-blue-500/20 border-blue-500/40 !text-blue-800 dark:!text-blue-200;
+}
+
+.react-flow__node.bg-accent-gold\/10 {
+  @apply !bg-[#d4a373]/10 dark:!bg-[#d4a373]/20 border-[#d4a373]/40 !text-[#8b5a2b] dark:!text-[#e5c19d];
+}
+
+/* Selection and Controls */
+.react-flow__node.selected {
+  @apply border-[#d4a373] shadow-lg shadow-[#d4a373]/20;
+}
+
+.react-flow__controls button {
+  @apply !bg-white dark:!bg-card !border-black/5 dark:!border-white/10 !fill-neutral-600 dark:!fill-neutral-400 hover:!bg-neutral-100 dark:hover:!bg-white/10;
+}
+
+.react-flow__background {
+  @apply !opacity-20;
+}

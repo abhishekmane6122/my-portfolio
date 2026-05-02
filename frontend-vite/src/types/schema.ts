@@ -11,6 +11,7 @@ export interface ProjectData {
     tags: string[];
     featured: boolean;
     mermaidDiagram?: string;
+    flowDiagram?: { nodes: any[]; edges: any[]; height?: string; title?: string };
 }
 
 // Detailed project for case studies
@@ -55,6 +56,8 @@ export interface ProjectDetailed {
     };
     mermaidDiagram?: string;
     mermaidDiagrams?: { title: string; chart: string }[];
+    flowDiagram?: { nodes: any[]; edges: any[]; height?: string; title?: string };
+    flowDiagrams?: { title: string; nodes: any[]; edges: any[]; height?: string }[];
 }
 
 export interface ExperienceData {

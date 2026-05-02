@@ -7,7 +7,7 @@ import rehypeHighlight from 'rehype-highlight'
 import rehypeRaw from 'rehype-raw'
 import remarkGfm from 'remark-gfm'
 import { detailedProjects } from '@/data/projects-detailed'
-import Mermaid from '@/components/ui/Mermaid'
+import FlowDiagram from '@/components/ui/FlowDiagram';
 import 'highlight.js/styles/github-dark.css'
 
 export default function ProjectDetail() {
@@ -159,16 +159,16 @@ export default function ProjectDetail() {
                     </section>
 
                     {/* Architecture Diagrams */}
-                    {(project.mermaidDiagram || (project.mermaidDiagrams && project.mermaidDiagrams.length > 0)) && (
+                    {(project.flowDiagram || (project.flowDiagrams && project.flowDiagrams.length > 0)) && (
                         <section className="mb-24">
                             <div className="text-center mb-12">
                                 <h2 className="text-3xl font-serif font-light text-foreground tracking-tight mb-4">System Architecture</h2>
                                 <p className="text-muted-foreground text-lg font-light max-w-2xl mx-auto">Detailed blueprint of the multi-agent orchestration and data pipelines.</p>
                             </div>
 
-                            {project.mermaidDiagrams && project.mermaidDiagrams.length > 0 ? (
+                            {project.flowDiagrams && project.flowDiagrams.length > 0 ? (
                                 <div className="space-y-16">
-                                    {project.mermaidDiagrams.map((diag, index) => (
+                                    {project.flowDiagrams.map((diag, index) => (
                                         <div key={index} className="space-y-6">
                                             {diag.title && (
                                                 <div className="flex items-center justify-center gap-3 mb-6">
@@ -178,16 +178,23 @@ export default function ProjectDetail() {
                                                     </h3>
                                                 </div>
                                             )}
-                                            <Mermaid
-                                                chart={diag.chart}
-                                                id={`project-detail-${project.id}-${index}`}
+                                            <FlowDiagram
+                                                nodes={diag.nodes}
+                                                edges={diag.edges}
+                                                height={diag.height || '600px'}
+                                                title={diag.title}
                                             />
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                project.mermaidDiagram && (
-                                    <Mermaid chart={project.mermaidDiagram} id={`project-detail-${project.id}`} />
+                                project.flowDiagram && (
+                                    <FlowDiagram
+                                        nodes={project.flowDiagram.nodes}
+                                        edges={project.flowDiagram.edges}
+                                        height={project.flowDiagram.height || '600px'}
+                                        title={project.flowDiagram.title}
+                                    />
                                 )
                             )}
                         </section>

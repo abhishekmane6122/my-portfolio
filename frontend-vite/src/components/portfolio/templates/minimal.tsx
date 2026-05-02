@@ -51,7 +51,7 @@ import StarBackground from "@/components/ui/star-background";
 import ResumeDownload from "@/components/resume/ResumeDownload";
 import SkillsMatrix from "@/components/skills/SkillsMatrix";
 import TestimonialCarousel from "@/components/testimonials/TestimonialCarousel";
-import Mermaid from "@/components/ui/Mermaid";
+import FlowDiagram from "@/components/ui/FlowDiagram";
 
 const TimelineScrollAnimation = ({
   containerRef,
@@ -552,6 +552,7 @@ export function PortfolioTemplate({
     { name: "Projects", color: "#d4a373", anchor: "projects" },
     { name: "Skills", color: "#10b981", anchor: "skills" },
     { name: "Experience", color: "#a855f7", anchor: "experience" },
+    { name: "Insights", color: "#0077b5", anchor: "linkedin-posts" },
     { name: "Blog", color: "#f97316", isExternal: true, path: "/blog" },
     { name: "Contact", color: "#ec4899", anchor: "contact" },
   ];
@@ -1105,14 +1106,17 @@ export function PortfolioTemplate({
                       alt={project.title}
                       className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
-                  ) : project.mermaidDiagram ? (
+                  ) : project.flowDiagram ? (
                     <div className="relative aspect-[16/10] flex items-center justify-center bg-black/40 overflow-hidden group-hover:bg-black/60 transition-all duration-500">
                       <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 pointer-events-none" />
-                      <Mermaid
-                        chart={project.mermaidDiagram}
-                        id={`card-mermaid-${project.id}`}
-                        className="scale-[0.6] md:scale-[0.5] origin-center !my-0 !py-0 !bg-transparent !border-none !shadow-none opacity-80 group-hover:opacity-100 transition-opacity"
-                      />
+                      <div className="scale-[0.4] md:scale-[0.3] origin-center opacity-80 group-hover:opacity-100 transition-opacity w-full h-full">
+                        <FlowDiagram
+                          nodes={project.flowDiagram.nodes}
+                          edges={project.flowDiagram.edges}
+                          height="100%"
+                          title={project.title}
+                        />
+                      </div>
                     </div>
                   ) : (
                     <CoolProjectPlaceholder />
@@ -1170,7 +1174,7 @@ export function PortfolioTemplate({
                 LinkedIn Posts
               </h2>
             </div>
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
               {linkedinPosts.slice(0, 4).map((post, index) => (
                 <motion.article
                   key={post.id}
@@ -1178,34 +1182,31 @@ export function PortfolioTemplate({
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.08 }}
                   viewport={{ once: true }}
-                  className="group flex flex-col overflow-hidden rounded-xl border border-neutral-300 dark:border-white/10 bg-card dark:bg-[#0e0e0e] hover:border-[#8b5cf6] dark:hover:border-[#8b5cf6]/50 transition-all duration-300 shadow-md hover:shadow-lg"
+                  className="group flex flex-col overflow-hidden rounded-2xl border border-neutral-300 dark:border-white/10 bg-card dark:bg-[#0e0e0e] hover:border-[#d4a373] dark:hover:border-[#d4a373]/50 transition-all duration-300 shadow-md hover:shadow-xl"
                 >
                   {/* Post Image */}
                   {post.image && (
-                    <div className="relative aspect-[16/9] w-full overflow-hidden bg-neutral-200 dark:bg-[#0a0a0a]">
+                    <div className="relative aspect-video w-full overflow-hidden bg-neutral-100 dark:bg-[#0a0a0a]">
                       <img
                         src={`${import.meta.env.BASE_URL}${post.image.startsWith('/') ? post.image.slice(1) : post.image}`}
                         alt={post.title}
-                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                         onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                       />
                     </div>
                   )}
                   {/* Post Content */}
-                  <div className="flex flex-1 flex-col p-4">
-                    <div className="mb-2 flex items-center gap-2">
+                  <div className="flex flex-1 flex-col p-4 sm:p-5">
+                    <div className="mb-3 flex items-center gap-2">
                       <Linkedin className="h-3 w-3 text-[#0077b5]" />
                       <span className="font-mono text-[10px] text-neutral-500">{post.date}</span>
                     </div>
-                    <h3 className="text-sm font-medium text-neutral-900 dark:text-white mb-2 leading-snug line-clamp-2 group-hover:text-[#8b5cf6] transition-colors">
+                    <h3 className="text-sm font-medium text-neutral-900 dark:text-white mb-3 leading-snug line-clamp-2 group-hover:text-[#d4a373] transition-colors">
                       {post.title}
                     </h3>
-                    <p className="mb-3 line-clamp-3 text-xs leading-relaxed text-neutral-600 dark:text-neutral-400 font-light">
-                      {post.content}
-                    </p>
-                    <div className="flex flex-wrap gap-1 mb-3">
-                      {post.tags.slice(0, 3).map((tag) => (
-                        <span key={tag} className="text-[9px] font-mono uppercase tracking-wider text-[#8b5cf6] bg-[#8b5cf6]/10 px-1.5 py-0.5 rounded border border-[#8b5cf6]/20">
+                    <div className="flex flex-wrap gap-1.5 mb-4 mt-auto">
+                      {post.tags.slice(0, 2).map((tag) => (
+                        <span key={tag} className="text-[9px] font-mono uppercase tracking-wider text-[#d4a373] bg-[#d4a373]/10 px-2 py-0.5 rounded border border-[#d4a373]/20">
                           #{tag}
                         </span>
                       ))}
@@ -1214,9 +1215,9 @@ export function PortfolioTemplate({
                       href={post.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-auto inline-flex items-center gap-1 text-xs font-medium text-[#8b5cf6] hover:gap-2 transition-all"
+                      className="inline-flex items-center gap-2 text-xs font-medium text-[#d4a373] hover:gap-3 transition-all"
                     >
-                      Read <ArrowUpRight className="h-3 w-3" />
+                      Read full insight <ArrowUpRight className="h-3 w-3" />
                     </a>
                   </div>
                 </motion.article>
@@ -1420,6 +1421,8 @@ export function PortfolioTemplate({
           </div>
         </section>
       )}
+
+
 
       {/* Blogs Section */}
       {blogs && blogs.length > 0 && (

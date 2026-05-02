@@ -4,6 +4,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark, prism } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { useTheme } from '@/context/ThemeContext';
 import Mermaid from '@/components/ui/Mermaid';
+import FlowDiagram from '@/components/ui/FlowDiagram';
 
 interface CodeBlockProps {
     language: string;
@@ -29,6 +30,28 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ language, value }) => {
                 />
             </div>
         );
+    }
+
+    if (language === 'react-flow') {
+        try {
+            const flowData = JSON.parse(value);
+            return (
+                <div className="my-10 w-full">
+                    <FlowDiagram
+                        nodes={flowData.nodes}
+                        edges={flowData.edges}
+                        height={flowData.height || '400px'}
+                        title={flowData.title}
+                    />
+                </div>
+            );
+        } catch (e) {
+            return (
+                <div className="my-6 p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm">
+                    Failed to parse Flow Diagram data: {e instanceof Error ? e.message : 'Unknown error'}
+                </div>
+            );
+        }
     }
 
     const isDiagram = language === 'text';

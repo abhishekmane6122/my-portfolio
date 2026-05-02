@@ -19,6 +19,7 @@
     "@radix-ui/react-slot": "^1.2.4",
     "@tailwindcss/typography": "^0.5.19",
     "@types/react-syntax-highlighter": "^15.5.13",
+    "@xyflow/react": "^12.10.2",
     "axios": "^1.13.4",
     "canvas-confetti": "^1.9.4",
     "class-variance-authority": "^0.7.1",

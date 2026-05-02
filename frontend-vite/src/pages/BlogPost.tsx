@@ -133,7 +133,7 @@ export default function BlogPost() {
                 </div>
 
                 {/* Header */}
-                <div className="relative overflow-hidden bg-[#fcf1e3] dark:bg-bg-primary transition-colors duration-300 border-b border-black/10 dark:border-white/10 backdrop-blur-sm">
+                <div className="relative overflow-hidden bg-neutral-50 dark:bg-[#050505] transition-colors duration-300 border-b border-black/5 dark:border-white/10 backdrop-blur-sm">
                     <div className="relative max-w-4xl mx-auto px-6 py-2 md:py-3">
                         {/* Navigation */}
                         <div className="flex items-center gap-6 mb-6">
@@ -225,8 +225,8 @@ export default function BlogPost() {
                 </div>
 
                 {/* Content */}
-                <div className="bg-[#fcf1e3] dark:bg-bg-primary">
-                    <div className="max-w-4xl mx-auto px-8 pt-10 pb-20 bg-[#fcf1e3] dark:bg-bg-primary">
+                <div className="bg-white dark:bg-background transition-colors duration-300">
+                    <div className="max-w-4xl mx-auto px-8 pt-10 pb-20 bg-white dark:bg-background">
                         {/* Featured Image */}
                         {/* Featured Image */}
                         {post.featuredImage && (
@@ -268,7 +268,7 @@ export default function BlogPost() {
                                 remarkPlugins={[remarkGfm]}
                                 components={{
                                     code({ node, inline, className, children, ...props }: any) {
-                                        const match = /language-(\w+)/.exec(className || '')
+                                        const match = /language-([\w-]+)/.exec(className || '')
                                         // Robustly extract text content from react-markdown children
                                         const value = String(children).replace(/\n$/, '');
 
@@ -312,7 +312,7 @@ export default function BlogPost() {
                         </div>
 
                         {/* Author card */}
-                        <div className="mt-20 p-10 rounded-[2.5rem] bg-[#faf9f6] dark:bg-bg-secondary/50 border border-neutral-200 dark:border-white/5 shadow-none relative overflow-hidden group">
+                        <div className="mt-20 p-10 rounded-[2.5rem] bg-neutral-50 dark:bg-white/5 border border-neutral-200 dark:border-white/5 shadow-none relative overflow-hidden group">
                             <div className="flex flex-col md:flex-row items-center gap-8 text-center md:text-left">
                                 <div className="relative shrink-0">
                                     <img
