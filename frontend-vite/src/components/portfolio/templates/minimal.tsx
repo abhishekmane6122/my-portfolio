@@ -615,10 +615,15 @@ export function PortfolioTemplate({
           <div
             className="group relative flex cursor-pointer items-center gap-2 md:gap-3"
             onClick={() => setIsProfileCardOpen(true)}
+            title="View Profile Card"
           >
             {profileImage && (
-              <div className="h-8 w-8 md:h-10 md:w-10 overflow-hidden rounded-full border-2 border-white/10 dark:border-white/10 border-neutral-200 transition-transform group-hover:scale-110 group-hover:border-[#d4a373]">
-                <img src={profileImage ? `${import.meta.env.BASE_URL}${profileImage.startsWith('/') ? profileImage.slice(1) : profileImage}` : ''} alt={fullName} className="h-full w-full object-cover" />
+              <div className="relative">
+                {/* LinkedIn-style 'Open to Work' / Professional Frame */}
+                <div className="absolute -inset-1 rounded-full bg-gradient-to-tr from-emerald-500 to-emerald-400 opacity-75 blur-[2px] animate-pulse-slow" />
+                <div className="relative h-8 w-8 md:h-10 md:w-10 overflow-hidden rounded-full border-2 border-white dark:border-black transition-transform group-hover:scale-110 shadow-lg">
+                  <img src={profileImage ? `${import.meta.env.BASE_URL}${profileImage.startsWith('/') ? profileImage.slice(1) : profileImage}` : ''} alt={fullName} className="h-full w-full object-cover" />
+                </div>
               </div>
             )}
             <span
@@ -1601,13 +1606,16 @@ export function PortfolioTemplate({
 
           <div className="mt-20 pt-8 border-t border-neutral-200 dark:border-white/5 text-center text-xs text-neutral-600 flex flex-col items-center gap-4">
             <div className="dark:text-neutral-400">© {new Date().getFullYear()} {fullName}. All rights reserved.</div>
-            <div className="flex flex-col items-center gap-1">
-              <span className="font-mono text-[10px] uppercase tracking-widest text-neutral-500 dark:text-[#d4a373]/60">Engagement Metrics</span>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-mono text-neutral-400 uppercase">Total Views:</span>
-                <span className="text-sm font-bold text-neutral-900 dark:text-[#d4a373] transition-all tabular-nums">
-                  {viewStats.total_views.toLocaleString()}
-                </span>
+            <div className="flex flex-col items-center gap-2">
+              <span className="font-mono text-[10px] uppercase tracking-widest text-neutral-500 dark:text-[#d4a373]/60">Live Engagement</span>
+              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-100 dark:bg-white/5 border border-neutral-200 dark:border-white/10">
+                <span className="text-[10px] font-mono text-neutral-400 uppercase">Total Visitors:</span>
+                <img 
+                  src={`https://visitor-badge.laobi.icu/badge?page_id=abhishekmane6122.portfolio.final&left_color=transparent&right_color=transparent&left_text=&right_text_color=%23d4a373`} 
+                  alt="Views"
+                  className="h-4 pointer-events-none"
+                  style={{ filter: resolvedTheme === 'dark' ? 'none' : 'invert(0.2) sepia(1) saturate(5) hue-rotate(330deg)' }}
+                />
               </div>
             </div>
           </div>
@@ -1630,8 +1638,11 @@ export function PortfolioTemplate({
             </button>
 
             <div className="flex flex-col items-center text-center">
-              <div className="mb-6 h-32 w-32 overflow-hidden rounded-full border-4 border-[#d4a373]/20 shadow-lg">
-                <img src={profileImage ? `${import.meta.env.BASE_URL}${profileImage.startsWith('/') ? profileImage.slice(1) : profileImage}` : ''} alt={fullName} className="h-full w-full object-cover" />
+              <div className="relative mb-6">
+                <div className="absolute -inset-1 rounded-full bg-gradient-to-tr from-emerald-500 to-emerald-400 opacity-75 blur-[3px] animate-pulse-slow" />
+                <div className="relative h-32 w-32 overflow-hidden rounded-full border-4 border-white dark:border-[#0f0f0f] shadow-lg">
+                  <img src={profileImage ? `${import.meta.env.BASE_URL}${profileImage.startsWith('/') ? profileImage.slice(1) : profileImage}` : ''} alt={fullName} className="h-full w-full object-cover" />
+                </div>
               </div>
               <h3 className="mb-2 font-serif text-3xl font-light text-neutral-900 dark:text-white" style={{ fontFamily: "var(--font-cormorant)" }}>
                 {fullName}
