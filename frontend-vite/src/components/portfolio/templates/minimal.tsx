@@ -1599,10 +1599,15 @@ export function PortfolioTemplate({
             </div>
           </div>
 
-          <div className="mt-20 pt-8 border-t border-white/5 text-center text-xs text-neutral-600 flex flex-col items-center gap-2">
+          <div className="mt-20 pt-8 border-t border-white/5 text-center text-xs text-neutral-600 flex flex-col items-center gap-4">
             <div>© {new Date().getFullYear()} {fullName}. All rights reserved.</div>
-            <div className="font-mono text-[10px] uppercase tracking-widest text-[#d4a373]/60">
-              Total Views: <span className="text-[#d4a373]">{viewStats.total_views}</span>
+            <div className="flex flex-col items-center gap-2">
+              <span className="font-mono text-[10px] uppercase tracking-widest text-[#d4a373]/60">Engagement Metrics</span>
+              <img 
+                src={`https://visitor-badge.laobi.icu/badge?page_id=abhishekmane6122.portfolio.2026&left_color=transparent&right_color=%23d4a373&left_text=Total%20Views`} 
+                alt="Visitor Badge"
+                className="h-5 opacity-80 hover:opacity-100 transition-opacity"
+              />
             </div>
           </div>
         </div>
