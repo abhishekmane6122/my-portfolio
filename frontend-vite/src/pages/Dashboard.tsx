@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { getViewStats } from '../services/analytics'
 
 export default function Dashboard() {
-    const [viewStats, setViewStats] = useState({ total_views: 0, daily_views: {} })
+    const [viewStats, setViewStats] = useState({ total_views: 0 })
 
     useEffect(() => {
         const fetchStats = async () => {
