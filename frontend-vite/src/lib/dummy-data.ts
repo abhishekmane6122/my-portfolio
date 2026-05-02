@@ -5,8 +5,8 @@ export const dummyPortfolio: Partial<Portfolio> = {
     fullName: "Abhishek Mane",
     title: "AI Engineer @ CognitBotz | NLP & Deep Learning Enthusiast",
     tagline:
-        "Building real-world AI solutions with a focus on Ethical AI, LLM fine-tuning, and scalable cloud deployments.",
-    bio: "I'm an AI Engineer harnessing the power of Python, ML, Deep Learning, and NLP to address real-world challenges. Experienced in LLM fine-tuning, building and integrating APIs, and making AI accessible and reliable. I am a strong advocate for ethical AI, striving to mitigate bias and foster fairness. Skilled in deploying scalable solutions with AWS and Azure.",
+        "AI/ML Engineer building production-grade AI systems at enterprise scale — currently deployed at Adani Green Energy Limited.",
+    bio: "AI/ML Engineer building production-grade AI systems at enterprise scale — currently deployed at Adani Green Energy Limited. I've shipped multi-agent platforms, RAG pipelines, and full-stack AI applications that saved 250+ FTE hours/quarter for Adani Group. GreenRatna Awardee (Dec 2025). My stack: LangChain, LangGraph, Azure OpenAI, FastAPI, React, pgvector. Open to AI/ML Engineer roles.",
     skills: [
         "Python",
         "PyTorch",
