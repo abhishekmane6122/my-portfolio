@@ -1601,14 +1601,13 @@ export function PortfolioTemplate({
 
           <div className="mt-20 pt-8 border-t border-neutral-200 dark:border-white/5 text-center text-xs text-neutral-600 flex flex-col items-center gap-4">
             <div className="dark:text-neutral-400">© {new Date().getFullYear()} {fullName}. All rights reserved.</div>
-            <div className="flex flex-col items-center gap-2">
+            <div className="flex flex-col items-center gap-1">
               <span className="font-mono text-[10px] uppercase tracking-widest text-neutral-500 dark:text-[#d4a373]/60">Engagement Metrics</span>
-              <div className="bg-neutral-100 dark:bg-white/5 p-1 rounded-lg">
-                <img 
-                  src={`https://visitor-badge.laobi.icu/badge?page_id=abhishekmane6122.portfolio.2026&left_color=transparent&right_color=%23d4a373&left_text=Total%20Views`} 
-                  alt="Visitor Badge"
-                  className="h-5 opacity-90 hover:opacity-100 transition-opacity"
-                />
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-mono text-neutral-400 uppercase">Total Views:</span>
+                <span className="text-sm font-bold text-neutral-900 dark:text-[#d4a373] transition-all tabular-nums">
+                  {viewStats.total_views.toLocaleString()}
+                </span>
               </div>
             </div>
           </div>
