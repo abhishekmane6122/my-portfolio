@@ -619,9 +619,25 @@ export function PortfolioTemplate({
           >
             {profileImage && (
               <div className="relative">
-                {/* LinkedIn-style 'Open to Work' / Professional Frame */}
-                <div className="absolute -inset-1 rounded-full bg-gradient-to-tr from-emerald-500 to-emerald-400 opacity-75 blur-[2px] animate-pulse-slow" />
-                <div className="relative h-8 w-8 md:h-10 md:w-10 overflow-hidden rounded-full border-2 border-white dark:border-black transition-transform group-hover:scale-110 shadow-lg">
+                {/* LinkedIn-style 'Open to Work' Frame */}
+                <div className="absolute -inset-[3px] z-10 pointer-events-none">
+                  <svg viewBox="0 0 100 100" className="w-full h-full rotate-[135deg]">
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r="48"
+                      fill="none"
+                      stroke="#057642"
+                      strokeWidth="6"
+                      strokeDasharray="210 300"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="absolute bottom-[2px] left-1/2 -translate-x-1/2 text-[5px] md:text-[6px] font-bold text-white uppercase tracking-tighter bg-[#057642] px-1 rounded-sm whitespace-nowrap">Open to Work</span>
+                  </div>
+                </div>
+                <div className="relative h-8 w-8 md:h-10 md:w-10 overflow-hidden rounded-full border-[1.5px] border-white dark:border-black transition-transform group-hover:scale-110 shadow-sm">
                   <img src={profileImage ? `${import.meta.env.BASE_URL}${profileImage.startsWith('/') ? profileImage.slice(1) : profileImage}` : ''} alt={fullName} className="h-full w-full object-cover" />
                 </div>
               </div>
@@ -823,21 +839,24 @@ export function PortfolioTemplate({
             >
               <p>
                 {(bio || tagline || "")
-                  .split(" ")
-                  .slice(0, 30) // increased limit slightly to allow for more text if present
-                  .map((word, i) => {
-                    // Randomly colorize words (approx every 4th word purely for aesthetic randomness)
-                    const isColored = i > 0 && i % 4 === 2;
-                    return (
-                      <span
-                        key={i}
-                        className={isColored ? "text-[#d4a373]" : ""}
-                      >
-                        {word}{" "}
-                      </span>
-                    );
-                  })}
-                {(bio || tagline || "").split(" ").length > 30 && "..."}
+                  .split("Open to AI/ML Engineer roles.")
+                  .map((part, i, arr) => (
+                    <React.Fragment key={i}>
+                      {part.split(" ").map((word, j) => {
+                        const isColored = j > 0 && j % 5 === 2;
+                        return (
+                          <span key={j} className={isColored ? "text-[#d4a373]" : ""}>
+                            {word}{" "}
+                          </span>
+                        );
+                      })}
+                      {i < arr.length - 1 && (
+                        <span className="text-emerald-600 dark:text-emerald-400 font-bold border-b border-emerald-500/30 pb-0.5">
+                          Open to AI/ML Engineer roles.
+                        </span>
+                      )}
+                    </React.Fragment>
+                  ))}
               </p>
             </motion.div>
           )}
@@ -1639,8 +1658,25 @@ export function PortfolioTemplate({
 
             <div className="flex flex-col items-center text-center">
               <div className="relative mb-6">
-                <div className="absolute -inset-1 rounded-full bg-gradient-to-tr from-emerald-500 to-emerald-400 opacity-75 blur-[3px] animate-pulse-slow" />
-                <div className="relative h-32 w-32 overflow-hidden rounded-full border-4 border-white dark:border-[#0f0f0f] shadow-lg">
+                {/* LinkedIn-style 'Open to Work' Frame */}
+                <div className="absolute -inset-[6px] z-10 pointer-events-none">
+                  <svg viewBox="0 0 100 100" className="w-full h-full rotate-[135deg]">
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r="48"
+                      fill="none"
+                      stroke="#057642"
+                      strokeWidth="6"
+                      strokeDasharray="210 300"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="absolute bottom-[4px] left-1/2 -translate-x-1/2 text-[10px] font-bold text-white uppercase tracking-tighter bg-[#057642] px-2 py-0.5 rounded-sm whitespace-nowrap">Open to Work</span>
+                  </div>
+                </div>
+                <div className="relative h-32 w-32 overflow-hidden rounded-full border-4 border-white dark:border-[#0f0f0f] shadow-xl">
                   <img src={profileImage ? `${import.meta.env.BASE_URL}${profileImage.startsWith('/') ? profileImage.slice(1) : profileImage}` : ''} alt={fullName} className="h-full w-full object-cover" />
                 </div>
               </div>

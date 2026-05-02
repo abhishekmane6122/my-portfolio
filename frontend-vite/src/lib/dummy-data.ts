@@ -3,7 +3,7 @@ import type { Portfolio } from "@/types/schema";
 // Dummy data for demo preview
 export const dummyPortfolio: Partial<Portfolio> = {
     fullName: "Abhishek Mane",
-    title: "AI Engineer @ CognitBotz | NLP & Deep Learning Enthusiast",
+    title: "AI Engineer @ CognitBotz | Building Scalable, Enterprise-Grade AI Innovations",
     tagline:
         "AI/ML Engineer building production-grade AI systems at enterprise scale — currently deployed at Adani Green Energy Limited.",
     bio: "AI/ML Engineer building production-grade AI systems at enterprise scale — currently deployed at Adani Green Energy Limited. I've shipped multi-agent platforms, RAG pipelines, and full-stack AI applications that saved 250+ FTE hours/quarter for Adani Group. GreenRatna Awardee (Dec 2025). My stack: LangChain, LangGraph, Azure OpenAI, FastAPI, React, pgvector. Open to AI/ML Engineer roles.",
