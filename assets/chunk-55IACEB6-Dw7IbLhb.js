@@ -1,1 +1,0 @@
-import{_ as s}from"./BlogPost-ZGREU__1.js";import{s as o}from"./FlowDiagram-DFrV61xs.js";var d=s((t,e)=>{let n;return e==="sandbox"&&(n=o("#i"+t)),(e==="sandbox"?o(n.nodes()[0].contentDocument.body):o("body")).select(`[id="${t}"]`)},"getDiagramElement");export{d as g};
