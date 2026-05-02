@@ -1,35 +1,34 @@
 /**
- * ZERO-DB SOLUTION:
- * We use VisitorBadge.io which is designed for GitHub portfolios.
- * It tracks views based on a unique 'path' you provide.
+ * KVDB SOLUTION:
+ * This is a public Key-Value store with full CORS support.
+ * It is much more reliable for retrieving text/numbers than badge services.
  */
 
-// Use your GitHub username and repo name as the unique ID
-const PAGE_ID = 'abhishekmane6122-portfolio-2026';
+// A unique bucket for your portfolio
+const BUCKET_ID = 'AbhishekManePortfolio_v1_2026';
+const KEY = 'total_views';
+const API_URL = `https://kvdb.io/${BUCKET_ID}/${KEY}`;
 
 export const incrementView = async () => {
     try {
-        // VisitorBadge increments automatically when you hit the badge URL
-        // We use a CORS-friendly endpoint to trigger the hit
-        const response = await fetch(`https://api.visitorbadge.io/api/visitors?path=${PAGE_ID}`);
-        const data = await response.json();
-        return data;
+        // KVdb supports a special '+1' syntax to increment a value
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            body: '+1'
+        });
+        const count = await response.text();
+        return { total_views: parseInt(count) || 0 };
     } catch (error) {
-        // If it fails, we ignore it to prevent UI crashes
+        console.error('Failed to increment view:', error);
         return null;
     }
 };
 
 export const getViewStats = async () => {
     try {
-        // This fetches the current count
-        const response = await fetch(`https://api.visitorbadge.io/api/visitors?path=${PAGE_ID}`);
-        const data = await response.json();
-        
-        // The API returns an object with a 'text' or 'value' field depending on the version
-        // We ensure we return a number for our UI
-        const count = typeof data === 'number' ? data : (data.value || 0);
-        return { total_views: count };
+        const response = await fetch(API_URL);
+        const count = await response.text();
+        return { total_views: parseInt(count) || 0 };
     } catch (error) {
         console.error('Failed to fetch view stats:', error);
         return { total_views: 0 };
