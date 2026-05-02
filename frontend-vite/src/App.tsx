@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect } from 'react'
+import { incrementView } from './services/analytics'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { Toaster } from 'react-hot-toast'
@@ -14,7 +15,6 @@ const Login = lazy(() => import('./pages/Login'))
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 const Blog = lazy(() => import('./pages/Blog'))
 const BlogPost = lazy(() => import('./pages/BlogPost'))
-const Contact = lazy(() => import('./pages/Contact'))
 const ProjectDetail = lazy(() => import('./pages/ProjectDetail'))
 const LLMOpsPage = lazy(() => import('./pages/LLMOpsPage'))
 const NotFound = lazy(() => import('./pages/NotFound'))
@@ -40,6 +40,10 @@ function ScrollToTop() {
 }
 
 function App() {
+  useEffect(() => {
+    incrementView();
+  }, []);
+
   return (
     <ErrorBoundary>
       <ThemeProvider>
@@ -85,7 +89,6 @@ function App() {
             <Route path="/" element={<Portfolio />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
-            <Route path="/contact" element={<Contact />} />
             <Route path="/projects/:slug" element={<ProjectDetail />} />
             <Route path="/llmops" element={<LLMOpsPage />} />
             <Route path="/login" element={<Login />} />

@@ -5,12 +5,13 @@ interface NavLinkItem {
     to: string
     label: string
     icon?: React.ReactNode
+    isExternal?: boolean
 }
 
 const navLinks: NavLinkItem[] = [
     { to: '/', label: 'Home', icon: <Home className="w-4 h-4" /> },
     { to: '/blog', label: 'Blog', icon: <BookOpen className="w-4 h-4" /> },
-    { to: '/contact', label: 'Contact', icon: <Mail className="w-4 h-4" /> },
+    { to: 'mailto:abhishek.mane.work@gmail.com', label: 'Get in Touch', icon: <Mail className="w-4 h-4" />, isExternal: true },
 ]
 
 export default function Navigation() {
@@ -40,21 +41,39 @@ export default function Navigation() {
                     </Link>
 
                     <div className="flex items-center gap-1" role="menubar">
-                        {navLinks.map((link) => (
-                            <Link
-                                key={link.to}
-                                to={link.to}
-                                role="menuitem"
-                                aria-current={isActive(link.to) ? 'page' : undefined}
-                                className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-2 text-sm ${isActive(link.to)
-                                    ? 'bg-accent-blue text-white shadow-md'
-                                    : 'text-gray-600 dark:text-text-secondary hover:text-gray-900 dark:hover:text-text-primary hover:bg-gray-100 dark:hover:bg-bg-secondary'
-                                    }`}
-                            >
-                                {link.icon}
-                                <span className="hidden sm:inline">{link.label}</span>
-                            </Link>
-                        ))}
+                        {navLinks.map((link) => {
+                            const className = `px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-2 text-sm ${isActive(link.to)
+                                ? 'bg-accent-blue text-white shadow-md'
+                                : 'text-gray-600 dark:text-text-secondary hover:text-gray-900 dark:hover:text-text-primary hover:bg-gray-100 dark:hover:bg-bg-secondary'
+                                }`;
+
+                            if (link.isExternal) {
+                                return (
+                                    <a
+                                        key={link.to}
+                                        href={link.to}
+                                        role="menuitem"
+                                        className={className}
+                                    >
+                                        {link.icon}
+                                        <span className="hidden sm:inline">{link.label}</span>
+                                    </a>
+                                );
+                            }
+
+                            return (
+                                <Link
+                                    key={link.to}
+                                    to={link.to}
+                                    role="menuitem"
+                                    aria-current={isActive(link.to) ? 'page' : undefined}
+                                    className={className}
+                                >
+                                    {link.icon}
+                                    <span className="hidden sm:inline">{link.label}</span>
+                                </Link>
+                            );
+                        })}
                     </div>
                 </div>
             </div>

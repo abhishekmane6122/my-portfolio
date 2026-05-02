@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
+import { getViewStats } from "@/services/analytics";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { Link as RouterLink } from "react-router-dom";
 import {
@@ -498,6 +499,15 @@ export function PortfolioTemplate({
 
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [showScrollBottom, setShowScrollBottom] = useState(true);
+  const [viewStats, setViewStats] = useState({ total_views: 0 });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      const stats = await getViewStats();
+      setViewStats(stats);
+    };
+    fetchStats();
+  }, []);
 
   // Avoid hydration mismatch
   useEffect(() => {
@@ -1538,12 +1548,12 @@ export function PortfolioTemplate({
                   I'm currently specializing in Generative AI and Agentic Workflows. Reach out for collaborations or deep technical discussions.
                 </p>
                 <div className="pt-6 flex flex-wrap justify-center gap-6">
-                  <RouterLink
-                    to="/contact"
+                  <a
+                    href="mailto:abhishek.mane.work@gmail.com"
                     className="inline-flex items-center gap-4 px-10 py-5 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-black text-lg font-bold hover:scale-105 transition-all shadow-xl"
                   >
                     <Mail className="h-6 w-6" /> Get in Touch
-                  </RouterLink>
+                  </a>
                 </div>
               </div>
             </motion.div>
@@ -1589,8 +1599,11 @@ export function PortfolioTemplate({
             </div>
           </div>
 
-          <div className="mt-20 pt-8 border-t border-white/5 text-center text-xs text-neutral-600">
-            © {new Date().getFullYear()} {fullName}. All rights reserved.
+          <div className="mt-20 pt-8 border-t border-white/5 text-center text-xs text-neutral-600 flex flex-col items-center gap-2">
+            <div>© {new Date().getFullYear()} {fullName}. All rights reserved.</div>
+            <div className="font-mono text-[10px] uppercase tracking-widest text-[#d4a373]/60">
+              Total Views: <span className="text-[#d4a373]">{viewStats.total_views}</span>
+            </div>
           </div>
         </div>
       </footer>

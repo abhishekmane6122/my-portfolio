@@ -1,9 +1,22 @@
+import { useState, useEffect } from 'react'
+import { getViewStats } from '../services/analytics'
+
 export default function Dashboard() {
+    const [viewStats, setViewStats] = useState({ total_views: 0, daily_views: {} })
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            const stats = await getViewStats()
+            setViewStats(stats)
+        }
+        fetchStats()
+    }, [])
+
     const stats = [
+        { label: 'Total Views', value: viewStats.total_views.toString(), change: 'Across all time', color: 'text-orange-600' },
         { label: 'Total Projects', value: '12', change: '+2 this month', color: 'text-blue-500' },
         { label: 'Blog Posts', value: '8', change: '+1 this week', color: 'text-green-500' },
         { label: 'Technologies', value: '24', change: 'Actively used', color: 'text-purple-500' },
-        { label: 'Experience', value: '3+', change: 'Years', color: 'text-orange-500' },
     ]
 
     const skills = [
