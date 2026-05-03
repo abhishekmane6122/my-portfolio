@@ -51,4 +51,27 @@ By following these instructions, I would take your ASCII text and generate this 
 *   **Node `filter`**: Safety Check (Y: 400)
 *   **Node `answer`**: Final Response (Y: 500)
 
-**Would you like me to now execute this instruction and update the `04_small_language_models.json` with this specific visualized Runtime Flow?**
+
+{
+    "id": "13",
+    "slug": "production-ai-observability",
+    "title": "Production AI Observability: Monitoring, Logging, and Debugging",
+    "excerpt": "A deep dive into observability for AI systems, covering performance monitoring, tracing, and debugging in production environments.",
+    "content": "",
+    "publishedAt": "2025-02-01",
+    "readTime": 13,
+    "author": {
+        "name": "Abhishek Mane",
+        "photo": "/Abhishek_Profile.png"
+    },
+    "category": "DevOps",
+    "tags": [
+        "Observability",
+        "Monitoring",
+        "AI Production",
+        "DevOps",
+        "Tracing"
+    ],
+    "featuredImage": "/blog/ai-observability.png",
+    "featured": false
+}

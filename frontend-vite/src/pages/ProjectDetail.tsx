@@ -8,6 +8,7 @@ import rehypeRaw from 'rehype-raw'
 import remarkGfm from 'remark-gfm'
 import { detailedProjects } from '@/data/projects-detailed'
 import FlowDiagram from '@/components/ui/FlowDiagram';
+import FloatingThemeToggle from '@/components/ui/FloatingThemeToggle';
 import 'highlight.js/styles/github-dark.css'
 
 export default function ProjectDetail() {
@@ -26,18 +27,6 @@ export default function ProjectDetail() {
             </Helmet>
 
             <div className="min-h-screen bg-background text-foreground">
-                {/* Floating Home Button - Responsive positioning */}
-                <Link
-                    to="/"
-                    className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-50 p-3 sm:p-4 rounded-full bg-card border border-neutral-200 dark:border-white/10 text-[#d4a373] shadow-2xl hover:scale-110 transition-all flex items-center justify-center group backdrop-blur-xl"
-                    title="Back to Home"
-                    aria-label="Navigate to home page"
-                >
-                    <Home className="w-5 h-5 sm:w-6 sm:h-6" />
-                    <span className="max-w-0 overflow-hidden group-hover:max-w-xs group-hover:ml-2 transition-all duration-300 whitespace-nowrap font-medium text-sm hidden sm:inline">
-                        Home
-                    </span>
-                </Link>
 
                 {/* Hero */}
                 <div className="relative overflow-hidden bg-background/50 border-b border-neutral-200 dark:border-white/10 transition-colors duration-300">
@@ -61,6 +50,8 @@ export default function ProjectDetail() {
                                 <Home className="w-4 h-4" />
                                 Home
                             </Link>
+                            <span className="text-white/20">|</span>
+                            <FloatingThemeToggle />
                         </div>
 
                         <motion.div
@@ -143,8 +134,12 @@ export default function ProjectDetail() {
                         <div className="text-center mb-10">
                             <h2 className="text-3xl font-serif font-light text-foreground tracking-tight">The Challenge</h2>
                         </div>
-                        <div className="p-8 md:p-12 rounded-3xl bg-card border border-neutral-200 dark:border-white/10 backdrop-blur-xl shadow-xl transition-all hover:shadow-2xl text-center">
-                            <p className="text-xl text-muted-foreground leading-relaxed italic font-light">"{project.problem}"</p>
+                        <div className="p-8 md:p-12 rounded-3xl bg-card border border-neutral-200 dark:border-white/10 backdrop-blur-xl shadow-xl transition-all hover:shadow-2xl text-left">
+                            <div className="prose prose-lg dark:prose-invert max-w-none prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:font-light prose-headings:text-foreground prose-headings:font-serif prose-headings:font-light">
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                    {project.problem}
+                                </ReactMarkdown>
+                            </div>
                         </div>
                     </section>
 
@@ -154,7 +149,11 @@ export default function ProjectDetail() {
                             <h2 className="text-3xl font-serif font-light text-foreground tracking-tight">The Solution</h2>
                         </div>
                         <div className="p-8 md:p-12 rounded-3xl bg-card border border-neutral-200 dark:border-white/10 backdrop-blur-xl shadow-xl transition-all hover:shadow-2xl">
-                            <p className="text-lg text-muted-foreground leading-relaxed font-light">{project.solution}</p>
+                            <div className="prose prose-lg dark:prose-invert max-w-none prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:font-light prose-headings:text-foreground prose-headings:font-serif prose-headings:font-light">
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                    {project.solution}
+                                </ReactMarkdown>
+                            </div>
                         </div>
                     </section>
 
@@ -196,6 +195,58 @@ export default function ProjectDetail() {
                                         title={project.flowDiagram.title}
                                     />
                                 )
+                            )}
+                        </section>
+                    )}
+
+                    {/* Architecture & Design Deep Dive */}
+                    {project.architecture && (
+                        <section className="mb-24">
+                            <div className="text-center mb-12">
+                                <h2 className="text-3xl font-serif font-light text-foreground tracking-tight">Design Deep Dive</h2>
+                                <p className="text-muted-foreground text-lg font-light max-w-2xl mx-auto mt-4">Architectural decisions and system infrastructure for production-grade reliability.</p>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                                {[
+                                    { label: 'Pattern', value: project.architecture.pattern, icon: <div className="w-5 h-5" /> },
+                                    { label: 'Deployment', value: project.architecture.deployment, icon: <div className="w-5 h-5" /> },
+                                    { label: 'Security', value: project.architecture.security, icon: <div className="w-5 h-5" /> },
+                                    { label: 'Database', value: project.architecture.database.join(', '), icon: <div className="w-5 h-5" /> },
+                                    { label: 'Monitoring', value: project.architecture.monitoring, icon: <div className="w-5 h-5" /> },
+                                ].map((item, idx) => (
+                                    <div key={idx} className="p-6 rounded-3xl bg-card border border-neutral-200 dark:border-white/10 hover:border-[#d4a373]/30 transition-all">
+                                        <div className="text-[10px] font-mono uppercase tracking-widest text-[#d4a373] mb-2">{item.label}</div>
+                                        <div className="text-sm font-medium text-foreground leading-relaxed">{item.value}</div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {project.architecture.decisions && project.architecture.decisions.length > 0 && (
+                                <div className="p-8 md:p-10 rounded-[2.5rem] bg-neutral-50 dark:bg-white/5 border border-neutral-200 dark:border-white/10">
+                                    <h3 className="text-xl font-serif font-light mb-8 flex items-center gap-3">
+                                        <span className="h-2 w-2 rounded-full bg-[#d4a373]" />
+                                        Architectural Decisions (ADR)
+                                    </h3>
+                                    <div className="space-y-8">
+                                        {project.architecture.decisions.map((decision, idx) => (
+                                            <div key={idx} className="grid grid-cols-1 md:grid-cols-12 gap-6">
+                                                <div className="md:col-span-4">
+                                                    <div className="text-xs font-mono text-[#d4a373] uppercase tracking-wider mb-1">Issue</div>
+                                                    <div className="text-base font-medium">{decision.issue}</div>
+                                                </div>
+                                                <div className="md:col-span-3">
+                                                    <div className="text-xs font-mono text-neutral-500 uppercase tracking-wider mb-1">Choice</div>
+                                                    <div className="text-base font-medium">{decision.choice}</div>
+                                                </div>
+                                                <div className="md:col-span-5">
+                                                    <div className="text-xs font-mono text-neutral-500 uppercase tracking-wider mb-1">Rationale</div>
+                                                    <div className="text-sm text-muted-foreground leading-relaxed font-light">{decision.rationale}</div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
                             )}
                         </section>
                     )}
@@ -286,36 +337,6 @@ export default function ProjectDetail() {
                         </section>
                     )}
 
-                    {/* Code Snippets */}
-                    {project.codeSnippets.length > 0 && (
-                        <section className="mb-24">
-                            <div className="text-center mb-12">
-                                <h2 className="text-3xl font-serif font-light text-foreground tracking-tight">Code Highlights</h2>
-                            </div>
-                            <div className="space-y-12">
-                                {project.codeSnippets.map((snippet, index) => (
-                                    <div key={index} className="rounded-3xl overflow-hidden border border-neutral-200 dark:border-white/10 shadow-2xl">
-                                        <div className="px-8 py-4 bg-background border-b border-neutral-200 dark:border-white/10 flex items-center justify-between">
-                                            <span className="text-sm font-mono font-medium text-foreground uppercase tracking-widest">{snippet.title}</span>
-                                            <div className="flex gap-1.5">
-                                                <div className="h-3 w-3 rounded-full bg-red-500/20" />
-                                                <div className="h-3 w-3 rounded-full bg-yellow-500/20" />
-                                                <div className="h-3 w-3 rounded-full bg-green-500/20" />
-                                            </div>
-                                        </div>
-                                        <div className="prose prose-invert max-w-none text-base">
-                                            <ReactMarkdown
-                                                rehypePlugins={[rehypeHighlight, rehypeRaw]}
-                                                remarkPlugins={[remarkGfm]}
-                                            >
-                                                {`\`\`\`${snippet.language}\n${snippet.code}\n\`\`\``}
-                                            </ReactMarkdown>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
-                    )}
 
                     {/* Project Gallery */}
                     {project.images && project.images.length > 0 && (
@@ -365,6 +386,32 @@ export default function ProjectDetail() {
                             </div>
                         </section>
                     )}
+
+                    {/* Author Signature Section */}
+                    <section className="mt-32 pt-16 border-t border-neutral-200 dark:border-white/5">
+                        <div className="max-w-3xl mx-auto">
+                            <div className="relative p-8 md:p-10 rounded-[2.5rem] bg-card border border-neutral-200 dark:border-white/10 shadow-2xl overflow-hidden group">
+                                <div className="absolute inset-0 bg-gradient-to-br from-[#d4a373]/5 to-transparent pointer-events-none" />
+                                <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
+                                    <div className="relative shrink-0">
+                                        <div className="relative h-28 w-28 overflow-hidden rounded-3xl border-2 border-[#d4a373]/20 shadow-xl group-hover:scale-105 transition-transform duration-500">
+                                            <img src={`${import.meta.env.BASE_URL}Abhishek_Profile.png`} alt="Abhishek Mane" className="h-full w-full object-cover" />
+                                        </div>
+                                        <div className="absolute -bottom-2 -right-2 p-2 rounded-xl bg-[#d4a373] text-white shadow-lg">
+                                            <Trophy className="w-4 h-4" />
+                                        </div>
+                                    </div>
+                                    <div className="text-center md:text-left">
+                                        <span className="block font-mono text-[10px] uppercase tracking-[0.3em] text-[#d4a373] mb-3">Written By</span>
+                                        <h3 className="text-2xl font-bold text-foreground mb-3">Abhishek Mane</h3>
+                                        <p className="text-muted-foreground leading-relaxed font-light">
+                                            Full Stack Developer & AI/ML Engineer dedicated to architecting intelligent, high-performance systems and crafting intuitive digital experiences that bridge technology and human needs.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
                 </div>
             </div>
         </>

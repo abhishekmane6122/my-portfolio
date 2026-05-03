@@ -24,7 +24,7 @@ const FloatingThemeToggle: React.FC = () => {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={toggleTheme}
-            className="fixed top-6 right-6 z-[100] flex h-12 w-12 items-center justify-center rounded-full bg-white/10 dark:bg-black/20 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-2xl transition-colors hover:bg-white/20 dark:hover:bg-white/5"
+            className="z-10 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-neutral-100 dark:bg-white/10 backdrop-blur-xl border border-neutral-200 dark:border-white/10 shadow-lg transition-colors hover:bg-neutral-200 dark:hover:bg-white/20"
             aria-label="Toggle Theme"
         >
             <AnimatePresence mode="wait">

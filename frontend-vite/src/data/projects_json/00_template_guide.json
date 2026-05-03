@@ -1,0 +1,80 @@
+{
+    "id": "template-project-id",
+    "slug": "template-project-slug",
+    "title": "Master Project Template & Specification Guide",
+    "tagline": "A high-fidelity blueprint for documenting production-grade AI engineering projects.",
+    "banner": "/projects/template-banner.jpg",
+    "role": "Lead Architect / AI Engineer",
+    "duration": "e.g., 6 Months (2025)",
+    "featured": true,
+    "team": ["Developer Name", "Architect Name"],
+    
+    "__GUIDE_MARKDOWN": "The 'problem' and 'solution' fields support full Markdown. You can include Tables, Bold text, and Lists.",
+    "problem": "### The Challenge\n\n| Constraint | Requirement |\n| :--- | :--- |\n| Latency | < 200ms |\n| Accuracy | > 95% |\n\n1. **Scalability**: System must handle 1M+ requests.\n2. **Security**: Data must be AES-256 encrypted.",
+    "solution": "### The Architecture\n\n- **Agentic Flow**: Implemented a ReAct pattern.\n- **Data Privacy**: Local-first PII masking.",
+    
+    "techStack": [
+        {
+            "category": "AI & Core",
+            "technologies": ["Python", "LangChain", "FastAPI"]
+        }
+    ],
+
+    "architecture": {
+        "pattern": "Micro-services / Modular Monolith",
+        "deployment": "Azure / AWS / Docker",
+        "database": ["PostgreSQL", "ChromaDB"],
+        "security": "SSO / JWT / RBAC",
+        "monitoring": "LangSmith / Phoenix",
+        "decisions": [
+            {
+                "issue": "Database Choice",
+                "choice": "pgvector",
+                "rationale": "Allows hybrid search over relational and vector data."
+            }
+        ]
+    },
+
+    "__GUIDE_FLOW": "The 'flowDiagram' uses React Flow structure. 'nodes' are boxes, 'edges' are lines connecting them.",
+    "flowDiagram": {
+        "title": "Data Ingestion Pipeline",
+        "height": "500px",
+        "nodes": [
+            { "id": "1", "data": { "label": "🌐 External API" }, "position": { "x": 100, "y": 100 }, "className": "bg-accent-blue/10 border-accent-blue/50" },
+            { "id": "2", "data": { "label": "⚙️ Processing Agent" }, "position": { "x": 100, "y": 250 }, "className": "bg-accent-gold/10 border-accent-gold/50" }
+        ],
+        "edges": [
+            { "id": "e1-2", "source": "1", "target": "2", "animated": true, "label": "JSON Stream" }
+        ]
+    },
+
+    "__GUIDE_MERMAID": "Alternatively, use a simple 'mermaidDiagram' string for quick charts.",
+    "mermaidDiagram": "graph LR\n  A[User] --> B(LLM)\n  B --> C{Decision}\n  C -->|Query| D[Database]\n  C -->|Response| E[Interface]",
+
+    "results": [
+        { "metric": "ROI", "value": "250%", "description": "Increase in operational efficiency" }
+    ],
+    "challenges": [
+        {
+            "title": "Cold Start Latency",
+            "description": "Initial LLM response took 5s.",
+            "solution": "Implemented streaming and response caching."
+        }
+    ],
+    "images": ["/projects/preview-1.png"],
+    "videos": [],
+    "codeSnippets": [
+        {
+            "title": "Agent Orchestration Logic",
+            "language": "python",
+            "code": "class AIAgent:\n    def execute(self):\n        return 'Autonomous Action'"
+        }
+    ],
+    "liveUrl": "https://demo.yourdomain.com",
+    "githubUrl": "https://github.com/abhishekmane-ai/project-repo",
+    "testimonial": {
+      "text": "This system transformed our regulatory workflow entirely.",
+      "author": "Executive Stakeholder",
+      "role": "VP of Operations"
+    }
+}

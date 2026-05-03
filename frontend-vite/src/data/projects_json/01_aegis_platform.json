@@ -1,0 +1,45 @@
+{
+    "id": "aegis-platform",
+    "slug": "aegis-platform",
+    "title": "AEGIS - Regulatory Surveillance Platform",
+    "tagline": "Multi-agent autonomous system for automated regulatory compliance and corporate governance at Adani Group",
+    "banner": "/projects/aegis-banner.jpg",
+    "role": "Full Stack Developer & System Architect",
+    "duration": "4 months (Aug 2024 - Nov 2024)",
+    "problem": "Adani Group's Secretarial and Legal departments faced critical bottlenecks in regulatory compliance, manual disclosure cycles, and insider trading tracking across 3.9M+ investor records.",
+    "solution": "Architected AEGIS, a centralized multi-agent platform featuring Regulatory Intelligence Agents, a Directors Disclosure Module, and an AI Minutes Generator powered by Groq LLM.",
+    "team": ["2 developers", "1 QA engineer", "3 business stakeholders"],
+    "techStack": [
+        {
+            "category": "AI & Backend",
+            "technologies": ["FastAPI", "Python", "Groq LLM", "RAG", "LangGraph", "Azure AD SSO"]
+        },
+        {
+            "category": "Frontend & Infra",
+            "technologies": ["React", "TypeScript", "Tailwind CSS", "Framer Motion", "Docker", "Nginx"]
+        }
+    ],
+    "challenges": [],
+    "results": [
+        { "metric": "FTE Hours", "value": "250+", "description": "Hours saved per quarter" },
+        { "metric": "Optimization", "value": "94%", "description": "API speed improvement (8s to 500ms)" }
+    ],
+    "images": [],
+    "videos": [],
+    "codeSnippets": [],
+    "featured": true,
+    "architecture": {
+        "pattern": "Modular Multi-Agent Monolith",
+        "deployment": "Azure VM (Dockerized) with Nginx Proxy",
+        "database": ["PostgreSQL (Structured)", "Azure Key Vault (Secrets)"],
+        "security": "Azure AD SSO + RBAC (Role-Based Access Control)",
+        "monitoring": "LangSmith (AI Traces) + Custom Audit Logs",
+        "decisions": [
+            {
+                "issue": "Intent Classification",
+                "choice": "Deterministic Router + LLM Fallback",
+                "rationale": "Ensured 100% accuracy for standard regulatory queries while allowing flexibility for complex intent."
+            }
+        ]
+    }
+}

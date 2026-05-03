@@ -20,10 +20,10 @@ export default function BlogCard({ post, index }: BlogCardProps) {
             whileHover={{ y: -4 }}
             className="group h-full"
         >
-            <Link to={`/blog/${post.slug}`} className="block h-full no-underline">
-                <Card className="h-full overflow-hidden transition-all duration-base hover:shadow-elevated hover:border-accent-blue/50 bg-white dark:bg-bg-secondary border-gray-200 dark:border-bg-elevated">
+            <Link to={`/blog/${post.slug}`} className="block h-full no-underline hover:no-underline decoration-transparent">
+                <Card className="h-full flex flex-col overflow-hidden transition-all duration-base hover:shadow-elevated hover:border-accent-blue/50 bg-white dark:bg-bg-secondary border-gray-200 dark:border-bg-elevated">
                     {/* Featured image */}
-                    <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-blue-50 via-purple-50 to-cyan-50 dark:from-accent-blue/20 dark:via-accent-purple/20 dark:to-accent-cyan/20">
+                    <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-blue-50 via-purple-50 to-cyan-50 dark:from-accent-blue/20 dark:via-accent-purple/20 dark:to-accent-cyan/20 shrink-0">
                         {post.featuredImage ? (
                             <img
                                 src={`${import.meta.env.BASE_URL}${post.featuredImage.startsWith('/') ? post.featuredImage.slice(1) : post.featuredImage}`}
@@ -55,9 +55,9 @@ export default function BlogCard({ post, index }: BlogCardProps) {
                     </div>
 
                     {/* Content */}
-                    <CardContent className="p-6">
+                    <CardContent className="p-6 flex flex-col flex-grow">
                         {/* Meta info */}
-                        <div className="flex items-center gap-4 text-xs text-accent-blue mb-3">
+                        <div className="flex items-center gap-4 text-xs text-accent-blue mb-4 shrink-0">
                             <div className="flex items-center gap-1.5">
                                 <Calendar className="w-3.5 h-3.5" />
                                 {new Date(post.publishedAt).toLocaleDateString('en-US', {
@@ -69,48 +69,56 @@ export default function BlogCard({ post, index }: BlogCardProps) {
                         </div>
 
                         {/* Title */}
-                        <h3 className="text-xl font-heading font-semibold text-gray-900 dark:text-text-primary mb-3 leading-tight group-hover:text-accent-blue transition-colors duration-base line-clamp-2">
-                            {post.title}
-                        </h3>
+                        <div className="h-[60px] flex items-start mb-4 shrink-0">
+                            <h3 className="text-xl font-heading font-semibold text-gray-900 dark:text-text-primary leading-tight group-hover:text-accent-blue transition-colors duration-base line-clamp-2">
+                                {post.title}
+                            </h3>
+                        </div>
 
                         {/* Excerpt */}
-                        <p className="text-sm text-gray-600 dark:text-text-secondary leading-relaxed mb-4 line-clamp-2">
-                            {post.excerpt}
-                        </p>
+                        <div className="h-[44px] mb-4 shrink-0">
+                            <p className="text-sm text-gray-600 dark:text-text-secondary leading-relaxed line-clamp-2">
+                                {post.excerpt}
+                            </p>
+                        </div>
 
                         {/* Tags */}
-                        {post.tags && post.tags.length > 0 && (
-                            <div className="flex flex-wrap gap-2 mb-4">
-                                {post.tags.slice(0, 3).map((tag) => (
-                                    <Badge
-                                        key={tag}
-                                        variant="outline"
-                                        className="bg-gray-100 dark:bg-bg-tertiary border-gray-200 dark:border-bg-elevated text-gray-600 dark:text-text-tertiary font-mono"
-                                    >
-                                        <Tag className="w-2.5 h-2.5 mr-1" />
-                                        {tag}
-                                    </Badge>
-                                ))}
-                            </div>
-                        )}
+                        <div className="h-[24px] mb-4 shrink-0 overflow-hidden">
+                            {post.tags && post.tags.length > 0 && (
+                                <div className="flex flex-wrap gap-2">
+                                    {post.tags.slice(0, 3).map((tag) => (
+                                        <Badge
+                                            key={tag}
+                                            variant="outline"
+                                            className="bg-gray-100 dark:bg-bg-tertiary border-gray-200 dark:border-bg-elevated text-gray-600 dark:text-text-tertiary font-mono whitespace-nowrap"
+                                        >
+                                            <Tag className="w-2.5 h-2.5 mr-1" />
+                                            {tag}
+                                        </Badge>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
 
-                        <Separator className="mb-4" />
+                        <div className="mt-auto">
+                            <Separator className="mb-4" />
 
-                        {/* Author row */}
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <img
-                                    src={`${import.meta.env.BASE_URL}${post.author.photo.startsWith('/') ? post.author.photo.slice(1) : post.author.photo}`}
-                                    alt={post.author.name}
-                                    className="w-6 h-6 rounded-full object-cover"
-                                />
-                                <span className="text-xs text-gray-500 dark:text-text-tertiary">{post.author.name}</span>
-                            </div>
+                            {/* Author row */}
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <img
+                                        src={`${import.meta.env.BASE_URL}${post.author.photo.startsWith('/') ? post.author.photo.slice(1) : post.author.photo}`}
+                                        alt={post.author.name}
+                                        className="w-6 h-6 rounded-full object-cover"
+                                    />
+                                    <span className="text-xs text-gray-500 dark:text-text-tertiary">{post.author.name}</span>
+                                </div>
 
-                            {/* Read more link */}
-                            <div className="flex items-center gap-2 text-accent-blue font-medium text-xs group-hover:gap-3 transition-all">
-                                Read
-                                <ArrowRight className="w-3.5 h-3.5" />
+                                {/* Read more link */}
+                                <div className="flex items-center gap-2 text-accent-blue font-medium text-xs group-hover:gap-3 transition-all">
+                                    Read
+                                    <ArrowRight className="w-3.5 h-3.5" />
+                                </div>
                             </div>
                         </div>
                     </CardContent>

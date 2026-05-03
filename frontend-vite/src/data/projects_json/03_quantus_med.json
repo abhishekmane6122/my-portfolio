@@ -1,0 +1,45 @@
+{
+    "id": "quantus-med",
+    "slug": "quantus-med",
+    "title": "Quantus Med - Multimodal Clinical AI",
+    "tagline": "Fusing medical imagery with real-time physician voice dictation for automated SOAP reports",
+    "banner": "/projects/quantus-med-banner.jpg",
+    "role": "AI Engineer",
+    "duration": "Jan 2025 - Present",
+    "problem": "Physicians face massive documentation overhead, often spending more time on reports than on actual patient diagnosis.",
+    "solution": "Developed a zero-knowledge clinical AI using Llama-3 Vision and Whisper-large-v3 to generate structured SOAP reports in under 500ms.",
+    "team": ["Solo project"],
+    "techStack": [
+        {
+            "category": "Multimodal AI",
+            "technologies": ["Llama-3-Vision", "Gemini 1.5-Flash", "Whisper-v3", "Groq LPU"]
+        },
+        {
+            "category": "Inference",
+            "technologies": ["FastAPI", "Edge-TTS", "Zero-Knowledge Security"]
+        }
+    ],
+    "challenges": [],
+    "results": [
+        { "metric": "Latency", "value": "< 500ms", "description": "End-to-end report generation" },
+        { "metric": "Compliance", "value": "HIPAA", "description": "Designed for strict healthcare data privacy" }
+    ],
+    "images": [],
+    "videos": [],
+    "codeSnippets": [],
+    "featured": true,
+    "architecture": {
+        "pattern": "Real-time Multimodal Stream Processing",
+        "deployment": "Local Edge + Cloud Inference (Groq LPU)",
+        "database": ["Encrypted Local Storage (SQLite)"],
+        "security": "Zero-Knowledge Encryption + PII Masking at Edge",
+        "monitoring": "Prometheus/Grafana for Inference Latency",
+        "decisions": [
+            {
+                "issue": "Privacy vs. Intelligence",
+                "choice": "Edge-based PII Scrubber",
+                "rationale": "Ensured no patient-identifiable data leaves the local environment, meeting strict HIPAA guidelines."
+            }
+        ]
+    }
+}

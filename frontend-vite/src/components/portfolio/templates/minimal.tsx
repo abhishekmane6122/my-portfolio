@@ -497,8 +497,6 @@ export function PortfolioTemplate({
   const [mounted, setMounted] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
-  const [showScrollTop, setShowScrollTop] = useState(false);
-  const [showScrollBottom, setShowScrollBottom] = useState(true);
   const [viewStats, setViewStats] = useState({ total_views: 0 });
 
   useEffect(() => {
@@ -519,10 +517,6 @@ export function PortfolioTemplate({
     const handleScroll = () => {
       const currentScroll = window.scrollY;
       setIsScrolled(currentScroll > 50);
-      setShowScrollTop(currentScroll > 400);
-      
-      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
-      setShowScrollBottom(totalHeight - currentScroll > 400);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -559,11 +553,11 @@ export function PortfolioTemplate({
 
   const navItems = [
     { name: "Home", color: "#3b82f6", anchor: "home" },
-    { name: "Projects", color: "#d4a373", anchor: "projects" },
+    { name: "Work", color: "#d4a373", anchor: "projects" },
     { name: "Skills", color: "#10b981", anchor: "skills" },
     { name: "Experience", color: "#a855f7", anchor: "experience" },
-    { name: "Insights", color: "#0077b5", anchor: "linkedin-posts" },
-    { name: "Blog", color: "#f97316", isExternal: true, path: "/blog" },
+    { name: "Projects", path: "/projects", isExternal: true, color: "#f59e0b" },
+    { name: "Blog", path: "/blog", isExternal: true, color: "#f97316" },
     { name: "Contact", color: "#ec4899", anchor: "contact" },
   ];
 
@@ -619,25 +613,13 @@ export function PortfolioTemplate({
           >
             {profileImage && (
               <div className="relative">
-                {/* LinkedIn-style 'Open to Work' Frame */}
-                <div className="absolute -inset-[3px] z-10 pointer-events-none">
-                  <svg viewBox="0 0 100 100" className="w-full h-full rotate-[135deg]">
-                    <circle
-                      cx="50"
-                      cy="50"
-                      r="48"
-                      fill="none"
-                      stroke="#057642"
-                      strokeWidth="6"
-                      strokeDasharray="210 300"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="absolute bottom-[2px] left-1/2 -translate-x-1/2 text-[5px] md:text-[6px] font-bold text-white uppercase tracking-tighter bg-[#057642] px-1 rounded-sm whitespace-nowrap">Open to Work</span>
-                  </div>
+                {/* LinkedIn-style 'Open to Work' Label Only */}
+                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 z-20">
+                  <span className="text-[5px] md:text-[6px] font-bold text-white uppercase tracking-tighter bg-[#057642] px-1.5 py-0.5 rounded-full shadow-lg whitespace-nowrap border border-white/20">
+                    Open to Work
+                  </span>
                 </div>
-                <div className="relative h-8 w-8 md:h-10 md:w-10 overflow-hidden rounded-full border-[1.5px] border-white dark:border-black transition-transform group-hover:scale-110 shadow-sm">
+                <div className="relative h-8 w-8 md:h-10 md:w-10 overflow-hidden rounded-full transition-transform group-hover:scale-110 border border-neutral-200 dark:border-white/10">
                   <img src={profileImage ? `${import.meta.env.BASE_URL}${profileImage.startsWith('/') ? profileImage.slice(1) : profileImage}` : ''} alt={fullName} className="h-full w-full object-cover" />
                 </div>
               </div>
@@ -838,25 +820,60 @@ export function PortfolioTemplate({
               className="mt-8 max-w-2xl mx-auto text-lg md:text-xl lg:text-2xl leading-relaxed text-neutral-600 dark:text-neutral-400 font-light text-center"
             >
               <p>
-                {(bio || tagline || "")
-                  .split("Open to AI/ML Engineer roles.")
-                  .map((part, i, arr) => (
-                    <React.Fragment key={i}>
-                      {part.split(" ").map((word, j) => {
-                        const isColored = j > 0 && j % 5 === 2;
-                        return (
-                          <span key={j} className={isColored ? "text-[#d4a373]" : ""}>
-                            {word}{" "}
+                {(() => {
+                  let content = bio || tagline || "";
+                  const highlights = [
+                    "production-grade AI systems",
+                    "multi-agent platforms",
+                    "full-stack AI applications",
+                    "Adani Group. GreenRatna Awardee"
+                  ];
+                  
+                  // Use a unique marker to prevent nested replacements
+                  let parts: (string | React.ReactNode)[] = [content];
+                  
+                  highlights.forEach(highlight => {
+                    let nextParts: (string | React.ReactNode)[] = [];
+                    parts.forEach(part => {
+                      if (typeof part !== 'string') {
+                        nextParts.push(part);
+                        return;
+                      }
+                      
+                      const split = part.split(highlight);
+                      split.forEach((text, i) => {
+                        nextParts.push(text);
+                        if (i < split.length - 1) {
+                          nextParts.push(<span key={highlight + i} className="text-[#d4a373] font-medium">{highlight}</span>);
+                        }
+                      });
+                    });
+                    parts = nextParts;
+                  });
+
+                  // Handle the Green Bold status separately
+                  const statusPhrase = "Open to AI/ML Engineer roles.";
+                  let finalParts: (string | React.ReactNode)[] = [];
+                  parts.forEach(part => {
+                    if (typeof part !== 'string') {
+                      finalParts.push(part);
+                      return;
+                    }
+                    const split = part.split(statusPhrase);
+                    split.forEach((text, i) => {
+                      finalParts.push(text);
+                      if (i < split.length - 1) {
+                        finalParts.push(
+                          <span key="status" className="text-emerald-600 dark:text-emerald-400 font-bold border-b border-emerald-500/30 pb-0.5">
+                            {statusPhrase}
                           </span>
                         );
-                      })}
-                      {i < arr.length - 1 && (
-                        <span className="text-emerald-600 dark:text-emerald-400 font-bold border-b border-emerald-500/30 pb-0.5">
-                          Open to AI/ML Engineer roles.
-                        </span>
-                      )}
-                    </React.Fragment>
-                  ))}
+                      }
+                    });
+                  });
+
+                  return finalParts;
+                })()}
               </p>
             </motion.div>
           )}
@@ -1541,13 +1558,29 @@ export function PortfolioTemplate({
               <div className="absolute -top-24 -right-24 h-48 w-48 bg-[#d4a373]/10 blur-[60px] rounded-full pointer-events-none" />
               <div className="absolute -bottom-24 -left-24 h-48 w-48 bg-purple-500/5 blur-[60px] rounded-full pointer-events-none" />
 
-              <span className="mb-12 block font-mono text-sm font-medium uppercase tracking-[0.4em] text-[#d4a373]">
-                Professional Profile
+              <span className="mb-8 block font-mono text-sm font-medium uppercase tracking-[0.4em] text-[#d4a373]">
+                Professional Summary
               </span>
 
-              {/* LinkedIn Badge Container - Stable Centering */}
-              <div className="flex justify-center w-full min-h-[320px] py-4">
-                <div className="relative z-20">
+              {/* Integrated Profile Card in Footer */}
+              <div className="flex flex-col items-center w-full mb-12">
+                <div className="relative mb-6">
+                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 z-20">
+                    <span className="text-[10px] font-bold text-white uppercase tracking-tighter bg-[#057642] px-3 py-1 rounded-full shadow-xl whitespace-nowrap border border-white/30">
+                      Open to Work
+                    </span>
+                  </div>
+                  <div className="relative h-32 w-32 overflow-hidden rounded-full border-4 border-white dark:border-[#1a1a1a] shadow-2xl">
+                    <img src={profileImage ? `${import.meta.env.BASE_URL}${profileImage.startsWith('/') ? profileImage.slice(1) : profileImage}` : ''} alt={fullName} className="h-full w-full object-cover" />
+                  </div>
+                </div>
+                <h3 className="text-3xl font-serif font-light text-neutral-900 dark:text-white mb-2" style={{ fontFamily: "var(--font-cormorant)" }}>{fullName}</h3>
+                <p className="text-sm font-mono uppercase tracking-[0.2em] text-[#d4a373]">{title}</p>
+              </div>
+
+              {/* LinkedIn Badge Container - Optional fallback or additional visibility */}
+              <div className="flex justify-center w-full min-h-0 mb-4">
+                <div className="relative z-20 scale-90">
                   <div
                     className="badge-base LI-profile-badge"
                     data-locale="en_US"
@@ -1564,7 +1597,7 @@ export function PortfolioTemplate({
                 </div>
               </div>
 
-              <div className="mt-16 space-y-6 max-w-md">
+              <div className="mt-4 space-y-6 max-w-md">
                 <h2 className="text-3xl font-medium text-neutral-900 dark:text-white leading-tight">
                   Let's engineer the future together.
                 </h2>
@@ -1626,14 +1659,14 @@ export function PortfolioTemplate({
           <div className="mt-20 pt-8 border-t border-neutral-200 dark:border-white/5 text-center text-xs text-neutral-600 flex flex-col items-center gap-4">
             <div className="dark:text-neutral-400">© {new Date().getFullYear()} {fullName}. All rights reserved.</div>
             <div className="flex flex-col items-center gap-2">
-              <span className="font-mono text-[10px] uppercase tracking-widest text-neutral-500 dark:text-[#d4a373]/60">Live Engagement</span>
-              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-100 dark:bg-white/5 border border-neutral-200 dark:border-white/10">
-                <span className="text-[10px] font-mono text-neutral-400 uppercase">Total Visitors:</span>
+              <span className="font-mono text-[10px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400">Live Engagement</span>
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-neutral-100 dark:bg-white/5 border border-neutral-200 dark:border-white/10 shadow-sm">
+                <span className="text-[10px] font-mono text-neutral-800 dark:text-neutral-200 font-bold uppercase tracking-tight">Total Visitors:</span>
                 <img 
-                  src={`https://visitor-badge.laobi.icu/badge?page_id=abhishekmane6122.portfolio.final&left_color=transparent&right_color=transparent&left_text=&right_text_color=%23d4a373`} 
+                  src={`https://visitor-badge.laobi.icu/badge?page_id=abhishekmane6122.portfolio.final&left_color=333333&right_color=057642&left_text=Views`} 
                   alt="Views"
-                  className="h-4 pointer-events-none"
-                  style={{ filter: resolvedTheme === 'dark' ? 'none' : 'invert(0.2) sepia(1) saturate(5) hue-rotate(330deg)' }}
+                  className="h-5 pointer-events-none rounded-sm"
+                  style={{ filter: resolvedTheme === 'dark' ? 'brightness(1.2) contrast(1.1)' : 'none' }}
                 />
               </div>
             </div>
@@ -1658,23 +1691,10 @@ export function PortfolioTemplate({
 
             <div className="flex flex-col items-center text-center">
               <div className="relative mb-6">
-                {/* LinkedIn-style 'Open to Work' Frame */}
-                <div className="absolute -inset-[6px] z-10 pointer-events-none">
-                  <svg viewBox="0 0 100 100" className="w-full h-full rotate-[135deg]">
-                    <circle
-                      cx="50"
-                      cy="50"
-                      r="48"
-                      fill="none"
-                      stroke="#057642"
-                      strokeWidth="6"
-                      strokeDasharray="210 300"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="absolute bottom-[4px] left-1/2 -translate-x-1/2 text-[10px] font-bold text-white uppercase tracking-tighter bg-[#057642] px-2 py-0.5 rounded-sm whitespace-nowrap">Open to Work</span>
-                  </div>
+                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 z-20">
+                  <span className="text-[10px] font-bold text-white uppercase tracking-tighter bg-[#057642] px-3 py-1 rounded-full shadow-xl whitespace-nowrap border border-white/30">
+                    Open to Work
+                  </span>
                 </div>
                 <div className="relative h-32 w-32 overflow-hidden rounded-full border-4 border-white dark:border-[#0f0f0f] shadow-xl">
                   <img src={profileImage ? `${import.meta.env.BASE_URL}${profileImage.startsWith('/') ? profileImage.slice(1) : profileImage}` : ''} alt={fullName} className="h-full w-full object-cover" />
@@ -1719,31 +1739,7 @@ export function PortfolioTemplate({
           </motion.div>
         </div>
       )}
-      {/* Floating Buttons Stack */}
-      <div className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-50 flex flex-col gap-3 sm:gap-4">
-        {showScrollTop && (
-          <motion.button
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="p-3 sm:p-4 rounded-full bg-white dark:bg-card border border-neutral-200 dark:border-white/10 text-[#8b5cf6] shadow-xl hover:scale-110 transition-all flex items-center justify-center group"
-            title="Scroll to Top"
-          >
-            <ArrowUp className="w-5 h-5 sm:w-6 sm:h-6" />
-          </motion.button>
-        )}
-        {showScrollBottom && (
-          <motion.button
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            onClick={() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' })}
-            className="p-3 sm:p-4 rounded-full bg-white dark:bg-card border border-neutral-200 dark:border-white/10 text-[#8b5cf6] shadow-xl hover:scale-110 transition-all flex items-center justify-center group"
-            title="Scroll to Bottom"
-          >
-            <ArrowDown className="w-5 h-5 sm:w-6 sm:h-6" />
-          </motion.button>
-        )}
-      </div>
+      {/* Profile Card Overlay */}
     </div>
   );
 }

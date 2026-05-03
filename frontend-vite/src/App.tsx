@@ -7,7 +7,7 @@ import { ThemeProvider } from './context/ThemeContext'
 import ErrorBoundary from './components/common/ErrorBoundary'
 import Navigation from './components/common/Navigation'
 import SkeletonLoader from './components/ui/SkeletonLoader'
-import FloatingThemeToggle from './components/ui/FloatingThemeToggle'
+import ScrollControls from './components/ui/ScrollControls'
 
 // Lazy load pages for better performance
 const Portfolio = lazy(() => import('./pages/Portfolio'))
@@ -15,6 +15,7 @@ const Login = lazy(() => import('./pages/Login'))
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 const Blog = lazy(() => import('./pages/Blog'))
 const BlogPost = lazy(() => import('./pages/BlogPost'))
+const Projects = lazy(() => import('./pages/Projects'))
 const ProjectDetail = lazy(() => import('./pages/ProjectDetail'))
 const LLMOpsPage = lazy(() => import('./pages/LLMOpsPage'))
 const NotFound = lazy(() => import('./pages/NotFound'))
@@ -47,8 +48,8 @@ function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider>
-        <FloatingThemeToggle />
         <ScrollToTop />
+        <ScrollControls />
         <Helmet>
           <title>Abhishek Mane | Full Stack Developer & AI/ML Engineer</title>
           <meta name="description" content="Professional portfolio of Abhishek Mane - Full Stack Developer specializing in AI/ML, React, Python, and FastAPI. View projects, experience, and technical blog." />
@@ -87,6 +88,7 @@ function App() {
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={<Portfolio />} />
+            <Route path="/projects" element={<Projects />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
             <Route path="/projects/:slug" element={<ProjectDetail />} />

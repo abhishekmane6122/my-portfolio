@@ -1,0 +1,227 @@
+{
+    "stats": {
+        "expertSkills": 15,
+        "yearsExperience": "2+",
+        "totalTechs": 28
+    },
+    "skills": [
+        {
+            "id": "python",
+            "name": "Python",
+            "category": "backend",
+            "proficiency": "expert",
+            "yearsOfExperience": 2.1,
+            "icon": "/icons/python.svg",
+            "description": "Architecting scalable AI backends, ETL pipelines, and enterprise automation with Python 3.11+",
+            "projects": [
+                "bse-rag-project",
+                "aegis-platform",
+                "equity-pulse",
+                "doc-capture"
+            ]
+        },
+        {
+            "id": "langchain",
+            "name": "LangChain",
+            "category": "ai-ml",
+            "proficiency": "expert",
+            "yearsOfExperience": 1.6,
+            "icon": "/icons/langchain.svg",
+            "description": "Orchestrating complex LLM chains, memory management, and tool integration for production-grade AI systems",
+            "projects": [
+                "aegis-platform",
+                "quantus-med",
+                "omniqa-agent"
+            ]
+        },
+        {
+            "id": "langgraph",
+            "name": "LangGraph",
+            "category": "ai-ml",
+            "proficiency": "expert",
+            "yearsOfExperience": 1.6,
+            "icon": "/icons/langgraph.svg",
+            "description": "Building stateful, multi-agent workflows and resilient autonomous systems with cyclical logic",
+            "projects": [
+                "aegis-platform",
+                "multi-agent-sql-system"
+            ]
+        },
+        {
+            "id": "rag-systems",
+            "name": "RAG Systems",
+            "category": "ai-ml",
+            "proficiency": "expert",
+            "yearsOfExperience": 1.6,
+            "icon": "/icons/ai.svg",
+            "description": "Designing high-precision retrieval-augmented generation pipelines using OpenAI, Llama-3, and Phi-3 models",
+            "projects": [
+                "bse-rag-project",
+                "aegis-platform",
+                "regulatory-rag-pipeline"
+            ]
+        },
+        {
+            "id": "multi-agent",
+            "name": "Multi-Agent Architectures",
+            "category": "ai-ml",
+            "proficiency": "expert",
+            "yearsOfExperience": 1.4,
+            "icon": "/icons/agents.svg",
+            "description": "Designing autonomous systems with intent routing, deterministic query handling, and dynamic agent delegation",
+            "projects": [
+                "aegis-platform",
+                "omniqa-agent"
+            ]
+        },
+        {
+            "id": "fastapi",
+            "name": "FastAPI",
+            "category": "backend",
+            "proficiency": "expert",
+            "yearsOfExperience": 1.3,
+            "icon": "/icons/fastapi.svg",
+            "description": "Developing high-performance, asynchronous RESTful APIs with Pydantic validation and automatic documentation",
+            "projects": [
+                "aegis-platform",
+                "equity-pulse",
+                "doc-capture",
+                "quantus-med"
+            ]
+        },
+        {
+            "id": "postgresql",
+            "name": "PostgreSQL & Vector Search",
+            "category": "backend",
+            "proficiency": "expert",
+            "yearsOfExperience": 1.0,
+            "icon": "/icons/postgresql.svg",
+            "description": "Designing high-concurrency relational schemas and optimizing vector search with pgvector and FAISS",
+            "projects": [
+                "equity-pulse",
+                "aegis-platform",
+                "bse-rag-project"
+            ]
+        },
+        {
+            "id": "azure",
+            "name": "Azure Cloud",
+            "category": "devops",
+            "proficiency": "expert",
+            "yearsOfExperience": 1.0,
+            "icon": "/icons/azure.svg",
+            "description": "Managing enterprise AI infrastructure, Azure OpenAI, AD SSO, and VM scheduling for high-availability apps",
+            "projects": [
+                "aegis-platform",
+                "equity-pulse"
+            ]
+        },
+        {
+            "id": "docker",
+            "name": "Docker",
+            "category": "devops",
+            "proficiency": "expert",
+            "yearsOfExperience": 1.6,
+            "icon": "/icons/docker.svg",
+            "description": "Containerizing AI workloads for consistent delivery across production, staging, and development environments",
+            "projects": [
+                "aegis-platform",
+                "equity-pulse",
+                "doc-capture"
+            ]
+        },
+        {
+            "id": "ai-observability",
+            "name": "AI Agent Observability",
+            "category": "ai-ml",
+            "proficiency": "expert",
+            "yearsOfExperience": 1.0,
+            "icon": "/icons/monitor.svg",
+            "description": "Building custom monitoring platforms for agent health, execution logs, and latency tracking",
+            "projects": [
+                "aegis-platform"
+            ]
+        },
+        {
+            "id": "security",
+            "name": "Enterprise Security",
+            "category": "devops",
+            "proficiency": "expert",
+            "yearsOfExperience": 1.0,
+            "icon": "/icons/security.svg",
+            "description": "Implementing RBAC, TLS in-transit, AES-256 at-rest, and Azure Key Vault secret management",
+            "projects": [
+                "aegis-platform",
+                "equity-pulse"
+            ]
+        },
+        {
+            "id": "react",
+            "name": "React",
+            "category": "frontend",
+            "proficiency": "intermediate",
+            "yearsOfExperience": 3,
+            "icon": "/icons/react.svg",
+            "description": "Building modern, performant web applications with React 18+, hooks, and context",
+            "projects": [
+                "aegis-platform",
+                "equity-pulse",
+                "quantus-med"
+            ]
+        },
+        {
+            "id": "playwright",
+            "name": "Playwright",
+            "category": "tools",
+            "proficiency": "expert",
+            "yearsOfExperience": 1.6,
+            "icon": "/icons/playwright.svg",
+            "description": "Advanced browser automation for large-scale regulatory scraping and automated test generation",
+            "projects": [
+                "bse-rag-project",
+                "omniqa-agent"
+            ]
+        },
+        {
+            "id": "git",
+            "name": "Git & GitLab",
+            "category": "tools",
+            "proficiency": "expert",
+            "yearsOfExperience": 4,
+            "icon": "/icons/git.svg",
+            "description": "Version control and collaborative development within enterprise GitLab environments"
+        }
+    ],
+    "categories": [
+        {
+            "id": "all",
+            "name": "All Skills",
+            "color": "#6366f1"
+        },
+        {
+            "id": "ai-ml",
+            "name": "AI & Agents",
+            "color": "#8b5cf6"
+        },
+        {
+            "id": "backend",
+            "name": "Scalable Backend",
+            "color": "#10b981"
+        },
+        {
+            "id": "devops",
+            "name": "Cloud & Security",
+            "color": "#f59e0b"
+        },
+        {
+            "id": "frontend",
+            "name": "UI Engineering",
+            "color": "#3b82f6"
+        },
+        {
+            "id": "tools",
+            "name": "Automation",
+            "color": "#ec4899"
+        }
+    ]
+}

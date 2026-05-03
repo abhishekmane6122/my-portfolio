@@ -49,6 +49,15 @@ export interface ProjectDetailed {
     }[];
     liveUrl?: string;
     githubUrl?: string;
+    featured: boolean;
+    architecture?: {
+        pattern: string;
+        deployment: string;
+        database: string[];
+        security: string;
+        monitoring: string;
+        decisions?: { issue: string; choice: string; rationale: string }[];
+    };
     testimonial?: {
         text: string;
         author: string;

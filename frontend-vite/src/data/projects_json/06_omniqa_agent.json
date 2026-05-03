@@ -1,0 +1,60 @@
+{
+    "id": "omniqa-agent",
+    "slug": "omniqa-agent",
+    "title": "OmniQA-Agent - Autonomous QA",
+    "tagline": "Autonomous Requirements & Test Engineering orchestrator for web applications",
+    "banner": "/projects/omniqa-agent-banner.jpg",
+    "role": "AI Engineer",
+    "duration": "2025",
+    "problem": "Writing test plans and user stories is a repetitive, time-consuming manual task for QA engineers.",
+    "solution": "Orchestrated LangChain pipelines via Llama-4 to crawl websites via Playwright and auto-generate Jira-ready test cases and Excel workbooks.",
+    "team": [
+        "Solo project"
+    ],
+    "techStack": [
+        {
+            "category": "Agentic AI",
+            "technologies": [
+                "Python",
+                "Playwright",
+                "LangChain",
+                "Groq Llama-4",
+                "Streamlit"
+            ]
+        }
+    ],
+    "challenges": [],
+    "results": [
+        {
+            "metric": "Output",
+            "value": "Jira-Ready",
+            "description": "Automated user story generation"
+        },
+        {
+            "metric": "Speed",
+            "value": "Fast",
+            "description": "DOM parsing to test case in seconds"
+        }
+    ],
+    "images": [],
+    "videos": [],
+    "codeSnippets": [],
+    "featured": false,
+    "architecture": {
+        "pattern": "LangChain-based Agentic Orchestrator",
+        "deployment": "Streamlit Cloud / Local Docker",
+        "database": [
+            "Local JSON Registry",
+            "Pandas DataFrames"
+        ],
+        "security": "Sandbox Environment for Web Crawling",
+        "monitoring": "LangSmith (Prompt debugging)",
+        "decisions": [
+            {
+                "issue": "Story Quality",
+                "choice": "Chain-of-Thought (CoT) Prompting",
+                "rationale": "Ensured generated user stories follow professional INVEST criteria by forcing step-by-step reasoning."
+            }
+        ]
+    }
+}

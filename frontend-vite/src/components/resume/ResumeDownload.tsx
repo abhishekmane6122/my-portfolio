@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { Download, FileText, X, ExternalLink } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
@@ -24,50 +25,70 @@ export default function ResumeDownload({ variant = 'button', showLabel = true }:
         toast.success('Resume downloaded!', { icon: '📄', duration: 3000 })
     }
 
-    const ResumeModal = () => (
-        <AnimatePresence>
+    const ResumeModal = () => {
+        const [mounted, setMounted] = useState(false)
+        useEffect(() => { setMounted(true) }, [])
+
+        if (!mounted) return null
+
+        return createPortal(
+            <AnimatePresence>
             {showModal && (
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-[200] flex items-center justify-center p-2 sm:p-4 bg-black/70 backdrop-blur-sm"
+                    className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center bg-black/90 backdrop-blur-xl transition-all duration-300"
                     onClick={(e) => { if (e.target === e.currentTarget) setShowModal(false) }}
                 >
                     <motion.div
-                        initial={{ scale: 0.9, opacity: 0, y: 20 }}
-                        animate={{ scale: 1, opacity: 1, y: 0 }}
-                        exit={{ scale: 0.9, opacity: 0 }}
-                        className="relative w-full max-w-3xl max-h-[95vh] bg-white dark:bg-[#0f0f0f] rounded-2xl shadow-2xl border border-neutral-200 dark:border-white/10 overflow-hidden flex flex-col"
+                        initial={{ y: "100%", opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: "100%", opacity: 0 }}
+                        transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                        className="relative w-full sm:max-w-4xl h-[94vh] sm:h-[88vh] bg-white dark:bg-[#0f0f0f] rounded-t-[2.5rem] sm:rounded-3xl shadow-2xl border-t sm:border border-neutral-200 dark:border-white/10 overflow-hidden flex flex-col"
                     >
-                        {/* Header */}
-                        <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-black/30 shrink-0">
-                            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-                                <FileText className="w-4 h-4 text-[#d4a373] shrink-0" />
-                                <span className="font-mono text-xs font-medium uppercase tracking-widest text-neutral-700 dark:text-neutral-300 truncate">
-                                    Abhishek Mane — Resume
-                                </span>
+                        {/* Mobile Handle */}
+                        <div className="sm:hidden w-12 h-1.5 bg-neutral-300 dark:bg-white/20 rounded-full mx-auto my-3 shrink-0" />
+
+                        {/* Sticky Header - Fully Opaque for Mobile */}
+                        <div className="sticky top-0 z-50 flex items-center justify-between px-6 sm:px-8 py-5 border-b border-neutral-200 dark:border-white/10 bg-white dark:bg-[#0f0f0f] sm:bg-white/95 sm:dark:bg-[#0f0f0f]/95 sm:backdrop-blur-md shrink-0">
+                            <div className="flex items-center gap-3 min-w-0">
+                                <div className="p-2 rounded-xl bg-[#d4a373]/10">
+                                    <FileText className="w-5 h-5 text-[#d4a373]" />
+                                </div>
+                                <div className="flex flex-col min-w-0">
+                                    <span className="font-bold text-sm sm:text-base text-neutral-900 dark:text-white truncate">
+                                        Professional Resume
+                                    </span>
+                                    <span className="font-mono text-[10px] uppercase tracking-widest text-[#d4a373] hidden sm:block">
+                                        Abhishek Mane
+                                    </span>
+                                </div>
                             </div>
-                            <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+                            <div className="flex items-center gap-2 shrink-0">
                                 <button
                                     onClick={handleDownload}
-                                    className="flex items-center gap-1.5 px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-[#d4a373] text-white text-xs font-mono uppercase tracking-widest hover:bg-[#c49363] transition-all"
+                                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#d4a373] text-white text-xs font-bold uppercase tracking-widest hover:bg-[#c49363] transition-all shadow-lg shadow-[#d4a373]/20"
                                 >
-                                    <Download className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                                    <span className="hidden sm:inline">Download PDF</span>
-                                    <span className="sm:hidden">PDF</span>
+                                    <Download className="w-3.5 h-3.5" />
+                                    <span className="hidden sm:inline">Download</span>
                                 </button>
                                 <a
                                     href={`${import.meta.env.BASE_URL}resume/Abhishek_Mane_Resume.pdf`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-neutral-100 dark:bg-white/10 text-neutral-700 dark:text-white text-xs hover:bg-neutral-200 dark:hover:bg-white/20 transition-all"
+                                    className="flex items-center gap-2 p-2 sm:px-4 sm:py-2 rounded-xl bg-neutral-100 dark:bg-white/5 text-neutral-700 dark:text-neutral-300 text-xs hover:bg-neutral-200 dark:hover:bg-white/10 transition-all"
                                 >
-                                    <ExternalLink className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                                    <ExternalLink className="w-4 h-4" />
                                     <span className="hidden sm:inline font-mono uppercase tracking-widest">Open</span>
                                 </a>
-                                <button onClick={() => setShowModal(false)} className="p-1.5 sm:p-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors">
-                                    <X className="w-4 h-4 text-neutral-500" />
+                                <button
+                                    onClick={() => setShowModal(false)}
+                                    className="flex items-center gap-1.5 p-2 px-3 rounded-xl hover:bg-red-500/10 hover:text-red-500 transition-colors group"
+                                >
+                                    <span className="text-[10px] font-bold uppercase tracking-widest hidden sm:inline opacity-0 group-hover:opacity-100 transition-opacity">Close</span>
+                                    <X className="w-5 h-5" />
                                 </button>
                             </div>
                         </div>
@@ -234,12 +255,23 @@ export default function ResumeDownload({ variant = 'button', showLabel = true }:
                                 </p>
                             </RSection>
 
+                            {/* Bottom Close Button for Mobile Ergonomics */}
+                            <div className="mt-16 mb-12 flex justify-center">
+                                <button
+                                    onClick={() => setShowModal(false)}
+                                    className="px-8 py-3 rounded-2xl bg-neutral-100 dark:bg-white/5 text-neutral-600 dark:text-neutral-400 font-bold text-xs uppercase tracking-[0.2em] hover:bg-red-500/10 hover:text-red-500 transition-all border border-transparent hover:border-red-500/20"
+                                >
+                                    Close Resume
+                                </button>
+                            </div>
                         </div>
                     </motion.div>
                 </motion.div>
             )}
-        </AnimatePresence>
-    )
+            </AnimatePresence>,
+            document.body
+        )
+    }
 
     if (variant === 'card') {
         return (

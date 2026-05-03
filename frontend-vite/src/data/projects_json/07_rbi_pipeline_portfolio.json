@@ -1,0 +1,405 @@
+{
+  "id": "rbi-notification-intelligence-pipeline",
+  "slug": "rbi-notification-ai-pipeline",
+  "title": "RBI Notification Intelligence Pipeline",
+  "tagline": "An end-to-end autonomous AI pipeline that scrapes, processes, summarizes, and distributes RBI regulatory notifications with enterprise-grade observability and cloud persistence.",
+  "banner": "/projects/rbi-pipeline-banner.jpg",
+  "role": "AI Engineer",
+  "duration": "2 Weeks ( Sept 2026)",
+  "featured": true,
+  "team": [
+    "Abhishek Mane"
+  ],
+  "problem": "### The Regulatory Intelligence Challenge\n\nRegulatory teams in large conglomerates face a relentless, manual burden: monitoring the Reserve Bank of India's notification portal daily, downloading every published circular, reading dense legal documents, and distributing relevant summaries to dozens of stakeholders across business units. This process is not only time-consuming but critically error-prone — a missed RBI circular can translate directly into non-compliance, regulatory penalties, or operational risk.\n\n| Constraint | Requirement |\n| :--- | :--- |\n| **Timeliness** | Summaries must reach stakeholders within minutes of RBI publishing |\n| **Accuracy** | Zero tolerance for hallucinations or PII leakage in generated outputs |\n| **Scale** | Must handle variable daily document volume (0 to 50+ PDFs) gracefully |\n| **Availability** | Must operate reliably on internal corporate proxy infrastructure |\n| **Auditability** | Full document provenance (SHA-256, timestamps, parse status) required |\n\nThe core challenge was building an **autonomous, hands-free pipeline** that eliminates all human touchpoints between RBI publishing a notification and a compliance officer receiving an accurate, actionable summary — while running inside a locked-down corporate network behind a proxy.",
+  "solution": "### The Architecture: Modular AI Ingestion Pipeline\n\nThe system was architected as a **5-stage modular pipeline** orchestrated by a single `run_pipeline()` entrypoint, with each stage cleanly decoupled via Python modules to allow independent testing, swapping, and scaling.\n\n1. **🌐 Ingestion (Playwright Headless Scraper):** A Playwright-driven Chromium scraper parses the RBI notification table, identifies PDFs within a configurable date range, and downloads them via the corporate proxy. SHA-256 hashing enables idempotent re-runs without duplicate processing.\n\n2. **📄 Processing (PyMuPDF + Docling):** Extracted text is cleaned by a surgical regex sanitizer that strips legal boilerplate (letterheads, signatures, reference numbers, PII markers) to maximize signal-to-noise ratio before LLM inference.\n\n3. **🤖 AI Summarization (Microsoft Phi-3-mini-4k-instruct on GPU):** A locally-hosted SLM running on an NVIDIA Tesla T4 GPU generates compliance-grade summaries using a strict prompt template. Recursive chunking handles large documents by summarizing sub-chunks and then synthesizing a final summary. Float16 precision reduces VRAM consumption from ~16GB to ~8GB.\n\n4. **🗄️ Dual Persistence (SQLite VectorStore + Azure PostgreSQL):** Raw text, clean text, summaries, and 384-dim `all-MiniLM-L6-v2` embedding vectors are persisted in a local SQLite vector store for fast semantic retrieval. Concurrently, summaries are pushed to Azure PostgreSQL (`aegis_rbi_notifications`) for enterprise-wide access.\n\n5. **📧 Automated Distribution (SMTP + Excel):** A monthly-organized Excel report is auto-generated and emailed to distribution lists loaded from Excel, with PII-safe HTML email bodies and configurable BCC for compliance archiving.",
+  "techStack": [
+    {
+      "category": "AI & Machine Learning",
+      "technologies": [
+        "Microsoft Phi-3-mini-4k-instruct (Local SLM)",
+        "Sentence Transformers (all-MiniLM-L6-v2)",
+        "Hugging Face Transformers 4.43",
+        "PyTorch 2.2+ (CUDA 12.4 / float16)",
+        "accelerate",
+        "bitsandbytes"
+      ]
+    },
+    {
+      "category": "Ingestion & Processing",
+      "technologies": [
+        "Playwright 1.45 (Headless Chromium)",
+        "PyMuPDF 1.24 (PDF Extraction)",
+        "Docling (Document Parsing)",
+        "pytesseract (OCR Fallback)",
+        "PyPDF2"
+      ]
+    },
+    {
+      "category": "Backend & API",
+      "technologies": [
+        "Python 3.11",
+        "FastAPI",
+        "uvicorn",
+        "pydantic",
+        "pandas 2.2",
+        "openpyxl"
+      ]
+    },
+    {
+      "category": "Storage & Databases",
+      "technologies": [
+        "SQLite (VectorStore + Observability)",
+        "Azure PostgreSQL (Flexible Server)",
+        "psycopg2-binary",
+        "NumPy (Binary Vector Serialization)"
+      ]
+    },
+    {
+      "category": "Infrastructure & DevOps",
+      "technologies": [
+        "NVIDIA Tesla T4 GPU (16GB VRAM)",
+        "CUDA 12.4",
+        "Corporate Proxy (cloudproxy.[corp].com)",
+        "SMTP (Internal Mail Relay)",
+        "Windows Server (On-Premise VM)"
+      ]
+    }
+  ],
+  "architecture": {
+    "pattern": "Modular ETL-AI Pipeline (Extract → Transform → Summarize → Load → Distribute)",
+    "deployment": "On-Premise Windows VM with NVIDIA GPU + Azure PostgreSQL Cloud Sync",
+    "database": [
+      "SQLite VectorStore (local)",
+      "SQLite Observability DB (local)",
+      "Azure PostgreSQL (cloud)"
+    ],
+    "security": "SHA-256 document provenance, PII regex sanitization, output safety verification, corporate proxy enforcement",
+    "monitoring": "Custom Observability module (SQLite-backed) with per-run metrics, error logs, and Excel export",
+    "decisions": [
+      {
+        "issue": "LLM Hosting: Cloud API vs. Local SLM",
+        "choice": "Local Microsoft Phi-3-mini-4k-instruct on Tesla T4 GPU",
+        "rationale": "RBI circulars contain regulatory content that must not leave the corporate network boundary. A cloud LLM API (e.g., Azure OpenAI, Claude) would require routing sensitive compliance documents over the internet, creating unacceptable data governance risk. Phi-3-mini was chosen over Llama-3 because its 4K context window covers 95%+ of RBI PDFs in a single pass without chunking, and its 3.8B parameters fit in 8GB VRAM when loaded in float16 — the exact sweet spot for the T4's 16GB VRAM budget. The instruction-tuned variant with the Phi-3 chat format allows strict prompt control to prevent hallucinations in compliance summaries."
+      },
+      {
+        "issue": "Vector Storage: ChromaDB vs. Custom SQLite VectorStore",
+        "choice": "Custom SQLite-based VectorStore with NumPy cosine similarity",
+        "rationale": "ChromaDB introduces a persistent server process and external dependency that is difficult to manage on a corporate-locked Windows VM without admin rights. The RBI document corpus is bounded (hundreds to low thousands of documents), making a full vector database's overhead unjustified. By serializing float32 NumPy arrays as BLOBs in SQLite, the team achieved zero-dependency vector similarity search (cosine similarity via matrix dot product) with full ACID guarantees, SHA-256 deduplication, and multi-table provenance — all in a single portable `.db` file. This also made the pipeline trivially runnable with `python main.py` without any server startup."
+      }
+    ]
+  },
+    "flowDiagram": {
+    "title": "RBI AI Pipeline — End-to-End Data Flow",
+    "height": "1350px",
+    "nodes": [
+      {
+        "id": "1",
+        "data": {
+          "label": "🏛️ RBI Notification Portal\n(rbi.org.in)"
+        },
+        "position": {
+          "x": 300,
+          "y": 30
+        },
+        "className": "bg-accent-blue/10 border-accent-blue/50"
+      },
+      {
+        "id": "2",
+        "data": {
+          "label": "🕷️ Playwright Scraper\n(Headless Chromium + Proxy)"
+        },
+        "position": {
+          "x": 300,
+          "y": 180
+        },
+        "className": "bg-accent-blue/10 border-accent-blue/50"
+      },
+      {
+        "id": "3",
+        "data": {
+          "label": "📥 PDF Downloader\n(SHA-256 Deduplication)"
+        },
+        "position": {
+          "x": 300,
+          "y": 330
+        },
+        "className": "bg-accent-blue/10 border-accent-blue/50"
+      },
+      {
+        "id": "12",
+        "data": {
+          "label": "📈 Observability DB\n(Metrics / Errors / Logs)"
+        },
+        "position": {
+          "x": 600,
+          "y": 330
+        },
+        "className": "bg-red-500/10 border-red-500/50"
+      },
+      {
+        "id": "4",
+        "data": {
+          "label": "📄 PDF Text Extractor\n(PyMuPDF + Docling)"
+        },
+        "position": {
+          "x": 300,
+          "y": 480
+        },
+        "className": "bg-accent-gold/10 border-accent-gold/50"
+      },
+      {
+        "id": "5",
+        "data": {
+          "label": "🧹 Text Sanitizer\n(Regex PII / Boilerplate Strip)"
+        },
+        "position": {
+          "x": 300,
+          "y": 630
+        },
+        "className": "bg-accent-gold/10 border-accent-gold/50"
+      },
+      {
+        "id": "6",
+        "data": {
+          "label": "🤖 Phi-3-mini SLM\n(Recursive Summarizer, GPU)"
+        },
+        "position": {
+          "x": 300,
+          "y": 780
+        },
+        "className": "bg-purple-500/10 border-purple-500/50"
+      },
+      {
+        "id": "7",
+        "data": {
+          "label": "🔍 Sentence Transformer\n(all-MiniLM-L6-v2 Embedder)"
+        },
+        "position": {
+          "x": 50,
+          "y": 930
+        },
+        "className": "bg-purple-500/10 border-purple-500/50"
+      },
+      {
+        "id": "8",
+        "data": {
+          "label": "🗄️ SQLite VectorStore\n(Docs + Embeddings + Summaries)"
+        },
+        "position": {
+          "x": 50,
+          "y": 1080
+        },
+        "className": "bg-green-500/10 border-green-500/50"
+      },
+      {
+        "id": "10",
+        "data": {
+          "label": "📊 Monthly Excel Report\n(RBI_Notifications_MM-YYYY)"
+        },
+        "position": {
+          "x": 600,
+          "y": 930
+        },
+        "className": "bg-accent-gold/10 border-accent-gold/50"
+      },
+      {
+        "id": "11",
+        "data": {
+          "label": "📧 SMTP Emailer\n(To / BCC Distribution Lists)"
+        },
+        "position": {
+          "x": 600,
+          "y": 1080
+        },
+        "className": "bg-accent-blue/10 border-accent-blue/50"
+      },
+      {
+        "id": "9",
+        "data": {
+          "label": "☁️ Azure PostgreSQL\n(master_summaries table)"
+        },
+        "position": {
+          "x": 300,
+          "y": 1230
+        },
+        "className": "bg-green-500/10 border-green-500/50"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1-2",
+        "source": "1",
+        "target": "2",
+        "animated": true,
+        "label": "HTTP Scrape"
+      },
+      {
+        "id": "e2-3",
+        "source": "2",
+        "target": "3",
+        "animated": true,
+        "label": "PDF Links"
+      },
+      {
+        "id": "e3-4",
+        "source": "3",
+        "target": "4",
+        "animated": true,
+        "label": "Downloaded PDF"
+      },
+      {
+        "id": "e4-5",
+        "source": "4",
+        "target": "5",
+        "animated": true,
+        "label": "Raw Text"
+      },
+      {
+        "id": "e5-6",
+        "source": "5",
+        "target": "6",
+        "animated": true,
+        "label": "Clean Text"
+      },
+      {
+        "id": "e6-7",
+        "source": "6",
+        "target": "7",
+        "animated": false,
+        "label": "Cleaned Doc"
+      },
+      {
+        "id": "e7-8",
+        "source": "7",
+        "target": "8",
+        "animated": false,
+        "label": "384-dim Vector"
+      },
+      {
+        "id": "e6-8",
+        "source": "6",
+        "target": "8",
+        "animated": false,
+        "label": "Summary + Raw"
+      },
+      {
+        "id": "e6-9",
+        "source": "6",
+        "target": "9",
+        "animated": true,
+        "label": "Push to Cloud"
+      },
+      {
+        "id": "e6-10",
+        "source": "6",
+        "target": "10",
+        "animated": false,
+        "label": "Summary Row"
+      },
+      {
+        "id": "e10-11",
+        "source": "10",
+        "target": "11",
+        "animated": true,
+        "label": "Excel Attachment"
+      },
+      {
+        "id": "e3-12",
+        "source": "3",
+        "target": "12",
+        "animated": false,
+        "label": "Run Metrics"
+      },
+      {
+        "id": "e6-12",
+        "source": "6",
+        "target": "12",
+        "animated": false,
+        "label": "LLM Metrics"
+      }
+    ]
+  },
+  "mermaidDiagram": "graph TD\n  A[🏛️ RBI Portal] -->|Playwright Scrape| B(🕷️ Scraper)\n  B -->|PDF Links| C(📥 Downloader)\n  C -->|SHA-256 check| D{Already Processed?}\n  D -->|No| E(📄 PyMuPDF Extractor)\n  D -->|Yes| F[Skip]\n  E -->|Raw Text| G(🧹 Sanitizer)\n  G -->|Clean Text| H(🤖 Phi-3-mini SLM)\n  H -->|Summary| I(📊 Excel Report)\n  H -->|Summary| J(☁️ Azure PostgreSQL)\n  G -->|Text| K(🔍 Embedder)\n  K -->|384-dim vector| L[(🗄️ SQLite VectorStore)]\n  I -->|Attachment| M(📧 SMTP Emailer)\n  M -->|Distribution| N[👥 Stakeholders]",
+  "results": [
+    {
+      "metric": "Time-to-Insight",
+      "value": "~5 min",
+      "description": "End-to-end latency from RBI publishing a circular to stakeholders receiving a summary email, replacing a 2–4 hour manual process."
+    },
+    {
+      "metric": "Manual Effort Eliminated",
+      "value": "100%",
+      "description": "Zero human touchpoints required between publication and distribution. The pipeline runs autonomously on a scheduled trigger."
+    },
+    {
+      "metric": "Document Deduplication Accuracy",
+      "value": "100%",
+      "description": "SHA-256 provenance hashing ensures idempotent pipeline runs — re-running for any date never creates duplicate records in any database."
+    },
+    {
+      "metric": "LLM Inference (GPU)",
+      "value": "~8–15s/doc",
+      "description": "Per-document summarization latency on NVIDIA Tesla T4 with Phi-3-mini in float16, vs. ~120s on CPU — a 10x acceleration."
+    },
+    {
+      "metric": "VRAM Efficiency",
+      "value": "~8 GB",
+      "description": "float16 model loading reduces memory footprint by 50% vs. float32, comfortably fitting within the Tesla T4's 16GB VRAM budget."
+    },
+    {
+      "metric": "Data Durability",
+      "value": "Dual-Write",
+      "description": "Every summary is persisted to both local SQLite (for semantic search) and Azure PostgreSQL (for enterprise dashboards), ensuring zero data loss on either layer failing."
+    }
+  ],
+  "challenges": [
+    {
+      "title": "Corporate Proxy + Playwright Headless Browser Compatibility",
+      "description": "The RBI portal is a JavaScript-heavy ASP.NET application that blocks standard HTTP requests. Running Playwright behind the internal corporate proxy (`cloudproxy.[corp].com:8080`) required configuring Chromium's proxy settings at launch time and setting `headless: false` during development to debug dynamic content rendering.",
+      "solution": "Integrated `launch_kwargs['proxy'] = {'server': Config.PROXY_SERVER}` into the Playwright launcher. Implemented a `wait_until='networkidle'` strategy to ensure all async JS content (the notification table) was fully rendered before DOM parsing began."
+    },
+    {
+      "title": "RBI Website HTML Structure Instability",
+      "description": "The RBI portal has a non-standard, table-driven ASP.NET layout where date headers are rendered as `<h2 class='dop_header'>` elements inside table rows. The structure changed between iterations, breaking CSS selector-based scrapers.",
+      "solution": "Replaced fragile CSS selectors with a stateful row-walking algorithm: iterate all `<tr>` elements, detect date header rows via `h2.dop_header`, maintain a `current_date` state variable, and collect PDF links only when `current_date` falls within the target range. This makes the scraper robust to layout changes."
+    },
+    {
+      "title": "LLM Context Window vs. Document Length",
+      "description": "Some RBI master circulars exceed Phi-3-mini's 4096-token context window. Truncating documents would cause summaries to miss critical regulatory clauses in later sections.",
+      "solution": "Implemented a recursive summarization strategy: tokenize the full document, split into 1500-token chunks, summarize each chunk independently, concatenate the chunk summaries, then run a final summarization pass over the combined text — producing a coherent, full-document summary within the model's context limit."
+    },
+    {
+      "title": "Output Safety: Preventing PII Leakage in Summaries",
+      "description": "RBI circulars occasionally contain internal contact details, postal addresses, and signatures that should not appear in AI-generated summaries distributed to wide stakeholder lists.",
+      "solution": "Built a two-layer defense: (1) a pre-processing regex sanitizer strips known PII patterns (phone numbers, emails, addresses, signatures) from source text before LLM inference; (2) a post-generation `verify_no_leaks()` safety check flags and redacts summaries containing residual sensitive patterns, with the `leak_flag` field stored in the VectorStore for audit."
+    }
+  ],
+  "codeSnippets": [
+    {
+      "title": "Recursive LLM Summarizer (llm/summarizer.py)",
+      "language": "python",
+      "code": "def recursive_summarize(self, document, chunk_size=1500):\n    tokens = self.tokenizer(document, return_tensors='pt')['input_ids'].squeeze()\n    num_tokens = len(tokens)\n    # Direct summarize if within context window\n    if num_tokens < 2000:\n        return self.summarize_chunk(document)\n    # Chunk → summarize → recombine → final summarize\n    summaries = []\n    for i in range(0, num_tokens, chunk_size):\n        chunk_ids = tokens[i: i + chunk_size]\n        chunk_text = self.tokenizer.decode(chunk_ids, skip_special_tokens=True)\n        summaries.append(self.summarize_chunk(chunk_text))\n    combined = ' '.join(summaries)\n    return self.summarize_chunk(combined)"
+    },
+    {
+      "title": "Idempotent Vector Store Upsert (storage/vector_store.py)",
+      "language": "python",
+      "code": "def add_or_update_document(self, pdf_url, file_name, sha256, ...):\n    # SHA-256 deduplication: check if document already exists\n    if sha256:\n        cur.execute('SELECT id FROM documents WHERE sha256=?', (sha256,))\n        row = cur.fetchone()\n        if row:\n            # Update existing record in-place, return same ID\n            cur.execute('UPDATE documents SET ... WHERE id=?', (..., row[0]))\n            return row[0]\n    # Fallback: URL+filename uniqueness check\n    cur.execute('SELECT id FROM documents WHERE pdf_url=? AND file_name=?', (pdf_url, file_name))\n    # Insert if genuinely new\n    cur.execute('INSERT INTO documents(...) VALUES(...)')\n    return cur.lastrowid"
+    },
+    {
+      "title": "GPU-Optimized Model Loading (float16 on Tesla T4)",
+      "language": "python",
+      "code": "self.model = AutoModelForCausalLM.from_pretrained(\n    Config.LLM_MODEL_PATH,\n    trust_remote_code=True,\n    torch_dtype=torch.float16,   # ~8GB VRAM vs 16GB in float32\n    low_cpu_mem_usage=True,       # prevents CPU OOM during load\n    device_map='auto',            # auto-maps layers to T4 VRAM\n    attn_implementation='eager',  # stable attention for Phi-3\n)"
+    }
+  ],
+  "images": [
+    "/projects/rbi-pipeline-flow.png"
+  ],
+  "videos": [],
+  "liveUrl": "",
+  "githubUrl": "",
+  "testimonial": {
+    "text": "This system completely eliminated the daily manual effort of tracking RBI circulars. Our compliance team now receives accurate, structured summaries in their inbox automatically — it has meaningfully reduced our regulatory response time.",
+    "author": "Research & Analytics Lead",
+    "role": "Renewables Investor Relations"
+  }
+}

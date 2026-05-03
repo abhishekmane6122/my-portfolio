@@ -15,8 +15,6 @@ export default function BlogPost() {
     const { slug } = useParams<{ slug: string }>()
     const post = slug ? getPostBySlug(slug) : undefined
 
-    const [showTopButton, setShowTopButton] = useState(false)
-    const [showBottomButton, setShowBottomButton] = useState(true)
     const [scrollProgress, setScrollProgress] = useState(0)
 
     useEffect(() => {
@@ -26,26 +24,14 @@ export default function BlogPost() {
     useEffect(() => {
         const handleScroll = () => {
             const currentScroll = window.scrollY
-            setShowTopButton(currentScroll > 400)
-            
             const totalHeight = document.documentElement.scrollHeight - window.innerHeight
             const progress = (currentScroll / totalHeight) * 100
             setScrollProgress(progress)
-            
-            // Show bottom button if we are not at the bottom
-            setShowBottomButton(totalHeight - currentScroll > 400)
         }
         window.addEventListener('scroll', handleScroll)
         return () => window.removeEventListener('scroll', handleScroll)
     }, [])
 
-    const scrollToTop = () => {
-        window.scrollTo({ top: 0, behavior: 'smooth' })
-    }
-
-    const scrollToBottom = () => {
-        window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' })
-    }
 
     if (!post) {
         return <Navigate to="/blog" replace />
@@ -88,49 +74,7 @@ export default function BlogPost() {
                         transition={{ type: 'spring', stiffness: 100, damping: 20 }}
                     />
                 </div>
-                {/* Floating Buttons Stack - Responsive positioning */}
-                <div className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-50 flex flex-col gap-3 sm:gap-4">
-                    {/* Back to Top */}
-                    {showTopButton && (
-                        <motion.button
-                            initial={{ opacity: 0, scale: 0.5 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            onClick={scrollToTop}
-                            className="p-3 sm:p-4 rounded-full bg-white dark:bg-card border border-neutral-200 dark:border-white/10 text-[#d4a373] shadow-xl hover:scale-110 transition-all flex items-center justify-center group"
-                            title="Scroll to Top"
-                            aria-label="Scroll to top of page"
-                        >
-                            <ArrowUp className="w-5 h-5 sm:w-6 sm:h-6" />
-                        </motion.button>
-                    )}
-
-                    {/* Scroll to Bottom */}
-                    {showBottomButton && (
-                        <motion.button
-                            initial={{ opacity: 0, scale: 0.5 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            onClick={scrollToBottom}
-                            className="p-3 sm:p-4 rounded-full bg-white dark:bg-card border border-neutral-200 dark:border-white/10 text-[#d4a373] shadow-xl hover:scale-110 transition-all flex items-center justify-center group"
-                            title="Scroll to Bottom"
-                            aria-label="Scroll to bottom of page"
-                        >
-                            <ArrowDown className="w-5 h-5 sm:w-6 sm:h-6" />
-                        </motion.button>
-                    )}
-
-                    {/* Floating Home Button */}
-                    <Link
-                        to="/"
-                        className="p-3 sm:p-4 rounded-full bg-white dark:bg-card border border-neutral-200 dark:border-white/10 text-[#d4a373] shadow-xl hover:scale-110 transition-all flex items-center justify-center group"
-                        title="Back to Home"
-                        aria-label="Navigate to home page"
-                    >
-                        <Home className="w-5 h-5 sm:w-6 sm:h-6" />
-                        <span className="max-w-0 overflow-hidden group-hover:max-w-xs group-hover:ml-2 transition-all duration-300 whitespace-nowrap font-medium text-sm hidden sm:inline">
-                            Home
-                        </span>
-                    </Link>
-                </div>
+                
 
                 {/* Header */}
                 <div className="relative overflow-hidden bg-neutral-50 dark:bg-[#050505] transition-colors duration-300 border-b border-black/5 dark:border-white/10 backdrop-blur-sm">

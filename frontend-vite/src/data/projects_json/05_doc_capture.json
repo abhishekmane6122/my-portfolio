@@ -1,0 +1,41 @@
+{
+    "id": "doc-capture",
+    "slug": "doc-capture",
+    "title": "Doc Capture - Intelligent Extraction",
+    "tagline": "Automated data extraction from identity documents and complex invoices using LLMs",
+    "banner": "/projects/doc-capture-banner.jpg",
+    "role": "AI Backend Developer",
+    "duration": "2024",
+    "problem": "Manual data entry from varied document types (Aadhaar, PAN, Invoices) was slow and prone to errors.",
+    "solution": "Built a FastAPI backend using Groq LLM and PyMuPDF to extract structured JSON/Excel data from multi-type documents with template mapping.",
+    "team": ["Solo project"],
+    "techStack": [
+        {
+            "category": "Backend & OCR",
+            "technologies": ["Python", "FastAPI", "Groq LLM", "PyMuPDF", "Docker"]
+        }
+    ],
+    "challenges": [],
+    "results": [
+        { "metric": "Throughput", "value": "High", "description": "Supports batch processing" },
+        { "metric": "Formats", "value": "JSON/XLSX", "description": "Automated structured exports" }
+    ],
+    "images": [],
+    "videos": [],
+    "codeSnippets": [],
+    "featured": false,
+    "architecture": {
+        "pattern": "FastAPI Micro-service for Document Processing",
+        "deployment": "Docker Compose (API + Redis)",
+        "database": ["S3/Blob Storage (Docs)", "Redis (Task Caching)"],
+        "security": "AES-256 Encryption at Rest + JWT Auth",
+        "monitoring": "ELK Stack (Elasticsearch, Logstash, Kibana)",
+        "decisions": [
+            {
+                "issue": "Scaling Extraction",
+                "choice": "Async Task Offloading",
+                "rationale": "Used Redis for task queuing to handle high-concurrency document uploads without blocking the API."
+            }
+        ]
+    }
+}

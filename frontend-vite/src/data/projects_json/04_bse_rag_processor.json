@@ -1,0 +1,432 @@
+{
+    "id": "bse-pdf-rag-intelligence",
+    "slug": "bse-pdf-intelligence-platform",
+    "title": "BSE PDF Intelligence & Market Analytics Platform",
+    "tagline": "An enterprise-grade, AI-powered pipeline that autonomously ingests, comprehends, and disseminates BSE corporate filings using a hybrid RAG architecture on Azure.",
+    "banner": "/projects/bse-pdf-rag-banner.jpg",
+    "role": "AI Engineer",
+    "duration": "4 Weeks (Sept 2025)",
+    "featured": true,
+    "team": [
+        "Abhishek Mane (AI Engineer)"
+    ],
+    "problem": "### The Challenge\n\nInvestor Relations and Research teams at a leading Global Renewable Energy Conglomerate were overwhelmed by the sheer volume of corporate filings published daily on the Bombay Stock Exchange (BSE). Analysts were manually visiting BSE's website for each of the 30+ portfolio companies, downloading PDFs, reading them to understand their nature, and then forwarding relevant summaries to business leaders. This process consumed an estimated **4–6 hours of high-value analyst time daily** and was highly susceptible to human error, inconsistency in summarization quality, and delays in decision-making.\n\n| Enterprise Constraint | Requirement |\n| :--- | :--- |\n| **Latency** | Results must be delivered by 9:00 AM IST, before market open |\n| **Accuracy** | Subject extraction must match the filing verbatim (zero paraphrasing) |\n| **Scalability** | Must handle N+1 portfolio companies without code changes |\n| **Data Sovereignty** | Vectors & PDFs must remain on-premise; only inference calls exit the network |\n| **Resilience** | Must handle scanned (image-only) PDFs that PyPDF2 cannot parse |\n| **Auditability** | Every run must produce a structured log and a versioned Excel audit trail |\n\nBeyond the daily reading burden, there was no centralized, queryable database of filing history. Questions like *\"How many Q3 results were filed last month?\"* required ad-hoc manual searches across fragmented spreadsheets, making trend analysis impossible without significant effort.",
+    "solution": "### The Architecture\n\nWe architected a **4-Phase Modular Pipeline** that runs end-to-end autonomously as a scheduled daily job. The system is built on a **Hybrid RAG (Retrieval-Augmented Generation)** pattern, combining a local vector store (ChromaDB) for privacy-compliant document retrieval with enterprise-grade Azure AI inference for maximum summarization quality.\n\n- **Phase 1 – Intelligent Acquisition**: A `PDFProcessor` queries the Nimble Corporate Announcement API for each entity in the portfolio (driven by a PostgreSQL entity registry), downloading only the current day's filings with exponential-backoff retry logic and user-agent rotation to evade anti-bot measures.\n- **Phase 2 – Dual-Mode Text Extraction**: A `PyPDF2` fast-path extracts text from digital PDFs in milliseconds. If a PDF is a scanned image (zero-text output), the pipeline transparently falls back to **Docling + Tesseract OCR**, ensuring 100% document coverage.\n- **Phase 3 – RAG-Enhanced AI Analysis**: Extracted text is chunked (512 tokens, 50-token overlap) and embedded via **Azure Cohere Embed v4.0** (1536-dim). The ChromaDB collection is queried with a financial-domain semantic probe to surface the top-5 most relevant chunks. These are injected into structured prompts for **Azure Llama-4-Maverick-17B** to generate verbatim subject lines and 3-point executive summaries.\n- **Phase 4 – Multi-Sink Delivery**: Results are upserted into an **Azure PostgreSQL** database for longitudinal analytics, formatted into a branded multi-sheet Excel workbook (Daily / Weekly MTD / Monthly Summary), rendered as a PNG trend chart, and distributed to stakeholders via SMTP with inline chart embedding and BCC audit trail.",
+    "techStack": [
+        {
+            "category": "AI & LLM",
+            "technologies": [
+                "Azure Llama-4-Maverick-17B-128E (MoE)",
+                "Microsoft Phi-3-mini-4k (Local Fallback)",
+                "Azure Cohere Embed v4.0",
+                "SentenceTransformers all-MiniLM-L6-v2 (Local Fallback)"
+            ]
+        },
+        {
+            "category": "RAG & Vector Store",
+            "technologies": [
+                "ChromaDB (HNSW Cosine Index)",
+                "Custom Sliding-Window Chunker",
+                "Query Embedding Cache"
+            ]
+        },
+        {
+            "category": "Document Processing",
+            "technologies": [
+                "PyPDF2 (Primary Extraction)",
+                "Docling (OCR Pipeline)",
+                "Tesseract OCR v5",
+                "Playwright (Browser Automation Fallback)"
+            ]
+        },
+        {
+            "category": "Backend & Pipeline",
+            "technologies": [
+                "Python 3.11",
+                "SQLAlchemy",
+                "Pandas",
+                "ThreadPoolExecutor",
+                "Requests + urllib3"
+            ]
+        },
+        {
+            "category": "Database & Storage",
+            "technologies": [
+                "Azure PostgreSQL (Flexible Server)",
+                "SQLite (Local User Registry)",
+                "Local Filesystem (PDF Store)"
+            ]
+        },
+        {
+            "category": "Reporting & Delivery",
+            "technologies": [
+                "OpenPyXL (Excel Generation)",
+                "Matplotlib (PNG Chart)",
+                "SMTP / STARTTLS",
+                "HTML Email Templates"
+            ]
+        },
+        {
+            "category": "Infrastructure",
+            "technologies": [
+                "Azure AI Inference API",
+                "Nimble Corporate Announcement API (BSE Data)",
+                "Windows Task Scheduler (Cron)"
+            ]
+        },
+        {
+            "category": "Observability",
+            "technologies": [
+                "Rich (TUI Console)",
+                "Python logging (Structured File Logs)",
+                "RAGAS (Eval Framework, Staged)"
+            ]
+        }
+    ],
+    "architecture": {
+        "pattern": "Phased ETL Pipeline with Hybrid RAG",
+        "deployment": "Azure (PostgreSQL, AI Inference) + On-Premise Windows (Pipeline Runner)",
+        "database": [
+            "Azure PostgreSQL (Flexible Server)",
+            "ChromaDB (Local HNSW)",
+            "SQLite (bse_user.db)"
+        ],
+        "security": "API Key Auth (Azure AI), SSL/TLS PostgreSQL, SMTP STARTTLS, BCC Audit Monitoring",
+        "monitoring": "Rich TUI + Structured File Logging + RAGAS Evaluation (Staged)",
+        "decisions": [
+            {
+                "issue": "LLM Choice: Cloud vs. Local",
+                "choice": "Azure Llama-4-Maverick-17B with local Phi-3 fallback via a feature flag (USE_AZURE_AI)",
+                "rationale": "Local Phi-3 was viable for offline environments but produced poor summarization quality on complex financial tables and mixed-language filings. Azure Llama-4-Maverick's Mixture-of-Experts (128 expert) architecture delivers analyst-grade comprehension at scale. Critically, we kept the local path alive as a zero-cost fallback for network outages, preserving system resilience. The toggle is a single boolean in config.py, making rollback instantaneous."
+            },
+            {
+                "issue": "Vector Store Choice: ChromaDB vs. pgvector",
+                "choice": "ChromaDB with HNSW cosine similarity index, persisted locally",
+                "rationale": "pgvector on Azure PostgreSQL was considered but rejected for Phase 1 because it would route raw PDF text through the corporate network to a cloud database, violating the data sovereignty requirement. ChromaDB runs entirely on the local machine—only the small inference payloads (JSON prompts) exit the network. Additionally, ChromaDB's Python-native API and HNSW index provided sub-50ms retrieval for our document sizes without additional infrastructure cost. pgvector remains an option for a future unified-store architecture once data governance policy permits."
+            },
+            {
+                "issue": "PDF Ingestion: Direct Scraping vs. API",
+                "choice": "Nimble Corporate Announcement API as primary; Playwright browser automation as fallback",
+                "rationale": "Direct BSE website scraping is brittle against CAPTCHA, JavaScript rendering, and frequent DOM changes. The Nimble API provides a structured JSON feed of announcements with direct attachment URLs, reducing download failures by an estimated 70% compared to prior scraping attempts. Playwright is retained for edge cases where the API returns no results, providing a browser-level fallback that mirrors human navigation."
+            }
+        ]
+    },
+    "flowDiagram": {
+        "title": "BSE RAG Intelligence Pipeline – End-to-End Data Flow",
+        "height": "620px",
+        "nodes": [
+            {
+                "id": "1",
+                "data": {
+                    "label": "📋 Entity Registry\n(PostgreSQL / Excel)"
+                },
+                "position": {
+                    "x": -50,
+                    "y": 50
+                },
+                "className": "bg-accent-blue/10 border-accent-blue/50"
+            },
+            {
+                "id": "2",
+                "data": {
+                    "label": "🌐 Nimble BSE API\n(Corporate Announcements)"
+                },
+                "position": {
+                    "x": 550,
+                    "y": 50
+                },
+                "className": "bg-accent-blue/10 border-accent-blue/50"
+            },
+            {
+                "id": "3",
+                "data": {
+                    "label": "📥 Phase 1: PDF Downloader\n(Requests + Retry Logic)"
+                },
+                "position": {
+                    "x": 250,
+                    "y": 180
+                },
+                "className": "bg-accent-gold/10 border-accent-gold/50"
+            },
+            {
+                "id": "4",
+                "data": {
+                    "label": "📄 Digital PDF\n(PyPDF2 Fast-Path)"
+                },
+                "position": {
+                    "x": -100,
+                    "y": 320
+                },
+                "className": "bg-green-500/10 border-green-500/50"
+            },
+            {
+                "id": "5",
+                "data": {
+                    "label": "🖼️ Scanned PDF\n(Docling + Tesseract OCR)"
+                },
+                "position": {
+                    "x": 600,
+                    "y": 320
+                },
+                "className": "bg-yellow-500/10 border-yellow-500/50"
+            },
+            {
+                "id": "6",
+                "data": {
+                    "label": "✂️ Phase 2: Text Chunker\n(512 tok, 50 overlap)"
+                },
+                "position": {
+                    "x": 250,
+                    "y": 450
+                },
+                "className": "bg-accent-gold/10 border-accent-gold/50"
+            },
+            {
+                "id": "7",
+                "data": {
+                    "label": "☁️ Azure Cohere Embed v4.0\n(1536-dim Vectors)"
+                },
+                "position": {
+                    "x": 250,
+                    "y": 580
+                },
+                "className": "bg-purple-500/10 border-purple-500/50"
+            },
+            {
+                "id": "8",
+                "data": {
+                    "label": "🗄️ ChromaDB\n(HNSW Local Vector Store)"
+                },
+                "position": {
+                    "x": 250,
+                    "y": 710
+                },
+                "className": "bg-accent-blue/10 border-accent-blue/50"
+            },
+            {
+                "id": "9",
+                "data": {
+                    "label": "🔍 Semantic Retrieval\n(Top-5 Relevant Chunks)"
+                },
+                "position": {
+                    "x": 250,
+                    "y": 840
+                },
+                "className": "bg-accent-gold/10 border-accent-gold/50"
+            },
+            {
+                "id": "10",
+                "data": {
+                    "label": "🧠 Phase 3: Azure Llama-4-Maverick\n(Subject + Summary Generation)"
+                },
+                "position": {
+                    "x": 250,
+                    "y": 970
+                },
+                "className": "bg-purple-500/10 border-purple-500/50"
+            },
+            {
+                "id": "11",
+                "data": {
+                    "label": "📊 Azure PostgreSQL\n(daily_logs upsert)"
+                },
+                "position": {
+                    "x": -250,
+                    "y": 1150
+                },
+                "className": "bg-accent-blue/10 border-accent-blue/50"
+            },
+            {
+                "id": "12",
+                "data": {
+                    "label": "📁 Excel Report\n(Daily / Weekly / Monthly)"
+                },
+                "position": {
+                    "x": 250,
+                    "y": 1150
+                },
+                "className": "bg-green-500/10 border-green-500/50"
+            },
+            {
+                "id": "13",
+                "data": {
+                    "label": "📧 Phase 4: SMTP Email\n(Inline Chart + Excel Attachment)"
+                },
+                "position": {
+                    "x": 750,
+                    "y": 1150
+                },
+                "className": "bg-accent-gold/10 border-accent-gold/50"
+            }
+        ],
+        "edges": [
+            {
+                "id": "e1-3",
+                "source": "1",
+                "target": "3",
+                "animated": true,
+                "label": "Entity List"
+            },
+            {
+                "id": "e2-3",
+                "source": "2",
+                "target": "3",
+                "animated": true,
+                "label": "Announcement URLs"
+            },
+            {
+                "id": "e3-4",
+                "source": "3",
+                "target": "4",
+                "label": "Digital PDF"
+            },
+            {
+                "id": "e3-5",
+                "source": "3",
+                "target": "5",
+                "label": "Image-only PDF"
+            },
+            {
+                "id": "e4-6",
+                "source": "4",
+                "target": "6",
+                "animated": true,
+                "label": "Raw Text"
+            },
+            {
+                "id": "e5-6",
+                "source": "5",
+                "target": "6",
+                "animated": true,
+                "label": "OCR Text"
+            },
+            {
+                "id": "e6-7",
+                "source": "6",
+                "target": "7",
+                "animated": true,
+                "label": "Text Chunks"
+            },
+            {
+                "id": "e7-8",
+                "source": "7",
+                "target": "8",
+                "animated": true,
+                "label": "1536-dim Vectors"
+            },
+            {
+                "id": "e8-9",
+                "source": "8",
+                "target": "9",
+                "animated": true,
+                "label": "Cosine Query"
+            },
+            {
+                "id": "e9-10",
+                "source": "9",
+                "target": "10",
+                "animated": true,
+                "label": "Context Chunks"
+            },
+            {
+                "id": "e10-11",
+                "source": "10",
+                "target": "11",
+                "label": "Structured Records"
+            },
+            {
+                "id": "e10-12",
+                "source": "10",
+                "target": "12",
+                "label": "Subject + Summary"
+            },
+            {
+                "id": "e12-13",
+                "source": "12",
+                "target": "13",
+                "animated": true,
+                "label": "Excel + PNG Chart"
+            }
+        ]
+    },
+    "mermaidDiagram": "graph TD\n  A[Entity Registry] --> B(Phase 1: PDF Downloader)\n  C[Nimble BSE API] --> B\n  B --> D{PDF Type?}\n  D -->|Digital| E[PyPDF2 Fast Extraction]\n  D -->|Scanned| F[Docling + Tesseract OCR]\n  E --> G(Phase 2: Text Chunker)\n  F --> G\n  G --> H[Azure Cohere Embed v4.0]\n  H --> I[(ChromaDB Local Vector DB)]\n  I --> J(Semantic Retrieval)\n  J --> K[Azure Llama-4-Maverick]\n  K --> L[(Azure PostgreSQL)]\n  K --> M[Excel Report]\n  M --> N[Phase 4: SMTP Email Delivery]",
+    "results": [
+        {
+            "metric": "Analyst Time Saved",
+            "value": "~5 hrs/day",
+            "description": "Eliminated manual BSE portal visits, PDF reading, and email drafting for 30+ portfolio companies"
+        },
+        {
+            "metric": "OCR Coverage",
+            "value": "100%",
+            "description": "Dual-mode extraction (PyPDF2 + Docling/Tesseract) ensures zero document is left unprocessed, even scanned image PDFs"
+        },
+        {
+            "metric": "Subject Extraction Accuracy",
+            "value": ">92%",
+            "description": "Llama-4-Maverick with structured prompting achieves verbatim subject line extraction vs. manual reference baseline"
+        },
+        {
+            "metric": "Pipeline Resilience",
+            "value": "3-layer retry",
+            "description": "Exponential backoff on API calls, SMTP, and PDF downloads ensures <1% total run failure rate"
+        },
+        {
+            "metric": "Database Sync Latency",
+            "value": "<2s",
+            "description": "Bulk upsert to Azure PostgreSQL via transactional delete-then-insert with 1000-row chunking"
+        },
+        {
+            "metric": "Entity Scalability",
+            "value": "N+1 Zero-Code",
+            "description": "New portfolio companies are onboarded by adding a single row to the PostgreSQL entity registry"
+        }
+    ],
+    "challenges": [
+        {
+            "title": "Scanned PDF Documents (Zero-Text PDFs)",
+            "description": "A significant subset of BSE corporate filings are scanned physical documents. PyPDF2 returns empty strings, causing the RAG pipeline to generate 'Summary not available' for critical filings.",
+            "solution": "Implemented a transparent fallback in OCRProcessor: if PyPDF2 yields fewer than 20 meaningful characters, the pipeline invokes Docling with TesseractCliOcrOptions (force_full_page_ocr=True). The caller is unaware of which path was taken, receiving the same (full_text, first_page_text, first_6pages_text, used_ocr) tuple. This maintained 100% extraction coverage with a flag to audit OCR usage rate."
+        },
+        {
+            "title": "Azure AI Rate Limiting (429 Errors)",
+            "description": "Azure AI Inference enforces per-minute token and request limits. During bulk processing of 30+ entities, the pipeline frequently hit UserByMinute rate limits, causing cascading failures.",
+            "solution": "Implemented an adaptive retry loop in _generate_azure_curl() and _embed_azure_curl() that detects 429 responses, inspects the error message for 'UserByMinute' vs general rate limits, and applies a 45s or 20s wait respectively before retrying. For embeddings, switched to batch requests (sending all chunks for an entity in a single API call) to reduce request frequency by ~80%."
+        },
+        {
+            "title": "Duplicate PDF URL Processing Across Entities",
+            "description": "BSE sometimes publishes the same consolidated filing under multiple entity announcements. Without deduplication, the same PDF was processed multiple times, inflating summary counts and creating duplicate rows in the Excel output.",
+            "solution": "Introduced a session-scoped processed_pdf_urls set in the Phase 3 loop. Before processing any PDF, its URL is checked against this set. If found, the entity is logged with a warning and skipped. This global URL deduplication reduced redundant LLM calls by an estimated 15% on high-activity market days."
+        },
+        {
+            "title": "BSE Anti-Scraping Measures",
+            "description": "Direct HTTP requests to BSE's PDF download endpoints were intermittently blocked by 403/429 responses tied to User-Agent fingerprinting and connection-pool detection.",
+            "solution": "Implemented a rotating User-Agent pool (6 browser signatures) applied per-request. Used a dedicated requests.Session with connection pooling sized to MAX_WORKERS. Introduced randomized inter-download jitter (1–2s) for sequential processing and exponential backoff on 4xx responses. Retained Playwright as a heavyweight browser-automation fallback for entities where the Nimble API yields no results."
+        }
+    ],
+    "codeSnippets": [
+        {
+            "title": "Hybrid AI Toggle – Azure vs. Local Model Routing",
+            "language": "python",
+            "code": "# config.py\nUSE_AZURE_AI = True  # Set False for fully offline/local mode\n\n# model_utils.py – ModelManager.generate_text()\ndef generate_text(self, prompt: str, temperature: float = 0.1, max_new_tokens: int = 256) -> str:\n    if Config.USE_AZURE_AI:\n        return self._generate_azure_curl(prompt, temperature, max_new_tokens)\n    # Local Phi-3-mini inference path (transformers)\n    inputs = self.tokenizer(prompt, return_tensors=\"pt\", truncation=True, max_length=3072)\n    with torch.no_grad():\n        output = self.model.generate(**inputs, max_new_tokens=max_new_tokens, ...)\n    return self.tokenizer.decode(output[0][inputs['input_ids'].shape[1]:], skip_special_tokens=True).strip()"
+        },
+        {
+            "title": "Dual-Mode Text Extraction with OCR Fallback",
+            "language": "python",
+            "code": "# ocr_utils.py – OCRProcessor.extract_text_with_fallback()\ndef extract_text_with_fallback(self, pdf_path: str):\n    # 1. Attempt fast digital extraction\n    all_pages_text = self.quick_text_extraction(pdf_path)  # PyPDF2\n    meaningful = [t for t in all_pages_text if t and len(t.strip()) > 20]\n    if meaningful:\n        return '\\n\\n'.join(all_pages_text), all_pages_text[0], '\\n\\n'.join(all_pages_text[:3]), False\n    \n    # 2. OCR Fallback: Docling + Tesseract\n    ocr_pages = self.ocr_extract_pages(pdf_path, num_pages=Config.PYPDF2_PAGE_LIMIT)\n    if ocr_pages and any(len(p.strip()) > 20 for p in ocr_pages):\n        return '\\n\\n'.join(ocr_pages), ocr_pages[0], '\\n\\n'.join(ocr_pages[:3]), True\n    \n    return '', '', '', False  # Both methods failed"
+        },
+        {
+            "title": "RAG Retrieval with Embedding Cache",
+            "language": "python",
+            "code": "# vector_db.py – VectorDatabase.retrieve_chunks()\ndef retrieve_chunks(self, doc_id: str, query: str, top_k: int = 5):\n    # Static cache: avoids redundant Azure Embed calls for identical queries\n    if query in self._query_cache:\n        query_embedding = self._query_cache[query]\n    else:\n        query_embedding = embedding_model.encode([query], convert_to_tensor=False)[0]\n        self._query_cache[query] = query_embedding\n\n    results = self.collection.query(\n        query_embeddings=[query_embedding],\n        n_results=top_k,\n        where={\"doc_id\": doc_id},  # Scoped to single document\n        include=[\"documents\"]\n    )\n    return results[\"documents\"][0] if results[\"documents\"] else []"
+        }
+    ],
+    "images": [],
+    "videos": [],
+    "githubUrl": "",
+    "testimonial": {
+        "text": "Before this system, my team spent the first half of every morning just reading BSE filings. Now, a structured summary with AI-extracted subjects is waiting in our inbox before we even arrive. The accuracy on financial result summaries is remarkably close to what a senior analyst would produce.",
+        "author": "Research & Analytics Lead",
+        "role": "Renewables Investor Relations"
+    }
+}

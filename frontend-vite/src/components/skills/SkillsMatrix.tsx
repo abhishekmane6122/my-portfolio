@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { skills, skillCategories } from '@/data/skills-matrix'
+import { skills, skillCategories, skillStats } from '@/data/skills-matrix'
 import type { Skill } from '@/types/schema'
 
 interface SkillCardProps {
@@ -134,21 +134,21 @@ export default function SkillsMatrix() {
             <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="text-center p-6 rounded-xl bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-white/10">
                     <div className="text-4xl font-bold text-foreground mb-2">
-                        {skills.filter(s => s.proficiency === 'expert').length}
+                        {skillStats?.expertSkills || skills.filter(s => s.proficiency === 'expert').length}
                     </div>
                     <div className="text-sm text-muted-foreground">Expert Level Skills</div>
                 </div>
 
                 <div className="text-center p-6 rounded-xl bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-white/10">
                     <div className="text-4xl font-bold text-foreground mb-2">
-                        {Math.max(...skills.map(s => s.yearsOfExperience))}+
+                        {skillStats?.yearsExperience || `${Math.max(...skills.map(s => s.yearsOfExperience))}+`}
                     </div>
                     <div className="text-sm text-muted-foreground">Years Experience</div>
                 </div>
 
                 <div className="text-center p-6 rounded-xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-white/10">
                     <div className="text-4xl font-bold text-foreground mb-2">
-                        {skills.length}
+                        {skillStats?.totalTechs || skills.length}
                     </div>
                     <div className="text-sm text-muted-foreground">Total Technologies</div>
                 </div>
