@@ -78,9 +78,9 @@ export default function BlogPost() {
 
                 {/* Header */}
                 <div className="relative overflow-hidden bg-neutral-50 dark:bg-[#050505] transition-colors duration-300 border-b border-black/5 dark:border-white/10 backdrop-blur-sm">
-                    <div className="relative max-w-4xl mx-auto px-6 py-2 md:py-3">
+                    <div className="relative max-w-4xl mx-auto px-4 sm:px-6 py-4 md:py-6">
                         {/* Navigation */}
-                        <div className="flex items-center gap-6 mb-6">
+                        <div className="flex flex-wrap items-center gap-4 sm:gap-6 mb-6">
                             <Link
                                 to="/blog"
                                 className="inline-flex items-center gap-2 text-xs font-mono font-medium uppercase tracking-widest text-accent-blue hover:opacity-70 transition-opacity"
@@ -170,7 +170,7 @@ export default function BlogPost() {
 
                 {/* Content */}
                 <div className="bg-white dark:bg-background transition-colors duration-300">
-                    <div className="max-w-4xl mx-auto px-8 pt-10 pb-20 bg-white dark:bg-background">
+                    <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 pt-6 md:pt-10 pb-12 md:pb-20 bg-white dark:bg-background">
                         {/* Featured Image */}
                         {/* Featured Image */}
                         {post.featuredImage && (
@@ -178,7 +178,7 @@ export default function BlogPost() {
                                 initial={{ opacity: 0, y: 30 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.8, ease: "easeOut" }}
-                                className="mb-12 rounded-[2rem] overflow-hidden bg-white/50 dark:bg-black/20 border border-neutral-200 dark:border-white/5"
+                                className="mb-8 md:mb-12 rounded-2xl md:rounded-[2rem] overflow-hidden bg-white/50 dark:bg-black/20 border border-neutral-200 dark:border-white/5"
                             >
                                 <img
                                     src={`${import.meta.env.BASE_URL}${post.featuredImage.startsWith('/') ? post.featuredImage.slice(1) : post.featuredImage}`}
@@ -256,7 +256,7 @@ export default function BlogPost() {
                         </div>
 
                         {/* Author card */}
-                        <div className="mt-20 p-10 rounded-[2.5rem] bg-neutral-50 dark:bg-white/5 border border-neutral-200 dark:border-white/5 shadow-none relative overflow-hidden group">
+                        <div className="mt-12 md:mt-20 p-6 md:p-10 rounded-2xl md:rounded-[2.5rem] bg-neutral-50 dark:bg-white/5 border border-neutral-200 dark:border-white/5 shadow-none relative overflow-hidden group">
                             <div className="flex flex-col md:flex-row items-center gap-8 text-center md:text-left">
                                 <div className="relative shrink-0">
                                     <img
@@ -281,7 +281,7 @@ export default function BlogPost() {
                         </div>
 
                         {/* Back to blog */}
-                        <div className="mt-20 text-center">
+                        <div className="mt-12 md:mt-20 text-center">
                             <Link
                                 to="/blog"
                                 className="inline-flex items-center gap-3 px-10 py-5 rounded-full bg-[#d4a373] text-white font-mono text-xs font-medium uppercase tracking-[0.2em] hover:bg-[#c49363] transition-all shadow-xl shadow-[#d4a373]/10 hover:-translate-y-1 active:scale-95"

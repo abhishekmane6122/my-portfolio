@@ -33,7 +33,7 @@ export default function ProjectDetail() {
                     <div className="absolute inset-0 bg-[#d4a373]/5 blur-[120px] rounded-full pointer-events-none" />
 
                     <div className="relative max-w-6xl mx-auto px-6 py-12">
-                        <div className="flex items-center gap-4 mb-8">
+                        <div className="flex flex-wrap items-center gap-4 mb-8">
                             <button
                                 onClick={() => window.history.back()}
                                 className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
@@ -95,10 +95,10 @@ export default function ProjectDetail() {
                     </div>
                 </div>
 
-                <div className="max-w-6xl mx-auto px-6 py-12">
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 md:py-12">
                     {/* Project info cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
-                        <div className="group p-8 rounded-3xl bg-card border border-neutral-200 dark:border-white/10 backdrop-blur-md transition-all hover:border-[#d4a373] dark:hover:border-[#d4a373]/50 hover:shadow-xl">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-16 md:mb-24">
+                        <div className="group p-6 md:p-8 rounded-2xl md:rounded-3xl bg-card border border-neutral-200 dark:border-white/10 backdrop-blur-md transition-all hover:border-[#d4a373] dark:hover:border-[#d4a373]/50 hover:shadow-xl">
                             <div className="flex items-center gap-4 mb-4">
                                 <div className="p-3 rounded-2xl bg-[#d4a373]/10 text-[#d4a373]">
                                     <Calendar className="w-6 h-6" />
@@ -108,7 +108,7 @@ export default function ProjectDetail() {
                             <div className="text-xl font-medium text-foreground">{project.duration}</div>
                         </div>
 
-                        <div className="group p-8 rounded-3xl bg-card border border-neutral-200 dark:border-white/10 backdrop-blur-md transition-all hover:border-[#d4a373] dark:hover:border-[#d4a373]/50 hover:shadow-xl">
+                        <div className="group p-6 md:p-8 rounded-2xl md:rounded-3xl bg-card border border-neutral-200 dark:border-white/10 backdrop-blur-md transition-all hover:border-[#d4a373] dark:hover:border-[#d4a373]/50 hover:shadow-xl">
                             <div className="flex items-center gap-4 mb-4">
                                 <div className="p-3 rounded-2xl bg-[#d4a373]/10 text-[#d4a373]">
                                     <Users className="w-6 h-6" />
@@ -118,7 +118,7 @@ export default function ProjectDetail() {
                             <div className="text-xl font-medium text-foreground">{project.role}</div>
                         </div>
 
-                        <div className="group p-8 rounded-3xl bg-card border border-neutral-200 dark:border-white/10 backdrop-blur-md transition-all hover:border-[#d4a373] dark:hover:border-[#d4a373]/50 hover:shadow-xl">
+                        <div className="group p-6 md:p-8 rounded-2xl md:rounded-3xl bg-card border border-neutral-200 dark:border-white/10 backdrop-blur-md transition-all hover:border-[#d4a373] dark:hover:border-[#d4a373]/50 hover:shadow-xl">
                             <div className="flex items-center gap-4 mb-4">
                                 <div className="p-3 rounded-2xl bg-[#d4a373]/10 text-[#d4a373]">
                                     <Trophy className="w-6 h-6" />
@@ -134,7 +134,7 @@ export default function ProjectDetail() {
                         <div className="text-center mb-10">
                             <h2 className="text-3xl font-serif font-light text-foreground tracking-tight">The Challenge</h2>
                         </div>
-                        <div className="p-8 md:p-12 rounded-3xl bg-card border border-neutral-200 dark:border-white/10 backdrop-blur-xl shadow-xl transition-all hover:shadow-2xl text-left">
+                        <div className="p-6 md:p-12 rounded-2xl md:rounded-3xl bg-card border border-neutral-200 dark:border-white/10 backdrop-blur-xl shadow-xl transition-all hover:shadow-2xl text-left">
                             <div className="prose prose-lg dark:prose-invert max-w-none prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:font-light prose-headings:text-foreground prose-headings:font-serif prose-headings:font-light">
                                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                                     {project.problem}
@@ -148,7 +148,7 @@ export default function ProjectDetail() {
                         <div className="text-center mb-10">
                             <h2 className="text-3xl font-serif font-light text-foreground tracking-tight">The Solution</h2>
                         </div>
-                        <div className="p-8 md:p-12 rounded-3xl bg-card border border-neutral-200 dark:border-white/10 backdrop-blur-xl shadow-xl transition-all hover:shadow-2xl">
+                        <div className="p-6 md:p-12 rounded-2xl md:rounded-3xl bg-card border border-neutral-200 dark:border-white/10 backdrop-blur-xl shadow-xl transition-all hover:shadow-2xl">
                             <div className="prose prose-lg dark:prose-invert max-w-none prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:font-light prose-headings:text-foreground prose-headings:font-serif prose-headings:font-light">
                                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                                     {project.solution}
@@ -223,7 +223,7 @@ export default function ProjectDetail() {
                             </div>
 
                             {project.architecture.decisions && project.architecture.decisions.length > 0 && (
-                                <div className="p-8 md:p-10 rounded-[2.5rem] bg-neutral-50 dark:bg-white/5 border border-neutral-200 dark:border-white/10">
+                                <div className="p-6 md:p-10 rounded-2xl md:rounded-[2.5rem] bg-neutral-50 dark:bg-white/5 border border-neutral-200 dark:border-white/10">
                                     <h3 className="text-xl font-serif font-light mb-8 flex items-center gap-3">
                                         <span className="h-2 w-2 rounded-full bg-[#d4a373]" />
                                         Architectural Decisions (ADR)
@@ -291,7 +291,7 @@ export default function ProjectDetail() {
                                 {project.results.map((result, index) => (
                                     <div
                                         key={index}
-                                        className="p-8 rounded-3xl bg-card border border-neutral-200 dark:border-white/10 text-center backdrop-blur-sm transition-all hover:shadow-xl"
+                                        className="p-6 md:p-8 rounded-2xl md:rounded-3xl bg-card border border-neutral-200 dark:border-white/10 text-center backdrop-blur-sm transition-all hover:shadow-xl"
                                     >
                                         <div className="text-4xl font-light text-[#d4a373] mb-3">{result.value}</div>
                                         <div className="text-base font-medium text-foreground mb-2">{result.metric}</div>
@@ -367,7 +367,7 @@ export default function ProjectDetail() {
                     {/* Testimonial */}
                     {project.testimonial && (
                         <section className="mb-24">
-                            <div className="relative p-12 md:p-16 rounded-[3rem] bg-card border border-neutral-200 dark:border-white/10 overflow-hidden group shadow-3xl">
+                            <div className="relative p-8 md:p-16 rounded-2xl md:rounded-[3rem] bg-card border border-neutral-200 dark:border-white/10 overflow-hidden group shadow-3xl">
                                 <div className="absolute top-0 right-0 p-12 text-8xl text-[#d4a373]/5 font-serif select-none transition-transform group-hover:-translate-y-2">"</div>
                                 <div className="relative z-10">
                                     <p className="text-2xl md:text-3xl text-foreground font-light italic mb-10 leading-relaxed tracking-tight">
@@ -390,7 +390,7 @@ export default function ProjectDetail() {
                     {/* Author Signature Section */}
                     <section className="mt-32 pt-16 border-t border-neutral-200 dark:border-white/5">
                         <div className="max-w-3xl mx-auto">
-                            <div className="relative p-8 md:p-10 rounded-[2.5rem] bg-card border border-neutral-200 dark:border-white/10 shadow-2xl overflow-hidden group">
+                            <div className="relative p-6 md:p-10 rounded-2xl md:rounded-[2.5rem] bg-card border border-neutral-200 dark:border-white/10 shadow-2xl overflow-hidden group">
                                 <div className="absolute inset-0 bg-gradient-to-br from-[#d4a373]/5 to-transparent pointer-events-none" />
                                 <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
                                     <div className="relative shrink-0">

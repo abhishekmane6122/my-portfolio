@@ -21,6 +21,33 @@ interface FlowDiagramProps {
 }
 
 const FlowDiagram: React.FC<FlowDiagramProps> = ({ nodes, edges, height = '400px', title }) => {
+    const [responsiveHeight, setResponsiveHeight] = React.useState(height);
+
+    React.useEffect(() => {
+        const updateHeight = () => {
+            const width = window.innerWidth;
+            if (width < 768) {
+                // On mobile, reduce fixed pixel heights if they are large
+                if (height.endsWith('px')) {
+                    const h = parseInt(height);
+                    if (h > 400) {
+                        setResponsiveHeight(`${Math.max(300, h * 0.6)}px`);
+                    } else {
+                        setResponsiveHeight(height);
+                    }
+                } else {
+                    setResponsiveHeight(height);
+                }
+            } else {
+                setResponsiveHeight(height);
+            }
+        };
+
+        updateHeight();
+        window.addEventListener('resize', updateHeight);
+        return () => window.removeEventListener('resize', updateHeight);
+    }, [height]);
+
     const { resolvedTheme } = useTheme();
     const isDark = resolvedTheme === 'dark';
 
@@ -40,11 +67,11 @@ const FlowDiagram: React.FC<FlowDiagramProps> = ({ nodes, edges, height = '400px
     const flowStyles = useMemo(() => ({
         background: 'transparent',
         width: '100%',
-        height: height,
-    }), [height]);
+        height: responsiveHeight,
+    }), [responsiveHeight]);
 
     return (
-        <div className="relative w-full overflow-hidden rounded-2xl border border-neutral-300 dark:border-white/10 bg-white dark:bg-[#050505] shadow-2xl transition-all duration-300 group hover:border-[#d4a373]/30" style={{ height }}>
+        <div className="relative w-full overflow-hidden rounded-2xl border border-neutral-300 dark:border-white/10 bg-white dark:bg-[#050505] shadow-2xl transition-all duration-300 group hover:border-[#d4a373]/30" style={{ height: responsiveHeight }}>
             <style dangerouslySetInnerHTML={{ __html: `
                 .react-flow__node div {
                     color: ${isDark ? '#f3f4f6' : '#111827'} !important;
