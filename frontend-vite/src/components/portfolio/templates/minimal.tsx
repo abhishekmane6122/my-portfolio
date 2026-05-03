@@ -1079,7 +1079,7 @@ export function PortfolioTemplate({
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.1 }}
                   viewport={{ once: true }}
-                  className="group relative overflow-hidden rounded-3xl border border-neutral-300 dark:border-white/10 bg-white dark:bg-[#0e0e0e] p-6 transition-all hover:border-[#d4a373] dark:hover:border-[#d4a373]/50 hover:-translate-y-1 shadow-lg hover:shadow-xl"
+                  className="group relative overflow-hidden rounded-3xl border border-neutral-300 dark:border-white/10 bg-white dark:bg-[#0e0e0e] p-6 transition-all hover:border-[#d4a373] dark:hover:border-[#d4a373]/50 hover:-translate-y-1 shadow-lg hover:shadow-xl hover:no-underline"
                 >
                   <div className={cn("mb-6 flex h-12 w-12 items-center justify-center rounded-2xl border border-white/5 shadow-sm", post.bg)}>
                     <post.icon className={cn("h-6 w-6", post.color)} />
@@ -1090,7 +1090,7 @@ export function PortfolioTemplate({
                   <p className="mb-6 text-sm text-neutral-700 dark:text-neutral-300 font-light leading-relaxed">
                     {post.desc}
                   </p>
-                  <div className="flex items-center gap-2 text-xs font-mono font-medium uppercase tracking-wider text-[#d4a373] opacity-0 group-hover:opacity-100 transition-all">
+                  <div className="flex items-center gap-2 text-xs font-mono font-medium uppercase tracking-wider text-[#d4a373] transition-all hover:no-underline">
                     Read Post <ArrowUpRight className="h-3 w-3" />
                   </div>
                 </motion.a>
@@ -1267,7 +1267,7 @@ export function PortfolioTemplate({
                       href={post.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-xs font-medium text-[#d4a373] hover:gap-3 transition-all"
+                      className="inline-flex items-center gap-2 text-xs font-medium text-[#d4a373] hover:gap-3 transition-all hover:no-underline"
                     >
                       Read full insight <ArrowUpRight className="h-3 w-3" />
                     </a>
