@@ -826,7 +826,7 @@ export function PortfolioTemplate({
                     "production-grade AI systems",
                     "multi-agent platforms",
                     "full-stack AI applications",
-                    "Adani Group. GreenRatna Awardee"
+                    "Enterprise Client. Performance Awardee"
                   ];
                   
                   // Use a unique marker to prevent nested replacements
@@ -950,19 +950,20 @@ export function PortfolioTemplate({
                   </h3>
                   <div className="flex flex-wrap items-center gap-3 text-[#d4a373] font-mono text-sm">
                     <span className="px-3 py-1 rounded-full bg-[#d4a373]/10 border border-[#d4a373]/20">December 2025</span>
+                    <span className="px-3 py-1 rounded-full bg-[#d4a373]/10 border border-[#d4a373]/20">Recognized</span>
                     <span>•</span>
-                    <span className="uppercase tracking-wider">GreenRatna</span>
+                    <span className="uppercase tracking-wider">Industry Excellence</span>
                   </div>
                 </div>
 
                 <p className="text-xl text-neutral-600 dark:text-neutral-400 font-light leading-relaxed italic text-balance">
-                  "Honored to share that I’ve received this recognition for designing and delivering AI-driven solutions for Adani Green Energy Limited (AGEL), appreciated by Hon’ble <span className="text-[#d4a373] font-medium">Chairman Shri Gautam Adani Sir</span> and leadership across the organization."
+                  "Honored to share that I’ve received this recognition for designing and delivering AI-driven solutions for a Leading Renewable Energy Firm, appreciated by the Executive Chairman and leadership across the organization."
                 </p>
 
                 <div className="flex flex-wrap items-center gap-6 pt-4">
                   <div className="flex flex-col">
                     <span className="text-xs text-neutral-500 uppercase tracking-widest mb-1">Organization</span>
-                    <span className="text-neutral-900 dark:text-white font-medium">Adani Green Energy Ltd. (AGEL)</span>
+                    <span className="text-neutral-900 dark:text-white font-medium">Leading Renewable Energy Firm</span>
                   </div>
                   <div className="h-8 w-px bg-neutral-200 dark:bg-white/10 hidden sm:block" />
                   <div className="flex flex-col">
@@ -973,7 +974,7 @@ export function PortfolioTemplate({
 
                 <div className="pt-8">
                   <a
-                    href="https://www.linkedin.com/posts/abhishek-mane-aiml_aiengineer-artificialintelligence-adanigreenenergy-activity-7415444089212563456-oi5M"
+                    href="https://www.linkedin.com/in/abhishek-mane-aiml"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-4 px-10 py-5 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-black text-lg font-medium hover:scale-105 transition-all shadow-xl group"
@@ -994,7 +995,7 @@ export function PortfolioTemplate({
                 </div>
                 <h4 className="font-medium text-neutral-900 dark:text-white">AI Innovation</h4>
                 <p className="text-sm text-neutral-700 dark:text-neutral-300 font-light leading-relaxed">
-                  Designed and delivered AI-driven solutions and portals for AGEL.
+                  Designed and delivered AI-driven solutions and portals for the firm.
                 </p>
               </div>
               <div className="space-y-3">
@@ -1003,7 +1004,7 @@ export function PortfolioTemplate({
                 </div>
                 <h4 className="font-medium text-neutral-900 dark:text-white">Leadership Recognition</h4>
                 <p className="text-sm text-neutral-700 dark:text-neutral-300 font-light leading-relaxed">
-                  Appreciated by Hon’ble Chairman Shri Gautam Adani Sir and leadership.
+                  Appreciated by the Executive Chairman and leadership.
                 </p>
               </div>
               <div className="space-y-3">
@@ -1021,7 +1022,7 @@ export function PortfolioTemplate({
             <div className="mt-10 p-6 rounded-3xl bg-[#d4a373]/5 border border-[#d4a373]/10">
               <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-[#d4a373] mb-4 block">Gratitude</span>
               <div className="flex flex-wrap gap-x-8 gap-y-3">
-                {["CognitBotz Solutions", "Adani Green Energy Ltd", "Hon'ble Chairman Sir", "Mentors & Team"].map((item) => (
+                {["CognitBotz Solutions", "Leading Renewable Energy Firm", "Executive Chairman", "Mentors & Team"].map((item) => (
                   <div key={item} className="flex items-center gap-2">
                     <div className="h-1 w-1 rounded-full bg-[#d4a373]" />
                     <span className="text-xs text-neutral-700 dark:text-neutral-300 font-medium">{item}</span>

@@ -1,7 +1,7 @@
 import { ProjectDetailed } from '@/types/schema'
 
 // Import individual project JSON files
-// NOTE: 02_adani_equity_platform.json is intentionally excluded (private/confidential)
+// NOTE: 02_equity_analytics_platform.json is intentionally excluded (private/confidential)
 import project1 from './projects_json/01_aegis_platform.json'
 import project3 from './projects_json/03_quantus_med.json'
 import project4 from './projects_json/04_bse_rag_processor.json'

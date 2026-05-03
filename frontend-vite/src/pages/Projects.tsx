@@ -136,7 +136,7 @@ export default function Projects() {
                         <Code2 className="w-8 h-8 text-[#d4a373] mx-auto mb-4" />
                         <h2 className="text-xl font-serif font-light text-foreground mb-2">The Production Standard</h2>
                         <p className="text-muted-foreground text-[13px] leading-relaxed">
-                            Every project in this archive is built with a focus on modularity, security, and measurable ROI. From Adani Group's multi-agent ecosystems saving 250+ hours/quarter to clinical AI delivering real-time multimodal inference.
+                            Every project in this archive is built with a focus on modularity, security, and measurable ROI. From enterprise-scale multi-agent ecosystems saving 250+ hours/quarter to clinical AI delivering real-time multimodal inference.
                         </p>
                     </div>
                 </div>

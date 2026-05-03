@@ -130,16 +130,16 @@ export default function ResumeDownload({ variant = 'button', showLabel = true }:
                                 <RSubheading
                                     title="CognitBotz Solutions"
                                     right1="Ahmedabad, India"
-                                    subtitle="Artificial Intelligence Engineer — Client: Adani Green Energy & Adani Group"
+                                    subtitle="Artificial Intelligence Engineer — Client: Leading Renewable Energy Firm & Fortune 50 Conglomerate"
                                     right2="Sep. 2025 — Present"
                                 >
                                     <RItemList items={[
-                                        { bold: "Aegis — Enterprise Compliance Platform", text: ": Designed and developed a full-stack, production-grade compliance intelligence platform for Adani Group's Secretarial & Legal teams. Built six independently deployable modules — BSE Intelligence, RBI Compliance, SEBI Hub, Director Disclosure Management, Insider Trading Surveillance, and Minutes Preparation — behind a unified React UI. Platform saved 250+ FTE hours per quarter and is live in production." },
+                                        { bold: "Aegis — Enterprise Compliance Platform", text: ": Designed and developed a full-stack, production-grade compliance intelligence platform for a Fortune 50 Conglomerate's Secretarial & Legal teams. Built six independently deployable modules — BSE Intelligence, RBI Compliance, SEBI Hub, Director Disclosure Management, Insider Trading Surveillance, and Minutes Preparation — behind a unified React UI. Platform saved 250+ FTE hours per quarter and is live in production." },
                                         { bold: "Regulatory RAG Pipeline (BSE, SEBI, RBI)", text: ": Engineered automated scraping and ingestion pipelines (using Playwright and Requests) that collect daily notifications from BSE, SEBI, and RBI portals, extract content from PDFs via PyMuPDF and OCR, and generate AI summaries using Phi-3-mini LLM. Indexed documents into ChromaDB vector store for semantic search and pushed structured data to Azure PostgreSQL. Delivered automated daily email reports via SMTP. Eliminated 6+ hours of manual daily monitoring and reduced SEBI notification noise by 71%." },
                                         { bold: "Multi-Agent NL-to-SQL System", text: ": Designed a multi-agent architecture where a routing agent classifies user intent and delegates to either a deterministic query handler or a GPT-powered dynamic SQL generation agent. Engineered prompt templates with schema context injection for SAP HANA-compatible SQL generation. Built a query validation layer to sanitize LLM output, prevent SQL injection, and enforce read-only access." },
-                                        { bold: "Equity Pulse — Market Analytics Platform", text: ": Built an end-to-end equity analytics platform for Adani Group's finance and portfolio teams. Designed ETL pipelines on a scheduled VM to extract, validate, and load daily bhavcopy data from BSE and NSE into Azure PostgreSQL. Developed a backend computation engine to calculate moving averages, volatility metrics, delivery ratios, and relative performance indices. Built the React frontend with interactive dashboards, candlestick charts, competitor analysis, and shareholding pattern tracking across 7 Adani business units and 3.9M+ investor records. Eliminated 4–6 hours of daily manual analyst work." },
+                                        { bold: "Equity Pulse — Market Analytics Platform", text: ": Built an end-to-end equity analytics platform for a Fortune 50 Conglomerate's finance and portfolio teams. Designed ETL pipelines on a scheduled VM to extract, validate, and load daily bhavcopy data from BSE and NSE into Azure PostgreSQL. Developed a backend computation engine to calculate moving averages, volatility metrics, delivery ratios, and relative performance indices. Built the React frontend with interactive dashboards, candlestick charts, competitor analysis, and shareholding pattern tracking across 7 enterprise business units and 3.9M+ investor records. Eliminated 4–6 hours of daily manual analyst work." },
                                         { bold: "Platform Infrastructure & Observability", text: ": Implemented Azure AD SSO with RBAC across all platforms. Secured all secrets via Azure Key Vault, enforced TLS in transit and AES-256 encryption at rest. Built a custom AI Agent Observability Platform to monitor all deployed agents in real time — covering health checks, execution logs, latency tracking, and failure alerts. Configured Azure VM scheduling for automated pipeline execution and optimized API response times from 8 seconds to 500ms. Integrated email-based triggers and automated reporting via SMTP for daily operational summaries." },
-                                        { bold: "Cross-Functional Technical Leadership", text: ": Act as de facto technical lead across all enterprise AI projects at CognitBotz. Lead daily Scrum meetings with a 15+ member cross-functional team spanning Data Engineers, Python Developers, AI/ML Engineers, and Frontend Developers. Directly engaged in stakeholder management with Adani Group leadership — conducting project progress updates, requirements gathering sessions, and sprint reviews to ensure delivery alignment with business objectives." },
+                                        { bold: "Cross-Functional Technical Leadership", text: ": Act as de facto technical lead across all enterprise AI projects at CognitBotz. Lead daily Scrum meetings with a 15+ member cross-functional team spanning Data Engineers, Python Developers, AI/ML Engineers, and Frontend Developers. Directly engaged in stakeholder management with enterprise leadership — conducting project progress updates, requirements gathering sessions, and sprint reviews to ensure delivery alignment with business objectives." },
                                     ]} />
                                 </RSubheading>
 
@@ -183,14 +183,14 @@ export default function ResumeDownload({ variant = 'button', showLabel = true }:
                                 {[
                                     {
                                         name: "Aegis — Regulatory Compliance Intelligence Suite",
-                                        context: "CognitBotz, Client: Adani Group",
+                                        context: "CognitBotz, Client: Fortune 50 Conglomerate",
                                         desc: "Production-grade multi-module platform automating BSE/SEBI/RBI monitoring, director disclosure management, insider trading surveillance across 3.9M+ investor records, and board meeting minutes generation. Saved 250+ FTE hours/quarter.",
                                         stack: "React, FastAPI, Python, LangChain, LangGraph, Azure OpenAI, Cohere Embeddings, pgvector (Azure PostgreSQL), Azure Key Vault, Azure VM, Nginx, Docker, GitLab."
                                     },
                                     {
                                         name: "Equity Pulse — Enterprise Equity Analytics Platform",
-                                        context: "CognitBotz, Client: Adani Group",
-                                        desc: "End-to-end equity analytics platform tracking 5 Adani business units with automated ETL from BSE/NSE, real-time dashboards, candlestick charts, competitor analysis, and shareholding pattern portal across 3.9M+ investor records. Eliminated 4–6 hrs of daily manual analyst work.",
+                                        context: "CognitBotz, Client: Fortune 50 Conglomerate",
+                                        desc: "End-to-end equity analytics platform tracking 5 enterprise business units with automated ETL from BSE/NSE, real-time dashboards, candlestick charts, competitor analysis, and shareholding pattern portal across 3.9M+ investor records. Eliminated 4–6 hrs of daily manual analyst work.",
                                         stack: "React, TypeScript, FastAPI, Python, Azure PostgreSQL, pgvector, Azure VM, APScheduler, Recharts, Docker, GitLab."
                                     },
                                     {
@@ -244,7 +244,7 @@ export default function ResumeDownload({ variant = 'button', showLabel = true }:
                             {/* AWARDS */}
                             <RSection title="Awards & Recognition">
                                 <p className="text-xs leading-relaxed text-neutral-700 dark:text-neutral-300 pl-1">
-                                    <span className="font-bold text-neutral-900 dark:text-white">GreenRatna — Performance of the Month Award</span> (December 2025), Adani Green Energy Limited: Recognized by AGEL leadership and stakeholders for designing and delivering impactful AI-driven portals and solutions. Work was appreciated by Hon'ble Chairman Shri Gautam Adani and received positive feedback across multiple teams at the organization.
+                                    <span className="font-bold text-neutral-900 dark:text-white">Performance Award</span> (December 2025), Enterprise Client: Recognized by leadership and stakeholders for designing and delivering impactful AI-driven portals and solutions. Work was highly appreciated and received positive feedback across multiple teams at the organization.
                                 </p>
                             </RSection>
 

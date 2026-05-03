@@ -7,7 +7,7 @@ export const testimonials: Testimonial[] = [
         author: {
             name: 'Secretarial Department Head',
             role: 'Department Head',
-            company: 'Adani Group',
+            company: 'Fortune 50 Conglomerate',
             photo: '/testimonials/avatar-1.jpg',
         },
         rating: 5,
@@ -20,7 +20,7 @@ export const testimonials: Testimonial[] = [
         author: {
             name: 'Legal & Compliance Manager',
             role: 'Manager',
-            company: 'Adani Group',
+            company: 'Fortune 50 Conglomerate',
             photo: '/testimonials/avatar-2.jpg',
         },
         rating: 5,

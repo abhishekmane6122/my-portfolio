@@ -2,11 +2,11 @@
     "id": "aegis-platform",
     "slug": "aegis-platform",
     "title": "AEGIS - Regulatory Surveillance Platform",
-    "tagline": "Multi-agent autonomous system for automated regulatory compliance and corporate governance at Adani Group",
+    "tagline": "Multi-agent autonomous system for automated regulatory compliance and corporate governance at a Fortune 50 Conglomerate",
     "banner": "/projects/aegis-banner.jpg",
     "role": "Full Stack Developer & System Architect",
     "duration": "4 months (Aug 2024 - Nov 2024)",
-    "problem": "Adani Group's Secretarial and Legal departments faced critical bottlenecks in regulatory compliance, manual disclosure cycles, and insider trading tracking across 3.9M+ investor records.",
+    "problem": "A Fortune 50 Conglomerate's Secretarial and Legal departments faced critical bottlenecks in regulatory compliance, manual disclosure cycles, and insider trading tracking across 3.9M+ investor records.",
     "solution": "Architected AEGIS, a centralized multi-agent platform featuring Regulatory Intelligence Agents, a Directors Disclosure Module, and an AI Minutes Generator powered by Groq LLM.",
     "team": ["2 developers", "1 QA engineer", "3 business stakeholders"],
     "techStack": [
