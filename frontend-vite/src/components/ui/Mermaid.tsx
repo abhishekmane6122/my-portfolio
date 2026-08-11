@@ -321,4 +321,6 @@ const Mermaid: React.FC<MermaidProps> = ({ chart, id = 'mermaid-diagram', classN
     );
 };
 
-export default Mermaid;
+// All props are plain strings, so an unrelated parent re-render can never
+// restart the render effect and blank out an already-drawn diagram.
+export default React.memo(Mermaid);

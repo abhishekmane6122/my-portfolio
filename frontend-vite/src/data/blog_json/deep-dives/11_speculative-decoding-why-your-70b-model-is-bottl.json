@@ -1,0 +1,29 @@
+{
+    "id": "411",
+    "slug": "speculative-decoding-why-your-70b-model-is-bottlenecked-on-memory-not-compute",
+    "title": "Speculative Decoding: Why Your 70B Model Is Bottlenecked on Memory, Not Compute",
+    "excerpt": "A 70B model spends most of its time doing something that sounds absurd once you say it out loud: moving 140GB of weights from HBM to the GPU's compute cores, just to produce one token.",
+    "content": "A 70B model spends most of its time doing something that sounds absurd once you say it out loud: moving 140GB of weights from HBM to the GPU's compute cores, just to produce one token. Then it does that again. And again. One token per full pass over the weights.\n\nThis is why decoding is memory-bound, not compute-bound. The GPU's math units sit mostly idle, waiting on memory bandwidth. A draft model can guess the next several tokens in the time the big model would have spent shuffling weights around for a single one - and that gap is what speculative decoding exploits.\n\nThe mechanics are simple enough to sketch on a whiteboard:\n\nA small draft model (1B, maybe 7B) proposes K candidate tokens. The target model verifies all K in one parallel pass, the same shape of computation as a prefill instead of a decode. Wherever the draft's guess matches, it's accepted. First mismatch, everything after it is thrown away and the target model's own token takes over.\n\nThe economics work because verification is cheap relative to generation - checking several tokens at once instead of paying the full memory-bandwidth tax per token. Two to three times faster wall-clock, and - the part people don't expect - zero quality loss, because the output is exactly what the target model would have produced anyway. It's the same model, sped up by exploiting spare capacity in the memory pipeline.\n\nTwo production variants worth knowing:\n\nMedusa skips the second model entirely. Instead of a separate draft model competing for VRAM and needing its own KV cache, it bolts extra prediction heads onto the target model itself - one head per future token position. Same forward pass, multiple guesses, no second model to manage.\n\nLookahead decoding goes further and doesn't need a draft model at all. It mines the model's own recent hidden states for repeating n-gram patterns, which makes it particularly effective on code and structured technical writing where patterns repeat constantly.\n\nThe failure mode is worth knowing before you ship this: speculative decoding degrades badly on high-temperature creative writing. When the target distribution is flat and the model is meant to pick less-likely tokens on purpose, the draft model's guesses get rejected constantly, and you're paying the draft model's latency for nothing. Serving frameworks like vLLM handle this with dynamic draft lengths - shrinking K when the GPU is already saturated with concurrent requests, growing it when there's spare capacity to spend.\n\nIf you're serving a large model and haven't asked whether decode is memory-bound in your setup, that's the first number to check before reaching for a bigger GPU.\n\n#AIEngineering #LLMInference #MachineLearning #SystemDesign #GenAI\n\n---\n\n## Diagrams\n\n### The draft-verify loop (sequence view)\n\n```mermaid\n---\ntitle: \"Speculative Decoding: Draft, Verify, Accept or Fall Back\"\nconfig:\n  look: handDrawn\n---\nsequenceDiagram\n    participant U as Request\n    participant D as Draft Model (1B)\n    participant T as Target Model (70B)\n\n    U->>D: Generate K candidate tokens\n    D-->>D: 5ms per token, sequential\n    D->>T: Submit K tokens for verification\n    Note over T: Single parallel \"prefill-style\" pass\n    T-->>T: Compare against its own logits\n    alt All K tokens accepted\n        T->>U: Return K tokens, continue from K+1\n    else Mismatch at position i\n        T->>U: Return tokens 1..i-1 plus target's own token i\n        Note over U: Everything after i is discarded and regenerated\n    end\n```\n\n### Where the speedup actually comes from\n\n```mermaid\n---\ntitle: \"Memory-Bound Decode vs Compute-Bound Verification\"\n---\nquadrantChart\n    title Latency per token: standard decode vs speculative\n    x-axis Low Compute Use --> High Compute Use\n    y-axis Low Memory Traffic --> High Memory Traffic\n    quadrant-1 Wasteful\n    quadrant-2 Standard sequential decode\n    quadrant-3 Idle\n    quadrant-4 Speculative verification\n    \"Standard decode (1 token/pass)\": [0.25, 0.85]\n    \"Speculative verify (K tokens/pass)\": [0.75, 0.4]\n    \"Draft model guess\": [0.15, 0.2]\n    \"GPU idle waiting on HBM\": [0.1, 0.9]\n```",
+    "featuredImage": "/blog/series/deep-dives-11.svg",
+    "author": {
+        "name": "Abhishek Mane",
+        "photo": "/Abhishek_Profile.png"
+    },
+    "publishedAt": "2026-08-11",
+    "readTime": 3,
+    "category": "Inference",
+    "tags": [
+        "Speculative Decoding",
+        "Memory Bandwidth",
+        "Latency",
+        "Inference",
+        "AI Engineering",
+        "LLMInference",
+        "Machine Learning",
+        "System Design",
+        "Gen AI"
+    ],
+    "featured": false,
+    "series": "Deep Dives",
+    "seriesSlug": "deep-dives"
+}

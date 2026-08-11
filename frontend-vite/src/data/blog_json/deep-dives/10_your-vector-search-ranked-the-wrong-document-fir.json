@@ -1,0 +1,29 @@
+{
+    "id": "410",
+    "slug": "your-vector-search-ranked-the-wrong-document-first-heres-why-and-what-fixes-it",
+    "title": "Your Vector Search Ranked the Wrong Document First. Here's Why, and What Fixes It.",
+    "excerpt": "Query: \"how to configure CUDA memory.\" Your vector search returns a document about RAM allocation for machine learning ranked above a document that's actually about configuring CUDA memory.",
+    "content": "Query: \"how to configure CUDA memory.\" Your vector search returns a document about RAM allocation for machine learning ranked above a document that's actually about configuring CUDA memory. The embeddings weren't broken. They did exactly what embeddings do - and that's precisely the limitation worth understanding.\n\nA bi-encoder, the workhorse of first-stage retrieval, embeds the query and every document independently, before either has any idea the other exists. Similarity is just cosine distance between two vectors computed in isolation. It's fast - embeddings are precomputed, so scoring a billion documents is a nearest-neighbor lookup - but independence is also exactly what it can't see: how a specific word in the query changes the meaning of a specific word in the document.\n\nA cross-encoder processes the query and a candidate document together, as one input, and uses attention to let them interact directly. It sees that \"CUDA\" in the query and \"CUDA\" in the document are talking about the same thing in a way cosine similarity on two separately-computed vectors simply cannot capture. That's reranking: a second, slower, much more accurate pass over a shortlist the first stage already narrowed down.\n\nThe production pattern is a funnel, not a single search. Retrieve fifty to a hundred candidates cheaply with the bi-encoder, then spend the expensive cross-encoder pass only on that shortlist, returning the top five to ten. For very large corpora, add a third stage in front - sparse BM25 narrowing a billion documents to a thousand before the bi-encoder even runs.\n\nHere's the number that changes how you'd spend a latency budget: NDCG (a standard ranking-quality metric) goes from roughly 0.65 without reranking to 0.78 with it, for a latency cost that's real but bounded - 150 to 300ms instead of 50 to 100. If you have 200ms to spend, the highest-ROI split is roughly 50ms on retrieval and 150ms on reranking, not more candidates from the vector database. Reranking fifty results consistently beats retrieving five hundred.\n\nSkip it when latency is genuinely tight (sub-100ms budgets), when queries are simple single-term lookups, or when the first-stage candidates are already clearly separated by score. Always use it when the stakes are high enough that getting the wrong document into an LLM's context is expensive - legal, medical, anything customer-facing where a hallucinated answer built on the wrong source is worse than a slower answer built on the right one.\n\n#RAG #InformationRetrieval #AIEngineering #VectorSearch #MachineLearning\n\n---\n\n## Diagrams\n\n### Why the ranking flips between stages\n\n```mermaid\n---\ntitle: \"Bi-Encoder vs Cross-Encoder: Independent Scoring vs Joint Scoring\"\nconfig:\n  look: handDrawn\n---\nflowchart TD\n    subgraph BI[\"Bi-encoder (first stage)\"]\n    Q1[\"Query\"] --> E1[\"Encoder\"]\n    D1[\"Document\"] --> E2[\"Encoder\"]\n    E1 --> SIM[\"Cosine similarity<br/>no interaction between the two\"]\n    E2 --> SIM\n    end\n\n    subgraph CROSS[\"Cross-encoder (reranking)\"]\n    QD[\"[Query, Document] as ONE input\"] --> ATT[\"Attention sees both together\"]\n    ATT --> SCORE[\"Relevance score<br/>captures word-level interaction\"]\n    end\n\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n    class E1,E2,ATT process\n    class SIM,SCORE output\n```\n\n### The retrieval funnel and where the latency budget goes\n\n```mermaid\n---\ntitle: \"The Two-Stage (Sometimes Three-Stage) Retrieval Funnel\"\n---\nflowchart LR\n    A[\"1 Billion+ documents\"] --> B[\"Sparse BM25<br/>optional, for huge corpora\"]\n    B --> C[\"Top 1,000\"]\n    C --> D[\"Bi-encoder search<br/>~50-100ms\"]\n    D --> E[\"Top 50-100 candidates\"]\n    E --> F[\"Cross-encoder rerank<br/>~150-300ms\"]\n    F --> G[\"Top 5-10 to the LLM\"]\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A input\n    class B,D,F process\n    class C,E,G output\n```",
+    "featuredImage": "/blog/series/deep-dives-10.svg",
+    "author": {
+        "name": "Abhishek Mane",
+        "photo": "/Abhishek_Profile.png"
+    },
+    "publishedAt": "2026-08-10",
+    "readTime": 3,
+    "category": "Retrieval",
+    "tags": [
+        "Reranking",
+        "Cross-Encoder",
+        "Relevance",
+        "Retrieval",
+        "RAG",
+        "Information Retrieval",
+        "AI Engineering",
+        "Vector Search",
+        "Machine Learning"
+    ],
+    "featured": false,
+    "series": "Deep Dives",
+    "seriesSlug": "deep-dives"
+}

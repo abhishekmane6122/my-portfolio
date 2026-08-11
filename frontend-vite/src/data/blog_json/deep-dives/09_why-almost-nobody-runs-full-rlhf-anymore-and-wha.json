@@ -1,0 +1,27 @@
+{
+    "id": "409",
+    "slug": "why-almost-nobody-runs-full-rlhf-anymore-and-what-replaced-it",
+    "title": "Why Almost Nobody Runs Full RLHF Anymore, and What Replaced It",
+    "excerpt": "A pretrained model is knowledgeable and completely uncontrolled at the same time - it can write beautifully and still ignore your instructions, hallucinate with total confidence, or produce...",
+    "content": "A pretrained model is knowledgeable and completely uncontrolled at the same time - it can write beautifully and still ignore your instructions, hallucinate with total confidence, or produce something unsafe, because nothing in pretraining ever taught it which of its capable outputs you actually want. Alignment is the step that closes that gap, and the method most teams associate with alignment - RLHF - is mostly not what's running in production anymore.\n\nClassic RLHF is a three-model system: supervised fine-tuning for a baseline, a reward model trained on human preference pairs, then PPO using that reward model to push the policy toward higher-scoring outputs. It works, and it's also why most teams moved away from it - PPO needs four models resident in memory at once, it's brutally sensitive to hyperparameters, and it has a documented failure mode where the policy suddenly collapses mid-training.\n\nDPO's insight is that you don't need the reward model as a separate object at all. Preference data - this response beat that one - can derive the optimal policy directly, with the model itself implicitly serving as its own reward model relative to a fixed reference copy. A three-model reinforcement learning problem becomes closer to a classification problem on pairs of responses. Fewer moving parts, far more stable training - why DPO became the default.\n\nOffline DPO only learns from the static preference dataset it was given - once outputs improve past what that dataset can distinguish, training stalls. Online alignment closes the gap: the model generates candidates live, a judge or rule-based check ranks them in real time, and the policy updates from that fresh signal instead of a frozen dataset.\n\nThe most consequential recent shift is what gets rewarded for reasoning models: not the final answer, but the chain of thought itself, increasingly verified rather than human-judged - did the math check out, did the code pass its tests. A stronger, cheaper signal when it's available.\n\nOne cost worth knowing before aligning a model harder than the task needs: alignment tax. Push too hard on safety or persona and raw capability erodes - coding, creative range, and reasoning nuance all soften as the model gets more cautious.\n\nSo the actual discipline isn't picking DPO over RLHF, it's measuring capability before and after every alignment pass, not just safety - the tax is real, and a KL penalty against the reference model only helps if someone is watching for it.\n\n#MachineLearning #RLHF #DPO #AIAlignment #LLM\n\n---\n\n## Diagrams\n\n### RLHF's four models vs DPO's two\n\n```mermaid\n---\ntitle: \"Why DPO Replaced RLHF/PPO in Most Production Pipelines\"\nconfig:\n  look: handDrawn\n---\nflowchart LR\n    subgraph RLHF[\"Classic RLHF / PPO\"]\n    P1[\"Policy model\"]\n    R1[\"Reference model\"]\n    V1[\"Value model\"]\n    RM1[\"Reward model\"]\n    P1 -.->|\"all 4 resident<br/>in memory at once\"| V1\n    end\n\n    subgraph DPO[\"DPO\"]\n    P2[\"Policy model\"]\n    R2[\"Reference model<br/>fixed\"]\n    P2 -->|\"preference pairs treated<br/>as a classification problem\"| R2\n    end\n\n    classDef heavy fill:#FBEDED,stroke:#C08383,stroke-width:1px,color:#1F2933\n    classDef light fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    class P1,R1,V1,RM1 heavy\n    class P2,R2 light\n```\n\n### The alignment progression, offline to reasoning\n\n```mermaid\n---\ntitle: \"From Offline Preference Data to Verified Reasoning Rewards\"\n---\nflowchart TD\n    A[\"Offline DPO<br/>static preference dataset\"] --> B[\"Ceiling: model improves<br/>past what data can distinguish\"]\n    B --> C[\"Online DPO / RLOO<br/>judge ranks fresh generations live\"]\n    C --> D[\"Reasoning-model alignment<br/>reward the chain of thought, not just the answer\"]\n    D --> E[\"Verification-based RL<br/>compiler or test suite as reward signal,<br/>no human judgment needed\"]\n\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef risk fill:#FBEDED,stroke:#C08383,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n    class A process\n    class B risk\n    class C,D process\n    class E output\n```",
+    "featuredImage": "/blog/series/deep-dives-09.svg",
+    "author": {
+        "name": "Abhishek Mane",
+        "photo": "/Abhishek_Profile.png"
+    },
+    "publishedAt": "2026-08-09",
+    "readTime": 3,
+    "category": "Model Training",
+    "tags": [
+        "RLHF",
+        "DPO",
+        "Alignment",
+        "Preference Tuning",
+        "Machine Learning",
+        "AIAlignment",
+        "LLM"
+    ],
+    "featured": false,
+    "series": "Deep Dives",
+    "seriesSlug": "deep-dives"
+}

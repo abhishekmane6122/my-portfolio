@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-label="Memory Routing: Not Every Message Belongs in Every Store">
+  <defs>
+    <linearGradient id="bgagent-memory135844" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#241A3F"/>
+      <stop offset="100%" stop-color="#3A2A63"/>
+    </linearGradient>
+    <radialGradient id="glowagent-memory135844" cx="0.82" cy="0.18" r="0.55">
+      <stop offset="0%" stop-color="#A78BFA" stop-opacity="0.38"/>
+      <stop offset="100%" stop-color="#A78BFA" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="gridagent-memory135844" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#FFFFFF" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="675" fill="url(#bgagent-memory135844)"/>
+  <rect width="1200" height="675" fill="url(#gridagent-memory135844)"/>
+  <rect width="1200" height="675" fill="url(#glowagent-memory135844)"/>
+  <rect x="0" y="0" width="8" height="675" fill="#A78BFA"/>
+
+  <text x="90" y="110" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="21"
+        fill="#A78BFA" letter-spacing="7">AGENT MEMORY LINEAGE</text>
+
+  <text x="90" y="234" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="112" fill="#FFFFFF" fill-opacity="0.13" font-weight="700">DAY 13</text>
+
+  <rect x="90" y="270" width="76" height="3" fill="#A78BFA"/>
+
+  <text x="90" y="336" font-family="Georgia,serif" font-size="58" fill="#FFFFFF" font-weight="400">Memory Routing: Not Every</text>
+    <text x="90" y="410" font-family="Georgia,serif" font-size="58" fill="#FFFFFF" font-weight="400">Message Belongs in Every</text>
+    <text x="90" y="484" font-family="Georgia,serif" font-size="58" fill="#FFFFFF" font-weight="400">Store</text>
+    
+  <line x1="90" y1="572" x2="1110" y2="572" stroke="#FFFFFF" stroke-opacity="0.14" stroke-width="1"/>
+  <text x="90" y="616" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="20"
+        fill="#FFFFFF" fill-opacity="0.62" letter-spacing="3">ABHISHEK MANE</text>
+  <text x="1110" y="616" text-anchor="end" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="20" fill="#A78BFA" letter-spacing="3">13 / 30</text>
+</svg>

@@ -1,0 +1,31 @@
+{
+    "id": "206",
+    "slug": "stop-counting-messages-start-counting-tokens",
+    "title": "Stop Counting Messages. Start Counting Tokens",
+    "excerpt": "\"Keep the last 10 messages\" feels like a budget. It is really a guess that holds until it does not. Two conversations, both with exactly ten messages in the window:",
+    "content": "\"Keep the last 10 messages\" feels like a budget. It is really a guess that holds until it does not.\n\nTwo conversations, both with exactly ten messages in the window:\n\n```\nConversation A   ten short exchanges                  ~180 tokens\nConversation B   one message contains a stack trace\n                 and a pasted YAML config           ~7,400 tokens\n```\n\nSame configuration, roughly 40x difference in actual context size. One wastes almost the entire budget, the other overflows the window. The message counter catches neither, because it is measuring the wrong unit.\n\nToken buffer memory replaces the proxy with the measurement: run the real tokenizer, sum the history, evict oldest-first until it fits under a hard ceiling.\n\nIt is deliberately unsophisticated. No summarisation, no embeddings, no retrieval. That is the point — it is deterministic, fast, and it is the floor everything else sits on. Summary buffer decides what to keep. Token buffer enforces how much fits.\n\nFive details decide whether it actually holds up.\n\nPin the tokenizer to the deployed model version. A counter using a different version will be within a few percent, pass every test in staging, and fail at the tail in production. This is a real source of overflow errors and it is close to invisible until it bites.\n\nReserve output space before allocating input. Fill the input to the window edge, then request a 4,000-token answer, and you get a truncation or a hard error.\n\nAccount for message formatting overhead. The API adds tokens per message for role markers and structure. Counting content only undercounts by a few percent, which is about the size of most safety margins.\n\nEvict at message boundaries. Half a message in context is worse than none, because the model will reason from a truncated fragment and you will spend an afternoon working out why.\n\nEmit the count per segment, not just the total. When a system starts overflowing, which segment grew is the entire diagnosis.\n\n```\ncontext.tokens.system      6,120\ncontext.tokens.tools       3,880\ncontext.tokens.retrieved   9,440   <- this one grew\ncontext.tokens.history    11,200\ncontext.tokens.reserved    4,000\n```\n\nEstimation has its place. `chars / 4` is fine for capacity planning and sizing a cluster.\n\nIt is not fine for enforcement. The gap between a heuristic and a real tokenizer is small in English prose and large in Hindi, in code, in JSON and in anything with long identifiers — which is to say, large in exactly the traffic that overflows.\n\nEstimate to plan, measure to enforce, and not the other way round.\n\n---\n\n## Diagrams\n\n### The eviction loop\n\n```mermaid\n---\ntitle: \"The Token Budget Eviction Loop\"\n---\nflowchart TD\n    A[\"New message\"] --> B[\"Tokenize with the model's own tokenizer<br/>pinned to the deployed version\"]\n    B --> C[\"Sum history plus system plus tools\"]\n    C --> D[\"Add per message formatting overhead\"]\n    D --> E[\"Add safety margin, 2 to 3 percent\"]\n\n    E --> F{\"Total plus output reserve<br/>over context limit\"}\n    F -->|No| G[\"Send to model\"]\n    F -->|Yes| H[\"Evict oldest message<br/>at a message boundary\"]\n\n    H --> I[(\"Archive<br/>evicted, not deleted\")]\n    H --> C\n\n    G --> J[\"Emit per segment token metrics\"]\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef store fill:#F3F0F8,stroke:#8880AE,stroke-width:1px,color:#1F2933\n    classDef decision fill:#FDF6E7,stroke:#C9A85C,stroke-width:1px,color:#1F2933\n    classDef risk fill:#FBEDED,stroke:#C08383,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A input\n    class B,C,D,E process\n    class F decision\n    class H risk\n    class I store\n    class G,J output\n```\n\n### When to estimate and when to measure\n\n```mermaid\n---\ntitle: \"Estimate to Plan, Measure to Enforce\"\n---\nflowchart TD\n    A[\"Need a token count\"] --> B{\"What is it for\"}\n\n    B -->|Capacity planning| C[\"Character heuristic<br/>chars divided by 4\"]\n    B -->|Prompt assembly and eviction| D[\"Real tokenizer<br/>pinned to model version\"]\n    B -->|Billing reconciliation| E[\"Provider usage response<br/>authoritative\"]\n\n    C --> F[\"Acceptable error<br/>10 to 30 percent<br/>much worse on Hindi, code, JSON\"]\n    D --> G[\"Exact for that model\"]\n    E --> H[\"Exact and auditable\"]\n\n    F --> I[\"Safe: sizing a cluster\"]\n    F --> J[\"Unsafe: deciding what to evict\"]\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef decision fill:#FDF6E7,stroke:#C9A85C,stroke-width:1px,color:#1F2933\n    classDef risk fill:#FBEDED,stroke:#C08383,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A input\n    class C,D,E process\n    class B decision\n    class F,J risk\n    class G,H,I output\n```",
+    "featuredImage": "/blog/series/agent-memory-lineage-06.svg",
+    "author": {
+        "name": "Abhishek Mane",
+        "photo": "/Abhishek_Profile.png"
+    },
+    "publishedAt": "2026-07-06",
+    "readTime": 3,
+    "category": "Agent Memory",
+    "tags": [
+        "Token Counting",
+        "Context Budget",
+        "Agent Memory",
+        "Cost",
+        "AI Engineering",
+        "LLMOps",
+        "Agentic AI",
+        "Context Engineering",
+        "Software Architecture"
+    ],
+    "featured": false,
+    "series": "Agent Memory Lineage",
+    "seriesSlug": "agent-memory-lineage",
+    "seriesPart": 6,
+    "seriesTotal": 30
+}

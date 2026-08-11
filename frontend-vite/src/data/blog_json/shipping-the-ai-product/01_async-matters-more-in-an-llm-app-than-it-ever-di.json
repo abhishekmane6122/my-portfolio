@@ -1,0 +1,31 @@
+{
+    "id": "301",
+    "slug": "async-matters-more-in-an-llm-app-than-it-ever-did-in-crud",
+    "title": "Async Matters More in an LLM App Than It Ever Did in CRUD",
+    "excerpt": "In a CRUD service a request holds a worker for about 40 milliseconds. In an LLM service it holds one for 8 seconds. Same framework, completely different concurrency problem.",
+    "content": "In a CRUD service a request holds a worker for about 40 milliseconds. In an LLM service it holds one for 8 seconds. Same framework, completely different concurrency problem.\n\nThe arithmetic on a sync worker pool:\n\n```\nCRUD:  8 workers x (1 / 0.04s)  =  200 req/s\nLLM:   8 workers x (1 / 8.0s)   =    1 req/s\n```\n\nOne request per second on a box that is essentially idle. The CPU is doing nothing, because every worker is blocked on a socket waiting for a token stream from someone else's GPU.\n\nThis is probably the most common performance bug in Python AI services, and it is not something you tune your way out of. It is the wrong concurrency model.\n\nThe fix is async end to end, and \"end to end\" is carrying real weight in that sentence. One blocking call anywhere in the request path blocks the whole event loop, not just that one request.\n\nFour that catch people regularly:\n\n```python\n# all of these block the loop inside an async handler\nresp = openai.chat.completions.create(...)\nresp = requests.post(...)\nrows = session.query(Doc).all()          # sync SQLAlchemy\ndata = open(\"f.json\").read()             # sync file IO\n```\n\nEvery one has an async equivalent. Mixing them is arguably worse than being fully sync, because you get sync throughput while believing you have async throughput.\n\nThree things that are specifically different in this setting.\n\nYour timeouts need to be shorter than your client's. A 60-second model call sitting behind a 30-second gateway timeout means you pay for tokens nobody ever receives. Set the deadline at the innermost layer and propagate it outward.\n\nConnection pools should be sized for concurrency, not for cores. A default httpx pool of 10 connections caps you at 10 in-flight model calls no matter how many coroutines you have. It shows up as latency that grows with load while CPU stays flat, which is a confusing signal if you are not looking for it.\n\nBlocking work belongs in a thread pool. Tokenizer calls, PDF parsing and image resizing are all CPU-bound. Wrap them in `run_in_threadpool` or move them to a worker, otherwise they stall every concurrent stream on that process.\n\nThe framing that makes the rest follow: an LLM API server is not really a compute service, it is an IO multiplexer that happens to be written in Python. Design it like a proxy rather than like a web app.\n\n---\n\n## Diagrams\n\n### Why sync workers collapse under LLM latency\n\n```mermaid\n---\ntitle: \"Sync vs Async Workers Under 8 Second LLM Calls\"\n---\nflowchart TD\n    A[\"100 concurrent users\"] --> B{\"Concurrency model\"}\n\n    B -->|\"Sync, 8 workers\"| C[\"Worker 1 blocked 8s\"]\n    B -->|\"Sync, 8 workers\"| D[\"Worker 8 blocked 8s\"]\n    C --> E[\"92 users queued<br/>CPU at 2 percent\"]\n    D --> E\n    E --> F[\"Throughput ~1 req/s<br/>latency grows without bound\"]\n\n    B -->|\"Async event loop\"| G[\"100 coroutines awaiting IO<br/>one thread, no blocking\"]\n    G --> H[\"Bounded by connection pool<br/>and upstream rate limits\"]\n    H --> I[\"Throughput limited by the PROVIDER<br/>not by your process\"]\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef decision fill:#FDF6E7,stroke:#C9A85C,stroke-width:1px,color:#1F2933\n    classDef risk fill:#FBEDED,stroke:#C08383,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A input\n    class G,H process\n    class B decision\n    class C,D,E,F risk\n    class I output\n```\n\n### One blocking call poisons the whole loop\n\n```mermaid\n---\ntitle: \"Where Blocking Calls Hide in an Async AI Handler\"\n---\nflowchart LR\n    A[\"Async request handler\"] --> B{\"Call type\"}\n\n    B -->|\"Async HTTP to model\"| C[\"awaits, loop free\"]\n    B -->|\"Sync SDK client\"| D[\"BLOCKS event loop<br/>all concurrent streams stall\"]\n    B -->|\"Sync DB session\"| E[\"BLOCKS event loop\"]\n    B -->|\"Sync file or S3 read\"| F[\"BLOCKS event loop\"]\n    B -->|\"Tokenizer or PDF parse\"| G[\"CPU bound<br/>also blocks the loop\"]\n\n    D --> H[\"Fix: async SDK client\"]\n    E --> I[\"Fix: async driver plus async session\"]\n    F --> J[\"Fix: aiofiles or async S3 client\"]\n    G --> K[\"Fix: run_in_threadpool<br/>or move to a worker\"]\n\n    C --> L[\"Throughput scales with<br/>pool size and provider limits\"]\n    H --> L\n    I --> L\n    J --> L\n    K --> L\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef decision fill:#FDF6E7,stroke:#C9A85C,stroke-width:1px,color:#1F2933\n    classDef risk fill:#FBEDED,stroke:#C08383,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A input\n    class C,H,I,J,K process\n    class B decision\n    class D,E,F,G risk\n    class L output\n```",
+    "featuredImage": "/blog/series/shipping-the-ai-product-01.svg",
+    "author": {
+        "name": "Abhishek Mane",
+        "photo": "/Abhishek_Profile.png"
+    },
+    "publishedAt": "2026-07-31",
+    "readTime": 3,
+    "category": "Backend",
+    "tags": [
+        "FastAPI",
+        "Async",
+        "Concurrency",
+        "Event Loop",
+        "Fast API",
+        "Python",
+        "AI Engineering",
+        "Software Architecture",
+        "Backend Development"
+    ],
+    "featured": false,
+    "series": "Shipping the AI Product",
+    "seriesSlug": "shipping-the-ai-product",
+    "seriesPart": 1,
+    "seriesTotal": 30
+}

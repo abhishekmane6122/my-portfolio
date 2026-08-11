@@ -101,7 +101,10 @@ export interface BlogPost {
     slug: string;
     title: string;
     excerpt: string;
-    content: string;
+    /** Absent on entries from the blog index; load it with getPostContent(). */
+    content?: string;
+    /** Glob key used to lazily fetch this post's body. */
+    contentKey?: string;
     featuredImage: string;
     author: {
         name: string;
@@ -114,6 +117,11 @@ export interface BlogPost {
     tags: string[];
     featured: boolean;
     relatedPosts?: string[];
+    /** Name of the multi-part series this post belongs to, if any. */
+    series?: string;
+    seriesSlug?: string;
+    seriesPart?: number;
+    seriesTotal?: number;
 }
 
 export interface LinkedinPostData {

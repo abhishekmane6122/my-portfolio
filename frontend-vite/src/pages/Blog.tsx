@@ -1,11 +1,13 @@
-import { useState, useEffect } from 'react'
-import { useSearchParams, Link } from 'react-router-dom'
+import { useState, useEffect, useMemo } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Search, Home } from 'lucide-react'
+import { Search, Plus } from 'lucide-react'
 import { Helmet } from 'react-helmet-async'
 import BlogCard from '@/components/blog/BlogCard'
-import { blogPosts } from '@/data/blog-posts'
+import { blogPosts, getAllCategories, getAllSeries } from '@/data/blog-posts'
 import { BlogPost } from '@/types/schema'
+
+const PAGE_SIZE = 12
 
 export default function Blog() {
     const [searchParams, setSearchParams] = useSearchParams()
@@ -13,39 +15,54 @@ export default function Blog() {
     // Initialize state from URL params
     const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '')
     const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'all')
+    const [selectedSeries, setSelectedSeries] = useState(searchParams.get('series') || 'all')
+    const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
 
-    const categories = [
-        'all',
-        'LLMOps',
-        'Backend',
-        'AI/ML',
-        'Edge AI',
-        'AI Agents',
-        'Infrastructure',
-        'Computer Vision',
-        'AI Frameworks',
-        'DevOps'
-    ]
+    // Derived from the posts themselves, so a new article never needs a code change here
+    const categories = useMemo(() => ['all', ...getAllCategories()], [])
+    const series = useMemo(() => getAllSeries(), [])
 
     // Update URL when search/filter changes
     useEffect(() => {
         const params = new URLSearchParams()
         if (searchQuery) params.set('search', searchQuery)
         if (selectedCategory && selectedCategory !== 'all') params.set('category', selectedCategory)
+        if (selectedSeries && selectedSeries !== 'all') params.set('series', selectedSeries)
         setSearchParams(params, { replace: true })
-    }, [searchQuery, selectedCategory, setSearchParams])
+    }, [searchQuery, selectedCategory, selectedSeries, setSearchParams])
 
-    const filteredPosts = (blogPosts as BlogPost[]).filter((post: BlogPost) => {
-        const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            post.tags.some((tag: string) => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+    // Any filter change starts the list over from the first page
+    useEffect(() => {
+        setVisibleCount(PAGE_SIZE)
+    }, [searchQuery, selectedCategory, selectedSeries])
 
-        const matchesCategory = selectedCategory === 'all' || post.category === selectedCategory
+    const filteredPosts = useMemo(() => {
+        const query = searchQuery.toLowerCase()
+        return (blogPosts as BlogPost[]).filter((post: BlogPost) => {
+            const matchesSearch =
+                !query ||
+                post.title.toLowerCase().includes(query) ||
+                post.excerpt.toLowerCase().includes(query) ||
+                (post.series?.toLowerCase().includes(query) ?? false) ||
+                post.tags.some((tag: string) => tag.toLowerCase().includes(query))
 
-        return matchesSearch && matchesCategory
-    })
+            const matchesCategory = selectedCategory === 'all' || post.category === selectedCategory
+            const matchesSeries = selectedSeries === 'all' || post.seriesSlug === selectedSeries
 
+            return matchesSearch && matchesCategory && matchesSeries
+        })
+    }, [searchQuery, selectedCategory, selectedSeries])
+
+    const isFiltering = Boolean(searchQuery) || selectedCategory !== 'all' || selectedSeries !== 'all'
     const featuredPost = (blogPosts as BlogPost[]).find((post: BlogPost) => post.featured)
+    const visiblePosts = filteredPosts.slice(0, visibleCount)
+    const remaining = filteredPosts.length - visiblePosts.length
+
+    const chipClass = (active: boolean) =>
+        `flex-shrink-0 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl font-mono text-[9px] sm:text-[10px] font-medium uppercase tracking-widest transition-all ${active
+            ? 'bg-[#d4a373] text-white shadow-lg shadow-[#d4a373]/20'
+            : 'bg-card text-neutral-500 dark:text-muted-foreground hover:bg-neutral-100 dark:hover:bg-white/10 border border-neutral-200 dark:border-white/10'
+        }`
 
     return (
         <>
@@ -88,25 +105,45 @@ export default function Blog() {
                             />
                         </div>
 
-                        {/* Category filter - horizontal scroll on mobile */}
-                        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap">
-                            {categories.map((category) => (
-                                <button
-                                    key={category}
-                                    onClick={() => setSelectedCategory(category)}
-                                    className={`flex-shrink-0 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl font-mono text-[9px] sm:text-[10px] font-medium uppercase tracking-widest transition-all ${selectedCategory === category
-                                        ? 'bg-[#d4a373] text-white shadow-lg shadow-[#d4a373]/20'
-                                        : 'bg-card text-neutral-500 dark:text-muted-foreground hover:bg-neutral-100 dark:hover:bg-white/10 border border-neutral-200 dark:border-white/10'
-                                        }`}
-                                >
-                                    {category === 'all' ? 'All' : category}
+                        {/* Series filter */}
+                        <div className="flex flex-col gap-2">
+                            <span className="text-[9px] font-mono uppercase tracking-[0.25em] text-neutral-400">Series</span>
+                            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap">
+                                <button onClick={() => setSelectedSeries('all')} className={chipClass(selectedSeries === 'all')}>
+                                    All Writing
                                 </button>
-                            ))}
+                                {series.map((s) => (
+                                    <button
+                                        key={s.slug}
+                                        onClick={() => setSelectedSeries(s.slug)}
+                                        className={chipClass(selectedSeries === s.slug)}
+                                    >
+                                        {s.name}
+                                        <span className="ml-1.5 opacity-60">{s.count}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Category filter - horizontal scroll on mobile */}
+                        <div className="flex flex-col gap-2">
+                            <span className="text-[9px] font-mono uppercase tracking-[0.25em] text-neutral-400">Topic</span>
+                            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap">
+                                {categories.map((category) => (
+                                    <button
+                                        key={category}
+                                        onClick={() => setSelectedCategory(category)}
+                                        className={chipClass(selectedCategory === category)}
+                                    >
+                                        {category === 'all' ? 'All' : category}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
 
                     {/* Featured post */}
-                    {featuredPost && selectedCategory === 'all' && !searchQuery && (
+                    {featuredPost && !isFiltering && (
                         <div className="mb-8 md:mb-12">
                             <h2 className="text-xl md:text-2xl font-serif font-light text-foreground mb-4 md:mb-6">Featured Article</h2>
                             <BlogCard post={featuredPost} index={0} />
@@ -116,18 +153,35 @@ export default function Blog() {
                     {/* Blog grid */}
                     <div>
                         <h2 className="text-xl md:text-2xl font-serif font-light text-foreground mb-6 md:mb-8">
-                            {searchQuery || selectedCategory !== 'all' ? 'Filtered Insights' : 'Library of Knowledge'}
+                            {isFiltering ? 'Filtered Insights' : 'Library of Knowledge'}
                             <span className="text-neutral-400 text-sm ml-3 font-mono font-normal">
                                 // {filteredPosts.length} results
                             </span>
                         </h2>
 
                         {filteredPosts.length > 0 ? (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                                {filteredPosts.map((post: BlogPost, index: number) => (
-                                    <BlogCard key={post.id} post={post} index={index} />
-                                ))}
-                            </div>
+                            <>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                                    {visiblePosts.map((post: BlogPost, index: number) => (
+                                        <BlogCard key={post.id} post={post} index={index % PAGE_SIZE} />
+                                    ))}
+                                </div>
+
+                                {remaining > 0 && (
+                                    <div className="mt-10 md:mt-14 flex flex-col items-center gap-3">
+                                        <button
+                                            onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
+                                            className="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-[#d4a373] text-white font-mono text-[10px] font-medium uppercase tracking-[0.2em] hover:bg-[#c49363] transition-all shadow-xl shadow-[#d4a373]/10 hover:-translate-y-0.5 active:scale-95"
+                                        >
+                                            <Plus className="w-4 h-4" />
+                                            Load More Articles
+                                        </button>
+                                        <span className="text-xs font-mono text-neutral-400">
+                                            Showing {visiblePosts.length} of {filteredPosts.length}
+                                        </span>
+                                    </div>
+                                )}
+                            </>
                         ) : (
                             <div className="text-center py-16 md:py-20">
                                 <div className="text-5xl md:text-6xl mb-4">🔍</div>

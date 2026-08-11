@@ -1,0 +1,31 @@
+{
+    "id": "306",
+    "slug": "postgres-with-pgvector-vs-a-dedicated-vector-database",
+    "title": "Postgres With pgvector vs a Dedicated Vector Database",
+    "excerpt": "The honest version of this decision, without the vendor framing: The argument for staying in Postgres is not performance.",
+    "content": "**Most teams do not need a vector database. They need an index on a table they already have.**\n\nThe honest version of this decision, without the vendor framing:\n\n```\npgvector wins when\n  corpus under ~5 to 10 million vectors\n  you already run Postgres\n  filters are relational (tenant, date, status, permissions)\n  you want ONE transactional store, one backup, one migration path\n\nDedicated vector DB wins when\n  tens of millions to billions of vectors\n  you need horizontal sharding of the index itself\n  filtering is simple but scale is extreme\n  you need features Postgres lacks: multi vector, built in hybrid, live reindex\n```\n\nThe argument for staying in Postgres is not performance. It is that **your embedding lives next to the row it describes**, inside the same transaction.\n\nThat matters more than benchmarks suggest:\n\n```sql\n-- one query, one consistency domain\nSELECT c.id, c.text, d.title\nFROM chunks c\nJOIN documents d ON d.id = c.document_id\nWHERE d.tenant_id = $1\n  AND d.status = 'published'\n  AND d.effective_date <= now()\n  AND c.embedding_version = 3\nORDER BY c.embedding <=> $2\nLIMIT 20;\n```\n\nTenant isolation, publication status, effective dating and index versioning are all enforced by the database, in the same query, in the same transaction as the vector search. With a separate vector store, every one of those becomes application code that can drift — and \"the filter was applied after retrieval\" is a recurring source of cross-tenant leaks.\n\nThree things you must get right in pgvector or it will disappoint you:\n\n**HNSW, not IVFFlat, for most workloads.** IVFFlat needs data present before you build the index and degrades as the table grows past what it was trained on. HNSW builds incrementally and holds recall.\n\n**Filters and ANN indexes fight each other.** A highly selective filter (`tenant_id = X` matching 0.1 percent of rows) can make the planner scan the HNSW graph and discard almost everything, or abandon the index entirely. Partial indexes per tenant, or partitioning, fix this. Measure with `EXPLAIN ANALYZE` — do not assume.\n\n**Tune `ef_search` per query class.** It is the recall/latency dial. The default is conservative; raising it costs milliseconds and buys real recall.\n\nAnd the decision that outlives the database choice: **store `embedding_model` and `embedding_version` as columns on every row.** Without them a partially migrated index is undetectable, and you will migrate.\n\n**Start in Postgres. Move when a specific number forces you to, and know which number it was.**\n\n---\n\n## Diagrams\n\n### The selection path\n\n```mermaid\n---\ntitle: \"pgvector or a Dedicated Vector Database\"\n---\nflowchart TD\n    A[\"Need vector search\"] --> B{\"Corpus size\"}\n\n    B -->|\"Under 10M vectors\"| C{\"Already running Postgres\"}\n    B -->|\"10M to 100M\"| D{\"Filters relational or simple\"}\n    B -->|\"Over 100M\"| E[\"Dedicated vector DB<br/>index sharding required\"]\n\n    C -->|Yes| F[\"pgvector<br/>one store, one transaction, one backup\"]\n    C -->|No| G{\"Is Postgres acceptable operationally\"}\n    G -->|Yes| F\n    G -->|No| H[\"Managed vector service\"]\n\n    D -->|\"Relational, permission aware\"| I[\"pgvector with partitioning<br/>or partial indexes per tenant\"]\n    D -->|\"Simple, scale dominates\"| E\n\n    F --> J[\"Store embedding_model<br/>and embedding_version as columns\"]\n    I --> J\n    E --> J\n    H --> J\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef decision fill:#FDF6E7,stroke:#C9A85C,stroke-width:1px,color:#1F2933\n    classDef store fill:#F3F0F8,stroke:#8880AE,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A input\n    class F,I,E,H process\n    class B,C,D,G decision\n    class J output\n```\n\n### One store keeps the permission filter inside the query\n\n```mermaid\n---\ntitle: \"Why Colocating Vectors and Rows Prevents Filter Drift\"\n---\nflowchart LR\n    subgraph SG1[\"Separate vector store\"]\n    A[\"Query\"] --> B[\"Vector DB<br/>top 50 by similarity\"]\n    B --> C[\"Application code<br/>filters by tenant and status\"]\n    C --> D[\"Fetch rows from Postgres\"]\n    D --> E[\"Filter logic lives in TWO places<br/>and can drift\"]\n    end\n\n    subgraph SG2[\"pgvector\"]\n    F[\"Query\"] --> G[\"One SQL statement<br/>JOIN plus WHERE plus ORDER BY distance\"]\n    G --> H[\"Tenant, status, effective date<br/>and embedding_version<br/>enforced by the database\"]\n    end\n\n    E --> I[\"Recurring failure<br/>post filtering leaks across tenants\"]\n    H --> J[\"Filter is a QUERY CONSTRAINT<br/>unauthorised rows are never candidates\"]\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef risk fill:#FBEDED,stroke:#C08383,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A,F input\n    class B,D,G,H process\n    class C,E,I risk\n    class J output\n```",
+    "featuredImage": "/blog/series/shipping-the-ai-product-06.svg",
+    "author": {
+        "name": "Abhishek Mane",
+        "photo": "/Abhishek_Profile.png"
+    },
+    "publishedAt": "2026-08-05",
+    "readTime": 3,
+    "category": "Retrieval",
+    "tags": [
+        "pgvector",
+        "PostgreSQL",
+        "Vector Database",
+        "Retrieval",
+        "Postgre SQL",
+        "Vector Search",
+        "RAG",
+        "AI Engineering",
+        "Database Design"
+    ],
+    "featured": false,
+    "series": "Shipping the AI Product",
+    "seriesSlug": "shipping-the-ai-product",
+    "seriesPart": 6,
+    "seriesTotal": 30
+}

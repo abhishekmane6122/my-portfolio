@@ -2,40 +2,77 @@ import { useState, useEffect } from 'react'
 import { useParams, Link, Navigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { motion } from 'framer-motion'
-import { Calendar, Clock, ArrowLeft, Tag, Share2, Home, ArrowUp, ArrowDown } from 'lucide-react'
+import { Calendar, Clock, ArrowLeft, ArrowRight, Tag, Share2, Home, Layers } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { getPostBySlug } from '../data/blog-posts'
+import { getPostBySlug, getSeriesNeighbours, getPostContent } from '../data/blog-posts'
 import CodeBlock from '@/components/blog/CodeBlock'
+import ReadingProgress from '@/components/blog/ReadingProgress'
 import toast from 'react-hot-toast'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+
+// Defined once at module scope. Passing fresh object/array literals would make
+// ReactMarkdown rebuild the whole article on every render, restarting the
+// Mermaid diagrams' render effects.
+const REMARK_PLUGINS = [remarkGfm]
+
+const MARKDOWN_COMPONENTS = {
+    // react-markdown v9+ dropped the `inline` prop, so fenced blocks are matched
+    // on their <pre> wrapper instead. Anything reaching the `code` renderer below
+    // is therefore an inline span.
+    pre({ children }: any) {
+        const child = Array.isArray(children) ? children[0] : children
+        const className: string = child?.props?.className || ''
+        const match = /language-([\w-]+)/.exec(className)
+        const value = String(child?.props?.children ?? '').replace(/\n$/, '')
+
+        return <CodeBlock language={match ? match[1] : 'text'} value={value} />
+    },
+    code({ node, className, children, ...props }: any) {
+        void node // keep the mdast node out of the DOM attributes
+        return (
+            <code className={className} {...props}>
+                {children}
+            </code>
+        )
+    },
+    img({ src, alt, ...props }: any) {
+        if (!src) return null
+        const isExternal = src.startsWith('http') || src.startsWith('https')
+        const finalSrc = isExternal ? src : `${import.meta.env.BASE_URL}${src.startsWith('/') ? src.slice(1) : src}`
+        return <img src={finalSrc} alt={alt} {...props} />
+    },
+}
 
 export default function BlogPost() {
     const { slug } = useParams<{ slug: string }>()
     const post = slug ? getPostBySlug(slug) : undefined
 
-    const [scrollProgress, setScrollProgress] = useState(0)
+    // Article bodies live in their own chunks, so the text arrives after the header
+    const [content, setContent] = useState<string | null>(null)
 
     useEffect(() => {
         window.scrollTo(0, 0)
     }, [slug])
 
     useEffect(() => {
-        const handleScroll = () => {
-            const currentScroll = window.scrollY
-            const totalHeight = document.documentElement.scrollHeight - window.innerHeight
-            const progress = (currentScroll / totalHeight) * 100
-            setScrollProgress(progress)
+        if (!post) return
+        let cancelled = false
+        setContent(null)
+        getPostContent(post).then((body) => {
+            if (!cancelled) setContent(body)
+        })
+        return () => {
+            cancelled = true
         }
-        window.addEventListener('scroll', handleScroll)
-        return () => window.removeEventListener('scroll', handleScroll)
-    }, [])
-
+    }, [post])
 
     if (!post) {
         return <Navigate to="/blog" replace />
     }
+
+    const { prev, next } = getSeriesNeighbours(post)
 
     const sharePost = () => {
         if (navigator.share) {
@@ -67,14 +104,8 @@ export default function BlogPost() {
 
             <div className="min-h-screen bg-background text-foreground selection:bg-accent-blue/20 selection:text-accent-blue">
                 {/* Vertical Reading Progress Bar - Left side to avoid scrollbar conflict */}
-                <div className="fixed top-0 left-0 w-1 h-full z-[100] bg-black/5 dark:bg-white/5 pointer-events-none">
-                    <motion.div
-                        className="w-full bg-accent-blue origin-top shadow-[0_0_10px_rgba(59,130,246,0.5)]"
-                        style={{ height: `${scrollProgress}%` }}
-                        transition={{ type: 'spring', stiffness: 100, damping: 20 }}
-                    />
-                </div>
-                
+                <ReadingProgress />
+
 
                 {/* Header */}
                 <div className="relative overflow-hidden bg-neutral-50 dark:bg-[#050505] transition-colors duration-300 border-b border-black/5 dark:border-white/10 backdrop-blur-sm">
@@ -103,10 +134,20 @@ export default function BlogPost() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5 }}
                         >
-                            <div className="mb-4">
+                            <div className="mb-4 flex flex-wrap items-center gap-2">
                                 <Badge variant="outline" className="bg-accent-blue/10 border-accent-blue/20 text-accent-blue uppercase tracking-wide">
                                     {post.category}
                                 </Badge>
+                                {post.series && (
+                                    <Link
+                                        to={`/blog?series=${post.seriesSlug}`}
+                                        className="inline-flex items-center gap-1.5 rounded-full border border-[#d4a373]/30 bg-[#d4a373]/10 px-3 py-1 font-mono text-[10px] font-medium uppercase tracking-wider text-[#d4a373] no-underline transition-colors hover:bg-[#d4a373]/20"
+                                    >
+                                        <Layers className="h-3 w-3" />
+                                        {post.series}
+                                        {post.seriesPart ? ` · Part ${post.seriesPart} of ${post.seriesTotal}` : ''}
+                                    </Link>
+                                )}
                             </div>
 
                             {/* Title */}
@@ -208,36 +249,21 @@ export default function BlogPost() {
                                 fontFamily: '"Charter", "Georgia", "Cambria", "Times New Roman", serif'
                             } as React.CSSProperties}
                         >
-                            <ReactMarkdown
-                                remarkPlugins={[remarkGfm]}
-                                components={{
-                                    code({ node, inline, className, children, ...props }: any) {
-                                        const match = /language-([\w-]+)/.exec(className || '')
-                                        // Robustly extract text content from react-markdown children
-                                        const value = String(children).replace(/\n$/, '');
-
-                                        return !inline ? (
-                                            <CodeBlock
-                                                language={match ? match[1] : 'text'}
-                                                value={value}
-                                                {...props}
-                                            />
-                                        ) : (
-                                            <code className={className} {...props}>
-                                                {children}
-                                            </code>
-                                        )
-                                    },
-                                    img({ src, alt, ...props }) {
-                                        if (!src) return null;
-                                        const isExternal = src.startsWith('http') || src.startsWith('https');
-                                        const finalSrc = isExternal ? src : `${import.meta.env.BASE_URL}${src.startsWith('/') ? src.slice(1) : src}`;
-                                        return <img src={finalSrc} alt={alt} {...props} />;
-                                    }
-                                }}
-                            >
-                                {post.content}
+                            {content === null ? (
+                                <div className="animate-pulse space-y-4" aria-label="Loading article">
+                                    {[...Array(8)].map((_, i) => (
+                                        <div
+                                            key={i}
+                                            className="h-4 rounded bg-neutral-200 dark:bg-white/10"
+                                            style={{ width: `${[100, 96, 88, 94, 60, 98, 90, 72][i]}%` }}
+                                        />
+                                    ))}
+                                </div>
+                            ) : (
+                            <ReactMarkdown remarkPlugins={REMARK_PLUGINS} components={MARKDOWN_COMPONENTS}>
+                                {content}
                             </ReactMarkdown>
+                            )}
                         </motion.article>
 
                         {/* Tags */}
@@ -254,6 +280,48 @@ export default function BlogPost() {
                                 ))}
                             </div>
                         </div>
+
+                        {/* Series navigation */}
+                        {post.series && (prev || next) && (
+                            <div className="mt-12 md:mt-16">
+                                <div className="mb-4 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] text-[#d4a373]">
+                                    <Layers className="h-3.5 w-3.5" />
+                                    Continue the {post.series} series
+                                </div>
+                                <div className="grid gap-4 sm:grid-cols-2">
+                                    {prev ? (
+                                        <Link
+                                            to={`/blog/${prev.slug}`}
+                                            className="group flex flex-col rounded-2xl border border-neutral-200 p-5 no-underline transition-all hover:-translate-y-0.5 hover:border-[#d4a373]/50 dark:border-white/10"
+                                        >
+                                            <span className="mb-2 inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-neutral-400">
+                                                <ArrowLeft className="h-3 w-3" />
+                                                {prev.seriesPart != null ? `Part ${prev.seriesPart}` : 'Previous'}
+                                            </span>
+                                            <span className="font-serif text-base leading-snug text-foreground transition-colors group-hover:text-[#d4a373]">
+                                                {prev.title}
+                                            </span>
+                                        </Link>
+                                    ) : (
+                                        <div className="hidden sm:block" />
+                                    )}
+                                    {next && (
+                                        <Link
+                                            to={`/blog/${next.slug}`}
+                                            className="group flex flex-col rounded-2xl border border-neutral-200 p-5 text-right no-underline transition-all hover:-translate-y-0.5 hover:border-[#d4a373]/50 dark:border-white/10"
+                                        >
+                                            <span className="mb-2 inline-flex items-center justify-end gap-1.5 font-mono text-[10px] uppercase tracking-widest text-neutral-400">
+                                                {next.seriesPart != null ? `Part ${next.seriesPart}` : 'Next'}
+                                                <ArrowRight className="h-3 w-3" />
+                                            </span>
+                                            <span className="font-serif text-base leading-snug text-foreground transition-colors group-hover:text-[#d4a373]">
+                                                {next.title}
+                                            </span>
+                                        </Link>
+                                    )}
+                                </div>
+                            </div>
+                        )}
 
                         {/* Author card */}
                         <div className="mt-12 md:mt-20 p-6 md:p-10 rounded-2xl md:rounded-[2.5rem] bg-neutral-50 dark:bg-white/5 border border-neutral-200 dark:border-white/5 shadow-none relative overflow-hidden group">

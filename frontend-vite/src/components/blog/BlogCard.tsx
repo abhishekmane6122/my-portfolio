@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Calendar, Clock, Tag, ArrowRight } from 'lucide-react'
+import { Calendar, Clock, Tag, ArrowRight, Layers } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import type { BlogPost } from '@/types/schema'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
@@ -57,7 +57,7 @@ export default function BlogCard({ post, index }: BlogCardProps) {
                     {/* Content */}
                     <CardContent className="p-6 flex flex-col flex-grow">
                         {/* Meta info */}
-                        <div className="flex items-center gap-4 text-xs text-accent-blue mb-4 shrink-0">
+                        <div className="flex items-center gap-3 text-xs text-accent-blue mb-4 shrink-0">
                             <div className="flex items-center gap-1.5">
                                 <Calendar className="w-3.5 h-3.5" />
                                 {new Date(post.publishedAt).toLocaleDateString('en-US', {
@@ -66,6 +66,18 @@ export default function BlogCard({ post, index }: BlogCardProps) {
                                     year: 'numeric'
                                 })}
                             </div>
+                            {post.series && (
+                                <>
+                                    <span className="text-gray-300 dark:text-bg-elevated">|</span>
+                                    <span className="flex items-center gap-1.5 min-w-0 text-[#d4a373]">
+                                        <Layers className="w-3.5 h-3.5 shrink-0" />
+                                        <span className="truncate font-mono text-[10px] uppercase tracking-wider">
+                                            {post.series}
+                                            {post.seriesPart ? ` ${post.seriesPart}/${post.seriesTotal}` : ''}
+                                        </span>
+                                    </span>
+                                </>
+                            )}
                         </div>
 
                         {/* Title */}

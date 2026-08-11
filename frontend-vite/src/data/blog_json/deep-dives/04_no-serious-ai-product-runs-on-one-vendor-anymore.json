@@ -1,0 +1,29 @@
+{
+    "id": "404",
+    "slug": "no-serious-ai-product-runs-on-one-vendor-anymore-heres-the-fleet-strategy-that-replaced-it",
+    "title": "No Serious AI Product Runs on One Vendor Anymore. Here's the Fleet Strategy That Replaced It.",
+    "excerpt": "For two years, the infrastructure conversation for a new AI product was short: get NVIDIA GPUs, pick a size, done. That conversation doesn't exist anymore.",
+    "content": "For two years, the infrastructure conversation for a new AI product was short: get NVIDIA GPUs, pick a size, done. That conversation doesn't exist anymore. The capacity story now involves more than a trillion dollars of committed cloud spend across multiple vendors, and the practical result for anyone architecting a serving stack is that single-vendor is no longer a defensible default - it's a concentration risk.\n\nBefore any of that, there's a more basic decision most teams skip past too quickly: API provider or self-hosted. The crossover point is volume, not preference. Under roughly a million queries a month, API pricing usually wins outright - no GPU procurement, no ops burden. Past ten million a month, self-hosting starts winning, provided you're honest about the hidden cost: at least one, usually two, dedicated engineers just for infrastructure. Most teams underestimate that line item and it quietly erases the savings on paper.\n\nIf self-hosting wins, the hardware question is no longer one answer. NVIDIA's B300 (Blackwell Ultra) is still the default for frontier training - highest performance, highest price, and a software stack (CUDA, NCCL, TensorRT-LLM) that locks you in. AMD's MI400 is the credible second source: 432GB of memory per GPU versus the B300's 288GB, which matters for MoE serving and long-context KV-cache workloads. AWS's Trainium3 anchors a vertically integrated stack at the cost of the Neuron SDK instead of CUDA - a real porting effort. And for single-replica, ultra-low-latency inference, Cerebras's wafer-scale engine is the only credible option under 50ms time-to-first-token.\n\nThe framing that should drive a capacity-planning conversation isn't \"which chip is fastest\" - it's a three-tier fleet: heavy compute for training and reasoning-scale inference (B300, MI400), high-throughput serving optimized for cost per token (Trainium3, MI400, Cerebras), and edge/specialty for latency-critical or sovereignty-constrained workloads where an open RISC-V stack or consumer silicon is genuinely the right answer, not a compromise.\n\nTwo things worth carrying into that conversation regardless of which vendor you pick: plan around memory per accelerator as much as raw FLOPS, since MoE serving is bottlenecked on expert residency, not math throughput - and treat any long-term contract priced at last year's rates with suspicion, because $/token has been falling 3 to 5x a year, and locking in early usually means locking in the worse deal.\n\n#AIInfrastructure #MLOps #CloudComputing #SystemDesign #AIEngineering\n\n---\n\n## Diagrams\n\n### API vs self-hosted, the actual decision\n\n```mermaid\n---\ntitle: \"API Provider or Self-Hosted: The Volume Crossover\"\n---\nflowchart TD\n    A[\"New AI workload\"] --> B{\"Query volume\"}\n    B -->|\"Under 1M/month\"| C[\"API provider<br/>faster to ship, no ops burden\"]\n    B -->|\"1M to 10M/month\"| D{\"Data residency<br/>or latency P99 < 100ms required?\"}\n    B -->|\"Over 10M/month\"| E[\"Self-hosted usually wins<br/>on unit economics\"]\n    D -->|Yes| E\n    D -->|No| C\n\n    E --> F[\"Hidden cost: 1-2 dedicated<br/>infra engineers, ongoing\"]\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef decision fill:#FDF6E7,stroke:#C9A85C,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n    classDef risk fill:#FBEDED,stroke:#C08383,stroke-width:1px,color:#1F2933\n    class A input\n    class B,D decision\n    class C,E output\n    class F risk\n```\n\n### The three-tier fleet (sketch style)\n\n```mermaid\n---\ntitle: \"A Three-Tier Fleet Strategy for 2026 AI Infrastructure\"\nconfig:\n  look: handDrawn\n---\nflowchart TD\n    A[\"Production AI workload\"] --> B{\"Dominant constraint\"}\n    B -->|\"Frontier training, max FLOPS\"| C[\"Tier 1: Training and Heavy Compute<br/>B300 NVL72, MI400 Helios\"]\n    B -->|\"Cost per token, MoE serving\"| D[\"Tier 2: High-Throughput Inference<br/>Trainium3, MI400, Cerebras CS-3\"]\n    B -->|\"Edge, latency, sovereignty\"| E[\"Tier 3: Edge and Specialty<br/>Open RISC-V, consumer silicon\"]\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef decision fill:#FDF6E7,stroke:#C9A85C,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n    class A input\n    class B decision\n    class C,D,E output\n```",
+    "featuredImage": "/blog/series/deep-dives-04.svg",
+    "author": {
+        "name": "Abhishek Mane",
+        "photo": "/Abhishek_Profile.png"
+    },
+    "publishedAt": "2026-08-04",
+    "readTime": 3,
+    "category": "Infrastructure",
+    "tags": [
+        "GPU",
+        "Hardware",
+        "Infrastructure",
+        "Multi-Vendor",
+        "AIInfrastructure",
+        "MLOps",
+        "Cloud Computing",
+        "System Design",
+        "AI Engineering"
+    ],
+    "featured": false,
+    "series": "Deep Dives",
+    "seriesSlug": "deep-dives"
+}

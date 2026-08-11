@@ -1,0 +1,30 @@
+{
+    "id": "224",
+    "slug": "prompt-caching-the-discount-most-teams-leave-on-the-table",
+    "title": "Prompt Caching: The Discount Most Teams Leave on the Table",
+    "excerpt": "One line in the wrong position can cost most of your input bill, and nothing in your stack will tell you.",
+    "content": "One line in the wrong position can cost most of your input bill, and nothing in your stack will tell you.\n\nHere is a real example, from an internal coding tool whose spend was three times the projection. Line 12 of the system prompt read:\n\n```\n\"Current time: 2026-08-01T09:14:22Z. Repo: payments-api. Branch: feat/refunds.\"\n```\n\nBelow it sat 14,000 tokens of coding standards, conventions and 30 tool schemas, all identical on every request.\n\nPrompt caching matches on prefix. A variable line at position 12 invalidates everything after it, so the cache hit rate was zero and had always been zero. No error, no metric, no alert.\n\nMoving those three fields to the bottom of the prompt took an afternoon. Hit rate went to 94 percent and input cost fell by roughly 70 percent.\n\nThe economics here are unusually favourable:\n\n```\nCache write   small premium over standard input\nCache read    typically 50 to 90 percent discount\nBreak even    ~1.1 to 1.5 reuses of the prefix\n```\n\nBreak-even at roughly one reuse means almost any repeated prefix is worth caching. When teams miss this, it is never for economic reasons. It is prompt construction.\n\nThe ordering rule is basically the whole technique:\n\n```\n1  System instructions        identical every call\n2  Tool schemas               identical per task class\n3  Few shot examples          stable\n4  Long lived facts           changes slowly\n5  Conversation summary       changes at compaction boundaries\n6  Recent turns               changes every turn\n7  Retrieved evidence         changes every turn\n8  Current user question      last\n```\n\nMost stable first, most variable last. Conveniently this is also what attention wants — recall is strongest at the edges of a long context, so putting the strongest evidence and the question last improves accuracy at the same time. Two independent forces pointing at one ordering.\n\nFour things silently kill a cache hit:\n\n```\nA timestamp, request ID or user name near the top\nTool schemas reordered non deterministically between calls\nJSON serialised with unordered keys\nLoad balancer routing a follow up turn to a different replica\n```\n\nThat last one deserves its own mention. Session affinity on conversation ID is a real latency optimisation, not just a nicety. One support platform's follow-up TTFT went from around 900 ms to around 120 ms purely by routing turn 2 back to the replica that already held the warm cache.\n\nOne metric makes all of this visible:\n\n```\ncache_hit_rate on the prefix, logged per request\n```\n\nWithout it this failure mode stays invisible indefinitely. With it, it is a one-line dashboard that pays for the instrumentation on day one.\n\n---\n\n## Diagrams\n\n### Prefix ordering decides the hit rate\n\n```mermaid\n---\ntitle: \"Prefix Ordering Decides the Cache Hit Rate\"\n---\nflowchart TD\n    subgraph SG1[\"Broken: 0 percent hit rate\"]\n    A[\"Timestamp and branch<br/>changes every call\"] --> B[\"System prompt 9,000\"]\n    B --> C[\"Tool schemas 4,000\"]\n    C --> D[\"Examples 1,000\"]\n    D --> E[\"User question\"]\n    E --> F[\"ALL 14,000 tokens reprocessed<br/>every single request\"]\n    end\n\n    subgraph SG2[\"Correct: 94 percent hit rate\"]\n    G[\"System prompt 9,000\"] --> H[\"Tool schemas 4,000\"]\n    H --> I[\"Examples 1,000\"]\n    I --> J[\"Retrieved evidence\"]\n    J --> K[\"Timestamp and branch\"]\n    K --> L[\"User question\"]\n    L --> M[\"Only the tail is reprocessed<br/>14,000 tokens read from cache\"]\n    end\n\n    F --> N[\"3x projected spend\"]\n    M --> O[\"~70 percent input cost reduction<br/>plus lower TTFT\"]\n\n    classDef risk fill:#FBEDED,stroke:#C08383,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A,B,C,D,E,F,N risk\n    class G,H,I,J,K,L process\n    class M,O output\n```\n\n### Session affinity keeps the cache warm\n\n```mermaid\n---\ntitle: \"Session Affinity Keeps the Prefix Cache Warm\"\n---\nflowchart TD\n    A[\"Turn 2 arrives\"] --> B[\"Router reads conversation ID\"]\n    B --> C{\"Replica holding this conversation<br/>still healthy\"}\n\n    C -->|Yes| D[\"Route to the SAME replica\"]\n    C -->|No| E[\"Route to least loaded\"]\n\n    D --> F[\"Prefix cache warm<br/>prefill only the ~400 new tokens\"]\n    E --> G[\"Cold cache<br/>prefill the full ~9,400 tokens\"]\n\n    F --> H[\"TTFT ~120 ms\"]\n    G --> I[\"TTFT ~900 ms\"]\n\n    H --> J[\"Log cache_hit_rate per request<br/>this is the only way the<br/>failure mode is ever visible\"]\n    I --> J\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef decision fill:#FDF6E7,stroke:#C9A85C,stroke-width:1px,color:#1F2933\n    classDef risk fill:#FBEDED,stroke:#C08383,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A input\n    class B,D,F process\n    class C decision\n    class E,G,I risk\n    class H,J output\n```",
+    "featuredImage": "/blog/series/production-reality-24.svg",
+    "author": {
+        "name": "Abhishek Mane",
+        "photo": "/Abhishek_Profile.png"
+    },
+    "publishedAt": "2026-07-24",
+    "readTime": 4,
+    "category": "Inference",
+    "tags": [
+        "Prompt Caching",
+        "Cost Optimization",
+        "TTFT",
+        "Inference",
+        "AI Engineering",
+        "LLMOps",
+        "Performance",
+        "System Design"
+    ],
+    "featured": false,
+    "series": "Production Reality",
+    "seriesSlug": "production-reality",
+    "seriesPart": 24,
+    "seriesTotal": 30
+}

@@ -1,0 +1,31 @@
+{
+    "id": "202",
+    "slug": "buffer-memory-perfect-recall-quadratic-bill",
+    "title": "Buffer Memory: Perfect Recall, Quadratic Bill",
+    "excerpt": "The simplest way to give an LLM memory is also the first one everyone writes. Keep a list, append every message, resend the whole list.",
+    "content": "The simplest way to give an LLM memory is also the first one everyone writes. Keep a list, append every message, resend the whole list.\n\n```python\nhistory.append({\"role\": \"user\", \"content\": msg})\nresp = client.chat(messages=[system] + history)\nhistory.append({\"role\": \"assistant\", \"content\": resp})\n```\n\nNothing is lost. No compression, no summarisation, no retrieval that can miss. For a prototype it is genuinely hard to beat.\n\nThe problem shows up when you look at what the API is actually receiving.\n\n```\nTurn  1  ->     50 tokens\nTurn  5  ->    450 tokens\nTurn 20  ->  3,800 tokens\nTurn 50  -> 11,000 tokens\n```\n\nTurn N resends turns 1 through N-1. Per-turn cost grows linearly, so total conversation cost grows quadratically. That is structural, not something you tune away.\n\nOn a real invoice this shows up as a distribution problem rather than an average one. A support product averaging 12 turns per conversation is comfortable. The same product where 4 percent of sessions run past 60 turns will find those sessions eating 40 percent of the token budget.\n\nTwo things people tend to miss.\n\nThe context window is a cliff, not a slope. Cross it and the call fails outright. It fails during the longest conversations, which in most products correlate with the most engaged customers.\n\nEvery resent token is also latency. Prefill time is proportional to prompt length, so turn 50 has a visibly longer pause before the first character appears than turn 5 did, on identical hardware.\n\nThere is one mitigation that genuinely applies here, and it is routinely left on the table. If the transcript is a stable prefix and only the newest turn changes, prompt caching makes those resent tokens 50 to 90 percent cheaper. Break-even is around 1.1 reuses, so almost any multi-turn conversation clears it easily.\n\nThe catch is prompt ordering. Put a timestamp, a session ID or a request ID near the top of the prompt and the prefix changes on every call. Your cache hit rate is zero and nothing errors, so nobody notices.\n\n```\nStable first   system, tools, examples, history\nVariable last  retrieved context, current user turn\n```\n\nOn a chat product that ordering rule is often worth more than a model upgrade.\n\nBuffer memory plus prefix caching is a defensible design for short and medium sessions. Worth being clear about what it does though: caching bounds the price of unbounded growth. It does not bound the growth - that still needs an eviction strategy, and skipping that step is how a \"cheap\" design turns into an unbounded one anyway.\n\n---\n\n## Diagrams\n\n### Why the cost is quadratic\n\n```mermaid\n---\ntitle: \"Why Buffer Memory Cost Grows Quadratically\"\n---\nflowchart TD\n    A[\"Turn 1<br/>sends: T1\"] --> B[\"Turn 2<br/>sends: T1 + T2\"]\n    B --> C[\"Turn 3<br/>sends: T1 + T2 + T3\"]\n    C --> D[\"Turn N<br/>sends: T1 ... TN\"]\n\n    D --> E[\"Per turn cost grows linearly\"]\n    D --> F[\"Total conversation cost<br/>grows quadratically\"]\n\n    F --> G{\"Two ceilings hit\"}\n    G -->|Budget| H[\"4 percent of sessions<br/>consume 40 percent of spend\"]\n    G -->|Context window| I[\"Hard failure, not degradation\"]\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef decision fill:#FDF6E7,stroke:#C9A85C,stroke-width:1px,color:#1F2933\n    classDef risk fill:#FBEDED,stroke:#C08383,stroke-width:1px,color:#1F2933\n\n    class A input\n    class B,C,D,E process\n    class G decision\n    class F,H,I risk\n```\n\n### Prompt ordering decides your cache hit rate\n\n```mermaid\n---\ntitle: \"Prompt Ordering Decides Your Cache Hit Rate\"\n---\nflowchart LR\n    subgraph SG1[\"Broken ordering, 0 percent cache hit\"]\n    A[\"Session ID and timestamp\"] --> B[\"System prompt<br/>9,000 tokens\"]\n    B --> C[\"Tool schemas<br/>4,000 tokens\"]\n    C --> D[\"History\"]\n    D --> E[\"All 13,000 tokens<br/>reprocessed every call\"]\n    end\n\n    subgraph SG2[\"Correct ordering, 90 percent plus cache hit\"]\n    F[\"System prompt<br/>9,000 tokens\"] --> G[\"Tool schemas<br/>4,000 tokens\"]\n    G --> H[\"History\"]\n    H --> I[\"Session ID and timestamp\"]\n    I --> J[\"Only the tail is reprocessed\"]\n    end\n\n    classDef risk fill:#FBEDED,stroke:#C08383,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A,B,C,D risk\n    class E risk\n    class F,G,H,I process\n    class J output\n```",
+    "featuredImage": "/blog/series/agent-memory-lineage-02.svg",
+    "author": {
+        "name": "Abhishek Mane",
+        "photo": "/Abhishek_Profile.png"
+    },
+    "publishedAt": "2026-07-02",
+    "readTime": 4,
+    "category": "Agent Memory",
+    "tags": [
+        "Buffer Memory",
+        "Token Cost",
+        "Agent Memory",
+        "Scaling",
+        "AI Engineering",
+        "LLMOps",
+        "Agentic AI",
+        "Cost Optimization",
+        "Software Architecture"
+    ],
+    "featured": false,
+    "series": "Agent Memory Lineage",
+    "seriesSlug": "agent-memory-lineage",
+    "seriesPart": 2,
+    "seriesTotal": 30
+}

@@ -1,0 +1,31 @@
+{
+    "id": "216",
+    "slug": "the-200-line-system-prompt-is-a-design-smell",
+    "title": "The 200-Line System Prompt Is a Design Smell",
+    "excerpt": "If you read a 200-line system prompt from top to bottom, you can usually date it like tree rings. Each of those lines is a bug someone patched with English instead of code.",
+    "content": "If you read a 200-line system prompt from top to bottom, you can usually date it like tree rings.\n\n```\nLines 1-15     the original, coherent instruction\nLines 16-40    formatting rules added after a demo went badly\nLines 41-70    \"IMPORTANT: never do X\" added after an incident\nLines 71-110   edge cases, each from one support ticket\nLines 111-150  ALL CAPS restatements of lines 41-70,\n               because the first version stopped working\nLines 151-200  contradictions with lines 16-40 that nobody has noticed\n```\n\nEach of those lines is a bug someone patched with English instead of code. Three separate things go wrong as a result, and only one of them is about token cost.\n\nThe first is that prompt instructions are not enforcement.\n\n```\n\"Only approve expenses under $500.\"\n\"Never access records outside the user's reporting line.\"\n\"Always cite a source for factual claims.\"\n```\n\nEvery one of those is a hint. Every one will eventually be bypassed by an ambiguous request, a long context or an unusual phrasing, and when it happens the failure will look like a model problem when it is really an architecture problem. Each belongs in a different layer:\n\n```\napproval limit    -> schema constraint + server side check\naccess scope      -> query filter applied by the data layer\ncitation required -> output validator, block and regenerate\n```\n\nThe second is that instructions compete for attention. Recall within a long context is strongest at the edges, so rule 47 of 80 sitting in the middle of a growing prompt is the one that gets ignored — and it gets ignored more often as the rest of the context grows around it.\n\nThe third is that contradictions become invisible. Line 22 says be concise, line 158 says always explain your reasoning fully. Different people, different complaints, months apart. The model resolves the conflict inconsistently, which reads to everyone else as randomness.\n\nThe refactor that works is mostly about moving rules to the layer that can actually hold them:\n\n```\nPrompt        role, task, tone, output shape.  Under 40 lines.\nSchema        anything with a value range or an enum.\nCode          anything with a limit, a scope, or a permission.\nValidator     anything that must be true of the output.\nEval          anything you would otherwise write in ALL CAPS.\n```\n\nThat last line is the practical test. If you find yourself wanting to write a rule in capitals, it is not a prompt rule. It is a missing test.\n\nA rule in a prompt degrades silently. A rule in code fails loudly. In production, loud is the feature.\n\n---\n\n## Diagrams\n\n### Where each rule actually belongs\n\n```mermaid\n---\ntitle: \"Where Each Rule Belongs: Prompt, Schema, Code or Validator\"\n---\nflowchart TD\n    A[\"A new rule is needed\"] --> B{\"What kind of rule\"}\n\n    B -->|\"Value range or fixed set\"| C[\"Schema constraint<br/>maximum, enum, required\"]\n    B -->|\"Permission or data scope\"| D[\"Data layer<br/>filter injected, not optional\"]\n    B -->|\"Must be true of the output\"| E[\"Output validator<br/>block and regenerate on failure\"]\n    B -->|\"Deterministic sequence\"| F[\"Code path<br/>not an agent decision\"]\n    B -->|\"Role, tone, output shape\"| G[\"System prompt<br/>this is the only correct case\"]\n\n    C --> H[\"Fails loudly at the boundary\"]\n    D --> H\n    E --> H\n    F --> H\n    G --> I[\"Degrades silently under long context\"]\n\n    I --> J{\"Is silent degradation acceptable\"}\n    J -->|No| K[\"Move it out of the prompt\"]\n    J -->|Yes| L[\"Keep it, and cover it with an eval\"]\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef decision fill:#FDF6E7,stroke:#C9A85C,stroke-width:1px,color:#1F2933\n    classDef risk fill:#FBEDED,stroke:#C08383,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A input\n    class C,D,E,F,G process\n    class B,J decision\n    class I,K risk\n    class H,L output\n```\n\n### Prompt bloat as a feedback loop\n\n```mermaid\n---\ntitle: \"Prompt Bloat as a Feedback Loop\"\n---\nflowchart LR\n    A[\"Incident or complaint\"] --> B[\"Add a rule to the prompt\"]\n    B --> C[\"Prompt grows\"]\n    C --> D[\"Middle of context loses attention\"]\n    D --> E[\"An older rule stops firing\"]\n    E --> F[\"New incident\"]\n    F --> G[\"Restate the old rule in ALL CAPS\"]\n    G --> C\n\n    C --> H[\"Contradictions accumulate<br/>nobody re-reads the whole prompt\"]\n    H --> I[\"Behaviour looks random\"]\n\n    I --> J[\"Break the loop<br/>move rules to schema, code and validators<br/>cover each with an eval case\"]\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef risk fill:#FBEDED,stroke:#C08383,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A input\n    class B process\n    class C,D,E,F,G,H,I risk\n    class J output\n```",
+    "featuredImage": "/blog/series/production-reality-16.svg",
+    "author": {
+        "name": "Abhishek Mane",
+        "photo": "/Abhishek_Profile.png"
+    },
+    "publishedAt": "2026-07-16",
+    "readTime": 4,
+    "category": "AI Engineering",
+    "tags": [
+        "System Prompt",
+        "Prompt Design",
+        "Refactoring",
+        "Context",
+        "AI Engineering",
+        "Prompt Engineering",
+        "LLMOps",
+        "Software Architecture",
+        "System Design"
+    ],
+    "featured": false,
+    "series": "Production Reality",
+    "seriesSlug": "production-reality",
+    "seriesPart": 16,
+    "seriesTotal": 30
+}

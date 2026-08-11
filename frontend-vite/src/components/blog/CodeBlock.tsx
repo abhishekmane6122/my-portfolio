@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useId } from 'react';
 import { Check, Copy } from 'lucide-react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark, prism } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -14,6 +14,9 @@ interface CodeBlockProps {
 const CodeBlock: React.FC<CodeBlockProps> = ({ language, value }) => {
     const [copied, setCopied] = useState(false);
     const { resolvedTheme } = useTheme();
+    // Stable for the lifetime of this block. A fresh id on every render would
+    // retrigger Mermaid's render effect and wipe the diagram mid-scroll.
+    const blockId = useId();
 
     const copyToClipboard = () => {
         navigator.clipboard.writeText(value);
@@ -24,10 +27,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ language, value }) => {
     if (language === 'mermaid') {
         return (
             <div className="my-10 w-full">
-                <Mermaid
-                    chart={value}
-                    id={`mermaid-${Math.random().toString(36).substring(2, 11)}`}
-                />
+                <Mermaid chart={value} id={`mermaid-${blockId}`} />
             </div>
         );
     }
@@ -121,4 +121,6 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ language, value }) => {
     );
 };
 
-export default CodeBlock;
+// `language` and `value` are plain strings, so this skips re-rendering every
+// code block and diagram whenever the article page re-renders (e.g. on scroll).
+export default React.memo(CodeBlock);

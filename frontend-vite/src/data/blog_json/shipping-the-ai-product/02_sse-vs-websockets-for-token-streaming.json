@@ -1,0 +1,31 @@
+{
+    "id": "302",
+    "slug": "sse-vs-websockets-for-token-streaming",
+    "title": "SSE vs WebSockets for Token Streaming",
+    "excerpt": "A lot of teams reach for WebSockets to stream tokens, and end up owning a bidirectional protocol they never use in one direction. Token streaming is server-to-client only.",
+    "content": "A lot of teams reach for WebSockets to stream tokens, and end up owning a bidirectional protocol they never use in one direction.\n\nToken streaming is server-to-client only. The client sends one request and then listens, which is exactly the shape Server-Sent Events was designed for.\n\n```\nSSE          one way, server to client\n             plain HTTP, works through every proxy\n             automatic browser reconnect with Last-Event-ID\n             text only\n\nWebSocket    two way, full duplex\n             protocol upgrade, some proxies interfere\n             you implement reconnection yourself\n             binary supported\n```\n\nThe decision is not really about performance, since both stream perfectly well. It comes down to whether the client needs to send anything mid-stream.\n\n```\nStreaming a response         -> SSE\nStreaming agent step updates -> SSE\nInterrupting a generation    -> SSE + a DELETE endpoint\nLive collaborative editing   -> WebSocket\nVoice, bidirectional audio   -> WebSocket\nMultiplexing many channels   -> WebSocket\n```\n\nThat third row is where teams usually talk themselves into WebSockets. \"The user needs to stop generation\" feels bidirectional, but it is really a second HTTP call to `DELETE /generations/{id}`, which is simpler than maintaining a socket.\n\nFour operational details decide whether SSE actually works in practice.\n\nProxy buffering will break it silently. nginx buffers responses by default, so your tokens generate correctly, arrive at nginx, and sit there until the response completes. The user waits the full 8 seconds and then gets everything at once. Streaming looks broken while the application logs look perfect.\n\n```\nproxy_buffering off;\nproxy_read_timeout 300s;\nX-Accel-Buffering: no\n```\n\nHeartbeats keep the connection alive. Load balancers close idle connections, and a model thinking for 30 seconds before its first token looks idle. Send a comment line every 15 seconds.\n\nYou have already sent HTTP 200, so an error at token 300 cannot change the status code. You need an in-band `event: error` and a client that handles it, otherwise a failed generation renders as a complete one that just stopped early.\n\nCancellation has to reach the inference call. A user closing the tab should stop the generation, and if the disconnect is not propagated you keep paying for tokens nobody will read.\n\nDefault to SSE. Reach for WebSockets when the client genuinely needs to speak mid-stream, and be honest that voice is usually the only case that qualifies.\n\n---\n\n## Diagrams\n\n### Choosing the streaming transport\n\n```mermaid\n---\ntitle: \"SSE or WebSocket: Choosing a Streaming Transport\"\n---\nflowchart TD\n    A[\"Need to stream model output\"] --> B{\"Does the client send data<br/>DURING the stream\"}\n\n    B -->|\"No, listens only\"| C[\"SSE\"]\n    B -->|\"Only to cancel\"| D[\"SSE plus a DELETE endpoint<br/>simpler than a socket\"]\n    B -->|\"Yes, continuous audio or edits\"| E[\"WebSocket\"]\n\n    C --> F[\"Plain HTTP, proxy friendly\"]\n    C --> G[\"Browser auto reconnect<br/>with Last-Event-ID\"]\n    D --> F\n    E --> H[\"You own reconnection logic\"]\n    E --> I[\"Protocol upgrade, check proxies\"]\n\n    F --> J[\"Required config<br/>proxy_buffering off<br/>heartbeat every 15s<br/>in band error events\"]\n    H --> J\n    G --> J\n    I --> J\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef decision fill:#FDF6E7,stroke:#C9A85C,stroke-width:1px,color:#1F2933\n    classDef risk fill:#FBEDED,stroke:#C08383,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A input\n    class C,D,E,F,G process\n    class B decision\n    class H,I risk\n    class J output\n```\n\n### The proxy buffering failure\n\n```mermaid\n---\ntitle: \"How Proxy Buffering Silently Breaks SSE\"\n---\nflowchart LR\n    subgraph SG1[\"Default nginx config\"]\n    A[\"App emits token 1 at t=0.3s\"] --> B[\"nginx buffer\"]\n    C[\"App emits token 400 at t=8s\"] --> B\n    B --> D[\"Buffer flushed at response end\"]\n    D --> E[\"User sees nothing for 8s<br/>then the whole answer at once\"]\n    end\n\n    subgraph SG2[\"Streaming enabled\"]\n    F[\"App emits token 1 at t=0.3s\"] --> G[\"proxy_buffering off<br/>X-Accel-Buffering: no\"]\n    G --> H[\"User sees token 1 at t=0.3s\"]\n    end\n\n    E --> I[\"App logs look PERFECT<br/>the bug is entirely in the proxy\"]\n    H --> J[\"Perceived latency<br/>8s becomes 0.3s\"]\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef risk fill:#FBEDED,stroke:#C08383,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A,C,F input\n    class G,H process\n    class B,D,E,I risk\n    class J output\n```",
+    "featuredImage": "/blog/series/shipping-the-ai-product-02.svg",
+    "author": {
+        "name": "Abhishek Mane",
+        "photo": "/Abhishek_Profile.png"
+    },
+    "publishedAt": "2026-08-01",
+    "readTime": 3,
+    "category": "Backend",
+    "tags": [
+        "SSE",
+        "WebSockets",
+        "Streaming",
+        "API Design",
+        "Fast API",
+        "Backend Development",
+        "AI Engineering",
+        "Software Architecture",
+        "Web Development"
+    ],
+    "featured": false,
+    "series": "Shipping the AI Product",
+    "seriesSlug": "shipping-the-ai-product",
+    "seriesPart": 2,
+    "seriesTotal": 30
+}

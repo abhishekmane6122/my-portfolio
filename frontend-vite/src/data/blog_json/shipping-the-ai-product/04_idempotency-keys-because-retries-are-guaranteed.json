@@ -1,0 +1,31 @@
+{
+    "id": "304",
+    "slug": "idempotency-keys-because-retries-are-guaranteed",
+    "title": "Idempotency Keys, Because Retries Are Guaranteed",
+    "excerpt": "An 8-second request sitting behind a 5-second gateway timeout will be retried by the client while the first call is still running.",
+    "content": "An 8-second request sitting behind a 5-second gateway timeout will be retried by the client while the first call is still running. Now you are paying twice, and the user may get two different answers.\n\nAI endpoints hit every condition that makes duplicate execution likely:\n\n```\nLong duration        8 to 60 seconds, well past most default timeouts\nAggressive clients   SDKs and browsers retry on timeout by default\nExpensive calls      a duplicate is real money, not a wasted CPU cycle\nNon-deterministic    retry 2 returns a DIFFERENT answer, not the same one\nSide effects         agents write files, send emails, update records\n```\n\nThat fourth line is what makes this different from ordinary API design. A retried CRUD read returns the same row. A retried generation returns different text, so what the user ends up seeing depends on which response arrives first — a race you cannot debug from logs afterwards.\n\nThe contract is straightforward:\n\n```\nPOST /v1/generations\nIdempotency-Key: 3f9a1c2e-...    (client generated, per logical operation)\n```\n\nAnd the server behaviour:\n\n```\nKey unseen        -> claim it atomically, execute, store the result\nKey seen, done    -> return the stored response, do not re-execute\nKey seen, running -> 409 Conflict, or block and stream the same result\nKey seen, failed  -> allow one retry, clear the claim\n```\n\nFour implementation details matter more than the happy path.\n\nClaim the key before doing the work, atomically — `SETNX` in Redis, or an insert against a unique constraint. If you check and then write, two concurrent retries will both pass the check and both execute.\n\nStore the response body, not just a flag. The whole point is returning the identical answer. A flag tells you it ran, but it does not let you reproduce what the user saw.\n\nScope the key by tenant. A global key namespace means one customer's UUID collision can affect another's. Key on `(tenant_id, idempotency_key)`.\n\nExpire keys, but not too aggressively. 24 hours is a reasonable window: longer than any plausible client retry, long enough to cover an outage.\n\nFor agents, apply this at two levels — the task, and each individual tool call. An agent resuming from a checkpoint will re-propose the same actions, and `send_email` executing twice because the run resumed is precisely the failure this prevents.\n\nWorth noting why the key is client-generated: the client is the only party that knows what counts as \"the same operation\". The server just has to honour it. A server generating its own key defeats the purpose entirely.\n\n---\n\n## Diagrams\n\n### The idempotency key state machine\n\n```mermaid\n---\ntitle: \"Idempotency Key Lifecycle for a Generation Endpoint\"\n---\nflowchart TD\n    A[\"POST with Idempotency-Key\"] --> B[\"Atomic claim<br/>SETNX on tenant_id plus key\"]\n\n    B --> C{\"Claim result\"}\n    C -->|\"Claimed, new\"| D[\"Mark RUNNING\"]\n    C -->|\"Exists, COMPLETED\"| E[\"Return stored response body<br/>do NOT re-execute\"]\n    C -->|\"Exists, RUNNING\"| F[\"409 Conflict<br/>or attach to the same stream\"]\n    C -->|\"Exists, FAILED\"| G[\"Clear claim, allow one retry\"]\n\n    D --> H[\"Execute model call\"]\n    G --> H\n\n    H --> I{\"Outcome\"}\n    I -->|Success| J[\"Store response body<br/>mark COMPLETED, TTL 24h\"]\n    I -->|Failure| K[\"Mark FAILED<br/>retry permitted\"]\n\n    J --> L[\"Return response\"]\n    E --> L\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef decision fill:#FDF6E7,stroke:#C9A85C,stroke-width:1px,color:#1F2933\n    classDef risk fill:#FBEDED,stroke:#C08383,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A input\n    class B,D,H,J process\n    class C,I decision\n    class F,G,K risk\n    class E,L output\n```\n\n### Why non-determinism makes duplicates worse\n\n```mermaid\n---\ntitle: \"Duplicate Execution in a Non-Deterministic Endpoint\"\n---\nflowchart LR\n    A[\"Client sends request at t=0\"] --> B[\"Gateway timeout at t=5s\"]\n    B --> C[\"Client retries at t=5s\"]\n\n    A --> D[\"Call 1 still running<br/>completes t=8s, answer X\"]\n    C --> E[\"Call 2 starts fresh<br/>completes t=13s, answer Y\"]\n\n    D --> F{\"Which response reaches the user\"}\n    E --> F\n\n    F --> G[\"Race condition<br/>X and Y are DIFFERENT text\"]\n    G --> H[\"Billed twice\"]\n    G --> I[\"User sees an answer<br/>you cannot reproduce from logs\"]\n    G --> J[\"Any side effects executed twice<br/>emails, writes, tool calls\"]\n\n    H --> K[\"Fix: idempotency key<br/>claimed atomically before execution\"]\n    I --> K\n    J --> K\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef decision fill:#FDF6E7,stroke:#C9A85C,stroke-width:1px,color:#1F2933\n    classDef risk fill:#FBEDED,stroke:#C08383,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A,C input\n    class D,E process\n    class B,F decision\n    class G,H,I,J risk\n    class K output\n```",
+    "featuredImage": "/blog/series/shipping-the-ai-product-04.svg",
+    "author": {
+        "name": "Abhishek Mane",
+        "photo": "/Abhishek_Profile.png"
+    },
+    "publishedAt": "2026-08-03",
+    "readTime": 4,
+    "category": "Backend",
+    "tags": [
+        "Idempotency",
+        "Retries",
+        "API Design",
+        "Reliability",
+        "APIDesign",
+        "Backend Development",
+        "AI Engineering",
+        "System Design",
+        "Distributed Systems"
+    ],
+    "featured": false,
+    "series": "Shipping the AI Product",
+    "seriesSlug": "shipping-the-ai-product",
+    "seriesPart": 4,
+    "seriesTotal": 30
+}

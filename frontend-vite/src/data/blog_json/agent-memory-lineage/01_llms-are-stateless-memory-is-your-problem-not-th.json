@@ -1,0 +1,31 @@
+{
+    "id": "201",
+    "slug": "llms-are-stateless-memory-is-your-problem-not-the-models",
+    "title": "LLMs Are Stateless. Memory Is Your Problem, Not the Model's",
+    "excerpt": "Something worth getting clear on early, because a lot of design decisions follow from it. An LLM has no memory. Not limited memory — none.",
+    "content": "Something worth getting clear on early, because a lot of design decisions follow from it.\n\nAn LLM has no memory. Not limited memory — none. Every API call is a pure function: tokens in, tokens out, nothing kept. The model that answered a question 400 milliseconds ago has no record that it happened.\n\nSo when a product \"remembers\" you, that is application code. Someone decided what to store, what to throw away, and what to replay on the next call.\n\nIt helps to stop treating this as a model capability and start treating it as a storage architecture, because that is what it is. Once you frame it that way, the design questions become ones you already know how to answer:\n\n- What is the cost model? Replaying full history makes per-conversation cost grow quadratically, not linearly.\n- What is the eviction policy? Something has to leave. What, and on what signal?\n- What happens when two stores disagree about the user's account tier?\n- Is retrieval by recency or by relevance? Those give different answers.\n- How do you know a stored fact is still true?\n\nMost teams meet this the same way. The prototype is great at 5 turns. At 40 turns it is either expensive or it has forgotten something important, and usually both in the same week.\n\nThere are four tiers worth knowing, and most systems ship with one.\n\nL1, working memory. The context window and KV cache. Under 50 ms. The only thing the model actually sees.\n\nL2, episodic. What happened, with timestamps. Vector store, 100 to 300 ms.\n\nL3, semantic. What is true, regardless of when it was learned. Structured store with deduplication and conflict resolution.\n\nL4, procedural. How to perform a task. Loaded when the task signature matches.\n\nThe tier most systems are missing is L3, and it is also the one that removes the most user-visible frustration. \"The assistant asked me my account type for the third time\" looks like a context window problem. It is almost always a missing fact store.\n\nOver the next fourteen posts I want to walk through the full lineage of agent memory, in the order the techniques were actually invented. Each one exists because the previous one broke somewhere specific, and knowing which break you have is most of the skill.\n\nIt starts with the simplest possible answer, which is to keep everything.\n\nThat one has a bill attached.\n\n---\n\n## Diagrams\n\n### Why the model has no memory\n\n```mermaid\n---\ntitle: \"LLMs Are Stateless: Your Application Holds the Memory\"\n---\nflowchart TD\n    H[\"YOUR APPLICATION<br/>stores, selects and replays history\"] --> A[\"Turn 1 request<br/>system + turn 1\"]\n    A --> B[\"LLM<br/>stateless function\"]\n    B --> C[\"Turn 1 response\"]\n    C --> H\n    B --> D[\"Nothing retained<br/>inside the model\"]\n\n    H --> E[\"Turn 2 request<br/>system + turn 1 + turn 2\"]\n    E --> F[\"LLM<br/>same weights, zero recall\"]\n    F --> G[\"Turn 2 response\"]\n    G --> H\n\n    D -.->|\"no link exists\"| F\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef risk fill:#FBEDED,stroke:#C08383,stroke-width:1px,color:#1F2933\n    classDef store fill:#F3F0F8,stroke:#8880AE,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A,E input\n    class B,F process\n    class C,G output\n    class D risk\n    class H store\n```\n\n### The four memory tiers\n\n```mermaid\n---\ntitle: \"The Four Agent Memory Tiers\"\n---\nflowchart TD\n    A[\"Incoming turn\"] --> B[\"L1 WORKING<br/>context window and KV cache<br/>under 50 ms\"]\n\n    B --> C{\"What does this turn need\"}\n    C -->|References the past| D[(\"L2 EPISODIC<br/>vector store with timestamps<br/>100 to 300 ms\")]\n    C -->|Mentions a known entity| E[(\"L3 SEMANTIC<br/>structured facts, deduped<br/>200 to 500 ms\")]\n    C -->|Matches a known task| F[(\"L4 PROCEDURAL<br/>skill registry<br/>loaded on match\")]\n    C -->|Pure conversation| G[\"No retrieval\"]\n\n    D --> B\n    E --> B\n    F --> B\n    G --> B\n\n    B --> H[\"Model call\"]\n    H --> I[\"Response\"]\n\n    I --> J{\"Anything durable produced\"}\n    J -->|New fact| E\n    J -->|Session ended| D\n    J -->|Task succeeded| F\n    J -->|Nothing| K[\"No write\"]\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef store fill:#F3F0F8,stroke:#8880AE,stroke-width:1px,color:#1F2933\n    classDef decision fill:#FDF6E7,stroke:#C9A85C,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A input\n    class B,H process\n    class D,E,F store\n    class C,J decision\n    class G,I,K output\n```",
+    "featuredImage": "/blog/series/agent-memory-lineage-01.svg",
+    "author": {
+        "name": "Abhishek Mane",
+        "photo": "/Abhishek_Profile.png"
+    },
+    "publishedAt": "2026-07-01",
+    "readTime": 3,
+    "category": "Agent Memory",
+    "tags": [
+        "Stateless LLM",
+        "Agent Memory",
+        "Architecture",
+        "Context",
+        "AI Engineering",
+        "Agentic AI",
+        "LLMOps",
+        "System Design",
+        "Software Architecture"
+    ],
+    "featured": false,
+    "series": "Agent Memory Lineage",
+    "seriesSlug": "agent-memory-lineage",
+    "seriesPart": 1,
+    "seriesTotal": 30
+}

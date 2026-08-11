@@ -1,0 +1,29 @@
+{
+    "id": "406",
+    "slug": "the-fine-tuning-decision-nobody-explains-well-full-weights-vs-lora-vs-qlora",
+    "title": "The Fine-Tuning Decision Nobody Explains Well: Full Weights vs LoRA vs QLoRA",
+    "excerpt": "Somebody on the team suggests fine-tuning a 70B model on company data. Then someone does the math: full fine-tuning means storing gradients and optimizer states for every one of those 70...",
+    "content": "Somebody on the team suggests fine-tuning a 70B model on company data. Then someone does the math: full fine-tuning means storing gradients and optimizer states for every one of those 70 billion parameters, and that arithmetic alone rules out a single A100 - you need a cluster most teams don't have lying around.\n\nThis is the problem parameter-efficient fine-tuning was built to solve, and LoRA is the version that won.\n\nThe idea is almost embarrassingly simple once you see it. Freeze the pretrained weight matrix entirely - no gradients touch it. Next to it, add two small trainable matrices, A and B, low-rank by construction, and let the model's output become the frozen path plus this small learned correction, scaled by a factor tied to the rank you chose. You're training a tiny fraction of the parameter count - often under 1% - and getting most of the benefit of full fine-tuning.\n\nOne detail catches people who learned LoRA a couple of years ago: the early convention targeted only the attention projections, query and value. The current standard targets every linear layer - even at low rank - for more stability at almost no extra trainable-parameter cost.\n\nQLoRA pushes the same idea one step further by quantizing the frozen base model to 4-bit (NF4) while keeping the LoRA adapters and gradients at 16-bit. Paged optimizers spill to CPU memory instead of crashing on an out-of-memory error mid-run. The combined effect: fine-tune a 70B model on hardware that couldn't hold its full-precision weights, let alone the gradients.\n\nTwo variants worth knowing if you're choosing a method today, not two years ago:\n\nDoRA decomposes the weight update into magnitude and direction, learned separately instead of coupled. It converges faster and gets closer to full fine-tuning quality - matters when an evaluation set is unforgiving.\n\nVera goes the opposite direction - fixed random projections plus a small trainable vector, cutting adapter size roughly 10x. Only worth it serving hundreds of adapters at once, where storage itself is the bottleneck.\n\nWhich brings up the part that actually changes production architecture: multi-LoRA serving. One base model in memory, a hundred-plus adapters swapped per request via continuous batching and paged attention - a finance adapter for one request, a legal adapter for the next, same GPU, roughly 5-10% latency overhead versus the base model alone.\n\nSo before commissioning ten separate fine-tuning runs for ten use cases, ask whether it's actually ten adapters on one base model - the infrastructure difference is a single deployment versus ten, and the cost difference compounds every month you're serving all of them.\n\n#MachineLearning #LLM #FineTuning #AIEngineering #MLOps\n\n---\n\n## Diagrams\n\n### What actually gets trained\n\n```mermaid\n---\ntitle: \"LoRA: Freeze the Big Matrix, Train the Small Ones\"\nconfig:\n  look: handDrawn\n---\nflowchart LR\n    X[\"Input x\"] --> W[\"Frozen weights W<br/>(no gradient)\"]\n    X --> A[\"Matrix A<br/>(trainable, rank r)\"]\n    A --> B[\"Matrix B<br/>(trainable, rank r)\"]\n    W --> SUM((\"+\"))\n    B --> SCALE[\"scale by alpha / r\"]\n    SCALE --> SUM\n    SUM --> H[\"Output h = Wx + (BA)x * alpha/r\"]\n\n    classDef frozen fill:#F3F0F8,stroke:#8880AE,stroke-width:1px,color:#1F2933\n    classDef trainable fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class W frozen\n    class A,B,SCALE trainable\n    class H,SUM output\n```\n\n### One base model, many adapters, one GPU\n\n```mermaid\n---\ntitle: \"Multi-LoRA Serving: Same Base Model, Different Skills Per Request\"\n---\nflowchart TD\n    BASE[(\"Base model<br/>Llama 70B, in memory once\")]\n    R1[\"Request: finance question\"] --> A1[\"Finance adapter\"]\n    R2[\"Request: legal question\"] --> A2[\"Legal adapter\"]\n    R3[\"Request: medical question\"] --> A3[\"Medical adapter\"]\n    A1 --> BASE\n    A2 --> BASE\n    A3 --> BASE\n    BASE --> OUT[\"Continuous batching + PagedAttention v3<br/>100+ adapters, 5-10% latency overhead\"]\n\n    classDef store fill:#F3F0F8,stroke:#8880AE,stroke-width:1px,color:#1F2933\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class BASE store\n    class R1,R2,R3 input\n    class A1,A2,A3 process\n    class OUT output\n```",
+    "featuredImage": "/blog/series/deep-dives-06.svg",
+    "author": {
+        "name": "Abhishek Mane",
+        "photo": "/Abhishek_Profile.png"
+    },
+    "publishedAt": "2026-08-06",
+    "readTime": 3,
+    "category": "Model Training",
+    "tags": [
+        "LoRA",
+        "QLoRA",
+        "PEFT",
+        "Fine-Tuning",
+        "Machine Learning",
+        "LLM",
+        "Fine Tuning",
+        "AI Engineering",
+        "MLOps"
+    ],
+    "featured": false,
+    "series": "Deep Dives",
+    "seriesSlug": "deep-dives"
+}
