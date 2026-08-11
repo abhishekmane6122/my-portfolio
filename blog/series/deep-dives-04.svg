@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-label="No Serious AI Product Runs on One Vendor Anymore. Here&apos;s the Fleet Strategy That Replaced It.">
+  <defs>
+    <linearGradient id="bgdeep-dives04512" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2B1618"/>
+      <stop offset="100%" stop-color="#48242A"/>
+    </linearGradient>
+    <radialGradient id="glowdeep-dives04512" cx="0.82" cy="0.18" r="0.55">
+      <stop offset="0%" stop-color="#E08C7D" stop-opacity="0.38"/>
+      <stop offset="100%" stop-color="#E08C7D" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="griddeep-dives04512" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#FFFFFF" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="675" fill="url(#bgdeep-dives04512)"/>
+  <rect width="1200" height="675" fill="url(#griddeep-dives04512)"/>
+  <rect width="1200" height="675" fill="url(#glowdeep-dives04512)"/>
+  <rect x="0" y="0" width="8" height="675" fill="#E08C7D"/>
+
+  <text x="90" y="110" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="21"
+        fill="#E08C7D" letter-spacing="7">DEEP DIVES</text>
+
+  
+
+  <rect x="90" y="184" width="76" height="3" fill="#E08C7D"/>
+
+  <text x="90" y="250" font-family="Georgia,serif" font-size="58" fill="#FFFFFF" font-weight="400">No Serious AI Product Runs</text>
+    <text x="90" y="324" font-family="Georgia,serif" font-size="58" fill="#FFFFFF" font-weight="400">on One Vendor Anymore.</text>
+    <text x="90" y="398" font-family="Georgia,serif" font-size="58" fill="#FFFFFF" font-weight="400">Here&apos;s the Fleet Strategy</text>
+    <text x="90" y="472" font-family="Georgia,serif" font-size="58" fill="#FFFFFF" font-weight="400">That Replaced It.</text>
+    
+  <line x1="90" y1="572" x2="1110" y2="572" stroke="#FFFFFF" stroke-opacity="0.14" stroke-width="1"/>
+  <text x="90" y="616" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="20"
+        fill="#FFFFFF" fill-opacity="0.62" letter-spacing="3">ABHISHEK MANE</text>
+  
+</svg>
