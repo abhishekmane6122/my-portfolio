@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-label="Autonomous Test Engineering">
+  <defs>
+    <linearGradient id="bgarttestmu" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#101F2B"/><stop offset="100%" stop-color="#1B3242"/>
+    </linearGradient>
+    <radialGradient id="glarttestmu" cx="0.8" cy="0.1" r="0.7">
+      <stop offset="0%" stop-color="#6FB6C9" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#6FB6C9" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grarttestmu" width="44" height="44" patternUnits="userSpaceOnUse">
+      <path d="M44 0H0V44" fill="none" stroke="#FFFFFF" stroke-opacity="0.045" stroke-width="1"/>
+    </pattern>
+    <marker id="ar" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+      <path d="M0 0 L9 4.5 L0 9 z" fill="#6FB6C9" fill-opacity="0.55"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="675" fill="url(#bgarttestmu)"/>
+  <rect width="1200" height="675" fill="url(#grarttestmu)"/>
+  <rect width="1200" height="675" fill="url(#glarttestmu)"/>
+  <rect x="0" y="0" width="7" height="675" fill="#6FB6C9"/>
+
+  <rect x="500" y="240" width="200" height="86" rx="14" fill="#6FB6C9" fill-opacity="0.28" stroke="#6FB6C9" stroke-opacity="0.7" stroke-width="2"/>
+  <rect x="140" y="410" width="160" height="80" rx="12" fill="#0A1620" fill-opacity="0.6" stroke="#6FB6C9" stroke-opacity="0.60" stroke-width="2"/>
+  <path d="M600 330 L220 408" stroke="#6FB6C9" stroke-opacity="0.3" stroke-width="2"/>
+  <rect x="370" y="450" width="160" height="80" rx="12" fill="#0A1620" fill-opacity="0.6" stroke="#6FB6C9" stroke-opacity="0.53" stroke-width="2"/>
+  <path d="M600 330 L450 448" stroke="#6FB6C9" stroke-opacity="0.3" stroke-width="2"/>
+  <rect x="620" y="450" width="160" height="80" rx="12" fill="#0A1620" fill-opacity="0.6" stroke="#6FB6C9" stroke-opacity="0.46" stroke-width="2"/>
+  <path d="M600 330 L700 448" stroke="#6FB6C9" stroke-opacity="0.3" stroke-width="2"/>
+  <rect x="850" y="410" width="160" height="80" rx="12" fill="#0A1620" fill-opacity="0.6" stroke="#6FB6C9" stroke-opacity="0.39" stroke-width="2"/>
+  <path d="M600 330 L930 408" stroke="#6FB6C9" stroke-opacity="0.3" stroke-width="2"/>
+  <ellipse cx="600" cy="600" rx="150" ry="34" fill="#6FB6C9" fill-opacity="0.16" stroke="#6FB6C9" stroke-opacity="0.45" stroke-width="2"/>
+  <path d="M220 492 L600 578" stroke="#6FB6C9" stroke-opacity="0.22" stroke-width="2" stroke-dasharray="4 5"/>
+  <path d="M450 532 L600 578" stroke="#6FB6C9" stroke-opacity="0.22" stroke-width="2" stroke-dasharray="4 5"/>
+  <path d="M700 532 L600 578" stroke="#6FB6C9" stroke-opacity="0.22" stroke-width="2" stroke-dasharray="4 5"/>
+  <path d="M930 492 L600 578" stroke="#6FB6C9" stroke-opacity="0.22" stroke-width="2" stroke-dasharray="4 5"/>
+
+  <text x="90" y="120" font-family="ui-monospace,SFMono-Regular,Menlo,monospace"
+        font-size="19" fill="#6FB6C9" letter-spacing="6">QA ENGINEERING</text>
+  <text x="90" y="182" font-family="Georgia,serif" font-size="52" fill="#FFFFFF">Autonomous Test Engineering</text>
+</svg>

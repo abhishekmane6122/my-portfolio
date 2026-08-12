@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-label="Industrial Safety Vision System">
+  <defs>
+    <linearGradient id="bgartvisionai" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2B2410"/><stop offset="100%" stop-color="#42381B"/>
+    </linearGradient>
+    <radialGradient id="glartvisionai" cx="0.8" cy="0.1" r="0.7">
+      <stop offset="0%" stop-color="#D9C05F" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#D9C05F" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grartvisionai" width="44" height="44" patternUnits="userSpaceOnUse">
+      <path d="M44 0H0V44" fill="none" stroke="#FFFFFF" stroke-opacity="0.045" stroke-width="1"/>
+    </pattern>
+    <marker id="ar" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+      <path d="M0 0 L9 4.5 L0 9 z" fill="#D9C05F" fill-opacity="0.55"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="675" fill="url(#bgartvisionai)"/>
+  <rect width="1200" height="675" fill="url(#grartvisionai)"/>
+  <rect width="1200" height="675" fill="url(#glartvisionai)"/>
+  <rect x="0" y="0" width="7" height="675" fill="#D9C05F"/>
+
+  <rect x="150" y="230" width="900" height="330" rx="14" fill="#1F1A0A" fill-opacity="0.5" stroke="#D9C05F" stroke-opacity="0.4"/>
+  <rect x="230" y="300" width="170" height="200" rx="6" fill="none" stroke="#D9C05F" stroke-opacity="0.85" stroke-width="3"/>
+  <rect x="230" y="278" width="78" height="20" rx="4" fill="#D9C05F" fill-opacity="0.65"/>
+  <circle cx="230" cy="300" r="4" fill="#D9C05F"/>
+  <circle cx="400" cy="300" r="4" fill="#D9C05F"/>
+  <circle cx="230" cy="500" r="4" fill="#D9C05F"/>
+  <circle cx="400" cy="500" r="4" fill="#D9C05F"/>
+  <rect x="470" y="270" width="140" height="230" rx="6" fill="none" stroke="#D9C05F" stroke-opacity="0.73" stroke-width="3"/>
+  <rect x="470" y="248" width="78" height="20" rx="4" fill="#D9C05F" fill-opacity="0.65"/>
+  <circle cx="470" cy="270" r="4" fill="#D9C05F"/>
+  <circle cx="610" cy="270" r="4" fill="#D9C05F"/>
+  <circle cx="470" cy="500" r="4" fill="#D9C05F"/>
+  <circle cx="610" cy="500" r="4" fill="#D9C05F"/>
+  <rect x="700" y="320" width="190" height="180" rx="6" fill="none" stroke="#D9C05F" stroke-opacity="0.61" stroke-width="3"/>
+  <rect x="700" y="298" width="78" height="20" rx="4" fill="#D9C05F" fill-opacity="0.65"/>
+  <circle cx="700" cy="320" r="4" fill="#D9C05F"/>
+  <circle cx="890" cy="320" r="4" fill="#D9C05F"/>
+  <circle cx="700" cy="500" r="4" fill="#D9C05F"/>
+  <circle cx="890" cy="500" r="4" fill="#D9C05F"/>
+  <rect x="930" y="290" width="90" height="150" rx="6" fill="none" stroke="#D9C05F" stroke-opacity="0.49" stroke-width="3"/>
+  <rect x="930" y="268" width="78" height="20" rx="4" fill="#D9C05F" fill-opacity="0.65"/>
+  <circle cx="930" cy="290" r="4" fill="#D9C05F"/>
+  <circle cx="1020" cy="290" r="4" fill="#D9C05F"/>
+  <circle cx="930" cy="440" r="4" fill="#D9C05F"/>
+  <circle cx="1020" cy="440" r="4" fill="#D9C05F"/>
+
+  <text x="90" y="120" font-family="ui-monospace,SFMono-Regular,Menlo,monospace"
+        font-size="19" fill="#D9C05F" letter-spacing="6">COMPUTER VISION</text>
+  <text x="90" y="182" font-family="Georgia,serif" font-size="52" fill="#FFFFFF">Industrial Safety Vision System</text>
+</svg>

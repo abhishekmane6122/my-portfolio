@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-label="Securities Regulator Intelligence">
+  <defs>
+    <linearGradient id="bgartsebipipeline" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0B2A2E"/><stop offset="100%" stop-color="#124048"/>
+    </linearGradient>
+    <radialGradient id="glartsebipipeline" cx="0.8" cy="0.1" r="0.7">
+      <stop offset="0%" stop-color="#4FC3D9" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#4FC3D9" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grartsebipipeline" width="44" height="44" patternUnits="userSpaceOnUse">
+      <path d="M44 0H0V44" fill="none" stroke="#FFFFFF" stroke-opacity="0.045" stroke-width="1"/>
+    </pattern>
+    <marker id="ar" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+      <path d="M0 0 L9 4.5 L0 9 z" fill="#4FC3D9" fill-opacity="0.55"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="675" fill="url(#bgartsebipipeline)"/>
+  <rect width="1200" height="675" fill="url(#grartsebipipeline)"/>
+  <rect width="1200" height="675" fill="url(#glartsebipipeline)"/>
+  <rect x="0" y="0" width="7" height="675" fill="#4FC3D9"/>
+
+  <rect x="40" y="300" width="140" height="86" rx="12" fill="#4FC3D9" fill-opacity="0.10" stroke="#4FC3D9" stroke-opacity="0.5"/>
+  <path d="M182 343 L256 343" stroke="#4FC3D9" stroke-opacity="0.45" stroke-width="2" marker-end="url(#ar)"/>
+  <rect x="260" y="300" width="140" height="86" rx="12" fill="#4FC3D9" fill-opacity="0.15" stroke="#4FC3D9" stroke-opacity="0.5"/>
+  <path d="M402 343 L476 343" stroke="#4FC3D9" stroke-opacity="0.45" stroke-width="2" marker-end="url(#ar)"/>
+  <rect x="480" y="300" width="140" height="86" rx="12" fill="#4FC3D9" fill-opacity="0.20" stroke="#4FC3D9" stroke-opacity="0.5"/>
+  <path d="M622 343 L696 343" stroke="#4FC3D9" stroke-opacity="0.45" stroke-width="2" marker-end="url(#ar)"/>
+  <rect x="700" y="300" width="140" height="86" rx="12" fill="#4FC3D9" fill-opacity="0.25" stroke="#4FC3D9" stroke-opacity="0.5"/>
+  <path d="M842 343 L916 343" stroke="#4FC3D9" stroke-opacity="0.45" stroke-width="2" marker-end="url(#ar)"/>
+  <rect x="920" y="300" width="140" height="86" rx="12" fill="#4FC3D9" fill-opacity="0.30" stroke="#4FC3D9" stroke-opacity="0.5"/>
+  <path d="M550 390 L550 470 L770 470" stroke="#4FC3D9" stroke-opacity="0.3" stroke-width="2" stroke-dasharray="5 5" fill="none"/>
+  <rect x="700" y="440" width="140" height="60" rx="10" fill="#08211F" fill-opacity="0.5" stroke="#4FC3D9" stroke-opacity="0.3"/>
+
+  <text x="90" y="120" font-family="ui-monospace,SFMono-Regular,Menlo,monospace"
+        font-size="19" fill="#4FC3D9" letter-spacing="6">REGULATORY AI</text>
+  <text x="90" y="182" font-family="Georgia,serif" font-size="52" fill="#FFFFFF">Securities Regulator Intelligence</text>
+</svg>
