@@ -1,0 +1,264 @@
+{
+    "id": "central-bank-circular-pipeline",
+    "slug": "central-bank-circular-intelligence-pipeline",
+    "title": "Central Bank Circular Intelligence Pipeline",
+    "tagline": "An autonomous pipeline that scrapes central-bank notifications, summarises them entirely on-premises with a local small language model, and distributes briefings — with no document content ever leaving the corporate network.",
+    "category": "Regulatory AI",
+    "domain": "Banking Regulation · Compliance",
+    "year": "2026",
+    "role": "AI Engineer — pipeline architecture, local model serving, GPU deployment, observability",
+    "duration": "Two weeks to production",
+    "team": [
+        "Solo build — architecture through production"
+    ],
+    "featured": false,
+    "art": "/projects/art-rbi-pipeline.svg",
+    "accent": "#D4A373",
+    "headline": "Built and shipped a fully air-gapped regulatory summarisation pipeline in two weeks, running a 3.8B-parameter model on a single on-prem GPU.",
+    "highlights": [
+        "Entirely on-premises inference — regulatory documents never reach an external API",
+        "Phi-3-mini served on a single Tesla T4, chosen to fit the GPU actually available",
+        "SHA-256 document provenance so a summary can always be traced to an exact source file",
+        "Recursive summarization for circulars exceeding the model's 4K context window",
+        "Delivered end to end in two weeks, including scraping through a corporate proxy"
+    ],
+    "context": "Regulatory teams monitoring central-bank notifications face a relentless, low-glamour obligation: read everything the regulator publishes, decide what applies, and tell the right people — daily. The volume is manageable; the consistency is not. The work is exactly the kind that gets dropped when the team is busy, and the cost of dropping it is a missed regulatory obligation.",
+    "problem": "### The constraint that shaped everything\n\nThe defining requirement was not accuracy or speed. It was that **regulatory documents could not leave the corporate network**. That single constraint removed the easy answer — call a hosted LLM API — and turned the project into a local model serving problem.\n\nThe rest followed from it:\n\n**Whatever model I chose had to fit the hardware that existed.** There was one GPU, not a cluster. A model that needed more memory than was available was not a trade-off to negotiate; it was simply unusable.\n\n**The portal is hostile to automation.** A JavaScript-heavy government site, reached through a corporate proxy that blocks most automated clients.\n\n**Circulars overflow a small model's context.** A 4K-token window is generous for a chat turn and inadequate for a regulatory circular, and truncation drops the operative clauses.\n\n**Provenance is a compliance requirement.** Months later, someone will ask which exact document produced a given summary. \"The one from that date\" is not an answer that survives an audit.",
+    "approach": "I inverted the usual model-selection order. Rather than picking the best model and finding hardware for it, I started from **the GPU that was actually available** and asked which model would fit with room for the KV cache at realistic input lengths. That produced a small language model, not a large one — and for constrained summarisation against supplied text, a well-chosen 3.8B model is genuinely sufficient.\n\nThe second decision was to build the whole thing as a **modular staged pipeline** rather than a script. Five distinct stages with explicit state means a failure in scraping does not look like a failure in summarisation, and a stage can be re-run without re-running the pipeline. In a two-week build, that structure is what made debugging fast enough to finish.\n\nThe third was to treat provenance as a first-class output rather than a logging concern — hashing every source document so the link between a summary and its source is cryptographic rather than circumstantial.",
+    "solution": "Browser automation drives the regulator's dynamic listing through the corporate proxy and collects notification PDFs. Each downloaded file is hashed with SHA-256; a document already seen is skipped, which makes re-runs cheap and idempotent.\n\nText extraction handles digital PDFs directly and routes scanned documents through OCR. Extracted text is sanitised for stray PII patterns before it reaches the model.\n\nSummarisation runs entirely on the local GPU using Phi-3-mini. Circulars longer than the context window are chunked, summarised recursively, and merged. A local sentence-transformer embeds each document into a vector store so past circulars can be searched semantically.\n\nResults are written to a local database and synced to Azure PostgreSQL, exported as an Excel briefing, and distributed to stakeholders by email — with per-run metrics, error logs and timings captured by a custom observability module.",
+    "systemDesign": {
+        "overview": "A five-stage modular pipeline — Extract, Transform, Summarize, Load, Distribute — with each stage independently runnable and its own state. Everything AI-related executes on a local GPU; cloud is used only for durable storage of results, never for inference.",
+        "components": [
+            {
+                "name": "Scraper",
+                "responsibility": "Drives the JavaScript-heavy regulator portal through the corporate proxy and collects notification links",
+                "tech": "Playwright · proxy-aware browser context"
+            },
+            {
+                "name": "Downloader & deduplicator",
+                "responsibility": "Fetches PDFs and hashes each with SHA-256, skipping documents already processed so re-runs are idempotent",
+                "tech": "SHA-256 provenance ledger"
+            },
+            {
+                "name": "Extractor",
+                "responsibility": "Pulls text from digital PDFs and routes scanned documents through OCR",
+                "tech": "PyMuPDF · Tesseract OCR"
+            },
+            {
+                "name": "Sanitiser",
+                "responsibility": "Strips stray PII patterns from extracted text before it reaches the model",
+                "tech": "Regex-based redaction"
+            },
+            {
+                "name": "Local summarizer",
+                "responsibility": "Generates compliance-tone summaries fully on-premises, chunking and recursively merging documents that exceed the context window",
+                "tech": "Phi-3-mini-4k-instruct · Tesla T4"
+            },
+            {
+                "name": "Embedder & vector store",
+                "responsibility": "Embeds circulars locally so the regulatory archive can be searched by meaning rather than date",
+                "tech": "all-MiniLM-L6-v2 · local vector store"
+            },
+            {
+                "name": "Observability module",
+                "responsibility": "Records per-run metrics, per-document state, errors and timings, exportable for review",
+                "tech": "Local metrics store · Excel export"
+            },
+            {
+                "name": "Reporting & distribution",
+                "responsibility": "Builds the Excel briefing and emails stakeholders, syncing results to cloud storage for durability",
+                "tech": "openpyxl · SMTP · Azure PostgreSQL"
+            }
+        ],
+        "dataFlow": [
+            {
+                "stage": "1 · Scrape",
+                "detail": "Browser automation loads the regulator's dynamic notification listing through the corporate proxy and extracts document links."
+            },
+            {
+                "stage": "2 · Download & hash",
+                "detail": "Each PDF is fetched and hashed. A hash already in the ledger means the document is skipped, making the pipeline safely re-runnable."
+            },
+            {
+                "stage": "3 · Extract & sanitise",
+                "detail": "Text is extracted, with OCR for scanned filings, then scrubbed of stray PII patterns before any model sees it."
+            },
+            {
+                "stage": "4 · Summarise locally",
+                "detail": "Phi-3-mini generates the summary on the local GPU. Documents over the context window are chunked and recursively merged."
+            },
+            {
+                "stage": "5 · Embed",
+                "detail": "A local sentence-transformer embeds the document so the archive supports semantic search across past circulars."
+            },
+            {
+                "stage": "6 · Persist",
+                "detail": "Summaries, provenance hashes and run metrics are written locally and synced to Azure PostgreSQL for durability and reporting."
+            },
+            {
+                "stage": "7 · Distribute",
+                "detail": "An Excel briefing is generated and emailed to stakeholders, with failures reported rather than absorbed."
+            }
+        ]
+    },
+    "aiEngineering": {
+        "summary": "A deliberately small-model system. The privacy constraint forced local inference, local inference forced a model that fits one GPU, and a 3.8B model turns out to be sufficient for constrained summarisation against supplied text — provided the chunking strategy respects where regulatory meaning lives.",
+        "models": [
+            {
+                "name": "Microsoft Phi-3-mini-4k-instruct",
+                "role": "On-premises summarization",
+                "why": "Selected by starting from the available hardware rather than the leaderboard. At 3.8B parameters it fits a single Tesla T4 with headroom for the KV cache at realistic input lengths, and its instruction tuning holds a compliance register well. For summarising text that is already supplied, reasoning depth matters far less than instruction-following and availability."
+            },
+            {
+                "name": "all-MiniLM-L6-v2",
+                "role": "Local embeddings",
+                "why": "Small enough to run on the same machine without competing for GPU memory, and strong enough for archive-level semantic search. Keeping embeddings local was non-negotiable given the same data-residency constraint that ruled out hosted inference."
+            }
+        ],
+        "retrieval": "Circulars are embedded into a local vector store so the regulatory archive can be searched by meaning — finding related past circulars on a topic rather than scrolling by publication date. Retrieval is a search aid over an already-summarised corpus rather than a generation input, which keeps the summarisation path deterministic and independent of index quality.",
+        "evaluation": "Summaries were reviewed against source documents during rollout to confirm the small model held compliance tone and did not introduce claims absent from the source. Per-run observability records document counts, failures, timings and token throughput, so a degradation in coverage or latency is visible immediately. The provenance hash means any summary questioned later can be re-derived from the exact source file that produced it.",
+        "guardrails": "Extracted text is sanitised for stray PII patterns before reaching the model. Documents that extract to nothing are recorded as explicit failures rather than summarised from empty input. Because inference is fully local, the strongest guardrail is architectural — there is no path by which regulatory document content reaches an external service."
+    },
+    "infrastructure": {
+        "hosting": "On-premises Azure VM with an NVIDIA Tesla T4 GPU running the model and pipeline, syncing results to Azure Database for PostgreSQL.",
+        "rationale": "Running inference on the group's own GPU-backed Azure VM is what made the project possible at all — the compliance position was that regulatory documents do not leave the corporate network, and a hosted API would have ended the discussion. Owning the VM also meant no per-token cost, so the pipeline could re-process the full archive during development without a budget conversation. Syncing results to managed PostgreSQL gave durability and reporting access without moving the sensitive processing off-premises.",
+        "dataResidency": "Complete. Documents, extracted text, embeddings and generated summaries are all processed and stored inside the corporate network; only derived summaries sync to the enterprise cloud database."
+    },
+    "decisions": [
+        {
+            "issue": "Hosted LLM API versus a locally-served model",
+            "choice": "Fully local inference on an on-premises GPU",
+            "rationale": "The governing requirement was that regulatory documents never leave the corporate network. That is a compliance position, not a preference, and it eliminated hosted APIs regardless of their quality advantage.",
+            "tradeoff": "Gave up frontier-model fluency and inherited GPU capacity planning and model serving as my responsibility — the correct trade when the alternative is not shipping."
+        },
+        {
+            "issue": "Which model, given one GPU",
+            "choice": "Phi-3-mini-4k-instruct, chosen by fitting the hardware first",
+            "rationale": "Model selection is an architecture decision constrained by available memory, not a ranking exercise. Starting from the T4's capacity and working backwards produced a model that fits with KV-cache headroom at real input lengths, rather than one that benchmarks well and OOMs in production.",
+            "tradeoff": "A 4K context window that forces chunking on longer circulars, and less nuance on complex documents than a larger model would give."
+        },
+        {
+            "issue": "Documents longer than a 4K context window",
+            "choice": "Recursive summarization rather than truncation",
+            "rationale": "Regulatory circulars place operative requirements late in the document. Truncating to fit reliably discards the part that determines whether the circular applies.",
+            "tradeoff": "Multiple forward passes per long document on a single GPU, which lengthens run time — acceptable for an overnight batch."
+        },
+        {
+            "issue": "How to guarantee a summary is traceable to its source",
+            "choice": "SHA-256 hashing of every source document, stored with the summary",
+            "rationale": "Compliance review months later needs certainty about which exact file produced a summary. A hash makes that link cryptographic instead of circumstantial, and it doubles as the deduplication key that makes re-runs idempotent.",
+            "tradeoff": "None worth noting — it solved provenance and idempotency with one mechanism."
+        }
+    ],
+    "challenges": [
+        {
+            "title": "A government portal that blocks automated clients",
+            "description": "The regulator's site is a JavaScript-heavy application reached through a corporate proxy that blocks most automated HTTP clients. Simple request libraries returned nothing usable, and the proxy interfered with headless browser networking.",
+            "solution": "I drove a real headless browser configured with the corporate proxy context so requests were indistinguishable from ordinary traffic, waiting on rendered content rather than raw responses. Getting this right consumed a meaningful share of the two-week timeline and was the single largest source of early failures."
+        },
+        {
+            "title": "Fitting a useful model onto one T4",
+            "description": "GPU memory has to hold model weights and the KV cache, and the cache grows with input length. A model that loads fine on a short prompt can exhaust memory on a long circular — the failure appears only under realistic load.",
+            "solution": "I sized the model against realistic worst-case input lengths rather than nominal weight size, leaving explicit cache headroom, and capped chunk sizes so a single forward pass could never exceed the budget. This is why chunking exists for capacity reasons as well as context-window reasons."
+        },
+        {
+            "title": "A small model drifting out of compliance tone",
+            "description": "Smaller models follow formatting instructions less reliably than large ones, and over a long recursive summarisation the output drifts toward conversational phrasing that is unusable in a compliance note.",
+            "solution": "The prompt contract is re-asserted at every recursion level rather than only at the top, so each merge step is re-anchored to the required register. Reviewing outputs against sources during rollout confirmed the register held across document lengths."
+        },
+        {
+            "title": "Knowing whether an unattended overnight run actually worked",
+            "description": "A batch pipeline that runs unattended can fail partially and still exit zero. Without per-document state, a run that processed 12 of 17 circulars is indistinguishable from a quiet publishing day.",
+            "solution": "I built a custom observability module recording per-run and per-document state, errors, timings and throughput, exportable for review and surfaced in the distribution email. Failures became visible the next morning rather than at the next audit."
+        }
+    ],
+    "techStack": [
+        {
+            "category": "AI & ML",
+            "technologies": [
+                "Microsoft Phi-3-mini-4k-instruct",
+                "Sentence Transformers (all-MiniLM-L6-v2)",
+                "HuggingFace Transformers",
+                "PyTorch",
+                "Recursive summarization",
+                "Local GPU inference"
+            ]
+        },
+        {
+            "category": "Ingestion & Extraction",
+            "technologies": [
+                "Playwright (proxy-aware)",
+                "PyMuPDF",
+                "Tesseract OCR",
+                "SHA-256 provenance ledger",
+                "PII sanitisation"
+            ]
+        },
+        {
+            "category": "Backend",
+            "technologies": [
+                "Python",
+                "Modular staged pipeline",
+                "Custom observability module",
+                "Idempotent re-runs"
+            ]
+        },
+        {
+            "category": "Data & Reporting",
+            "technologies": [
+                "Local vector store",
+                "Azure Database for PostgreSQL",
+                "openpyxl",
+                "SMTP distribution"
+            ]
+        },
+        {
+            "category": "Infrastructure",
+            "technologies": [
+                "Azure VM with NVIDIA Tesla T4",
+                "Corporate proxy enforcement",
+                "On-premises inference",
+                "Scheduled batch execution"
+            ]
+        }
+    ],
+    "diagrams": [
+        {
+            "title": "Five-stage pipeline, fully on-premises",
+            "caption": "Inference never leaves the corporate network; only derived summaries sync to cloud storage.",
+            "chart": "---\ntitle: \"Central Bank Circular Pipeline\"\n---\nflowchart TD\n    A[\"Regulator notification portal\"] --> B[\"Proxy-aware browser scrape\"]\n    B --> C[\"Download PDFs\"]\n    C --> D{\"SHA-256 already seen\"}\n    D -->|Yes| E[\"Skip - idempotent re-run\"]\n    D -->|No| F[\"Text extraction\"]\n    F --> G{\"Digital or scanned\"}\n    G -->|Scanned| H[\"OCR\"]\n    G -->|Digital| I[\"Extracted text\"]\n    H --> I\n    I --> J[\"PII sanitisation\"]\n    J --> K{\"Fits 4K context\"}\n    K -->|No| L[\"Chunk and recursively summarise\"]\n    K -->|Yes| M[\"Single-pass summarise\"]\n    L --> N[\"Local Phi-3 on Tesla T4\"]\n    M --> N\n    N --> O[\"Compliance summary\"]\n    O --> P[(\"Local store + provenance hash\")]\n    I --> Q[\"Local embeddings\"]\n    Q --> R[(\"Vector store\")]\n    P --> S[(\"Azure PostgreSQL sync\")]\n    P --> T[\"Excel briefing\"]\n    T --> U[\"Email distribution\"]\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef store fill:#F3F0F8,stroke:#8880AE,stroke-width:1px,color:#1F2933\n    classDef decision fill:#FDF6E7,stroke:#C9A85C,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A input\n    class B,C,F,H,I,J,L,M,N,Q process\n    class P,R,S store\n    class D,G,K decision\n    class E,O,T,U output"
+        },
+        {
+            "title": "Model selection driven by GPU capacity",
+            "caption": "Weights plus KV cache at realistic input length is the real constraint — not parameter count alone.",
+            "chart": "---\ntitle: \"Fitting the Model to the Hardware\"\n---\nflowchart TD\n    A[\"Available GPU<br/>single Tesla T4\"] --> B[\"Memory budget\"]\n    B --> C[\"Model weights\"]\n    B --> D[\"KV cache at max input length\"]\n    B --> E[\"Working headroom\"]\n\n    C --> F{\"Does a 7B+ model fit<br/>with cache headroom\"}\n    D --> F\n    E --> F\n    F -->|No| G[\"Select 3.8B Phi-3-mini\"]\n    F -->|Yes| H[\"Larger model viable\"]\n\n    G --> I{\"Is 4K context enough\"}\n    I -->|No for long circulars| J[\"Chunk + recursive summarise\"]\n    I -->|Yes| K[\"Single pass\"]\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef decision fill:#FDF6E7,stroke:#C9A85C,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A input\n    class B,C,D,E process\n    class F,I decision\n    class G,H,J,K output"
+        }
+    ],
+    "results": [
+        {
+            "metric": "Delivery time",
+            "value": "2 weeks",
+            "description": "Scraping through to distribution, built and deployed end to end."
+        },
+        {
+            "metric": "Data leaving the network",
+            "value": "None",
+            "description": "All extraction, embedding and inference runs on-premises; only derived summaries sync to cloud storage."
+        },
+        {
+            "metric": "Inference cost",
+            "value": "No per-token spend",
+            "description": "Owning the GPU meant the full archive could be reprocessed during development at no marginal cost."
+        },
+        {
+            "metric": "Re-run safety",
+            "value": "Idempotent",
+            "description": "SHA-256 provenance doubles as the deduplication key, so re-running a day is cheap and safe."
+        },
+        {
+            "metric": "Unattended failures",
+            "value": "Surfaced next morning",
+            "description": "Per-document observability turns silent partial failure into a visible report."
+        }
+    ]
+}

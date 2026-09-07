@@ -1,0 +1,300 @@
+{
+    "id": "shareholding-intelligence-platform",
+    "slug": "shareholding-intelligence-platform",
+    "title": "Shareholding Intelligence Platform",
+    "tagline": "A multi-tenant Investor Relations analytics portal that turns raw weekly depository registries into board-ready institutional-ownership intelligence across seven listed business units.",
+    "category": "Investor Analytics",
+    "domain": "Capital Markets · Investor Relations",
+    "year": "2026",
+    "role": "Full Stack & AI Engineer — architecture, backend, data pipeline, RAG assistant, deployment",
+    "duration": "Multi-sprint delivery, extended into ongoing production ownership",
+    "team": [
+        "Solo build — architecture through production"
+    ],
+    "featured": true,
+    "art": "/projects/art-shareholding.svg",
+    "accent": "#5B9BD5",
+    "headline": "Replaced a weekly manual reporting cycle with a governed pipeline that makes incorrect board reports structurally impossible.",
+    "highlights": [
+        "Seven listed entities served from one multi-tenant deployment with strict data isolation",
+        "Fuzzy entity resolution with human-in-the-loop review, where every decision is stored and reused forever",
+        "A hard export lock that blocks all reports while any shareholder remains unclassified",
+        "One-click generation of the corporate deck and workbook straight from approved data",
+        "Grounded retrieval assistant answering questions against the same numbers the dashboard shows"
+    ],
+    "context": "Investor Relations teams at a large listed group carry a weekly, non-negotiable deadline: explain to the CFO and the board **who bought, who sold, and who exited** across every listed entity in the group. The raw material is a depository registry extract — one flat file per entity per week listing every institutional and retail holder. It is accurate, and in that form it is almost unusable.",
+    "problem": "### Why this is harder than it looks\n\nThe difficulty is not the charting. It is everything upstream of the chart.\n\n**Entity resolution is the real problem.** The same institution appears across weeks and entities under a dozen different raw strings — legal suffixes, custodian prefixes, sub-account codes, spelling drift. Three variants of one pension fund's name are one investor. Treated as three, every week-over-week movement number is wrong, and wrong in a way nobody notices until a board meeting.\n\n**Movement is a diff, not a snapshot.** \"Top buyers\" only exists relative to the previous week's *resolved* positions. The platform must therefore hold a correct historical series, not merely the latest file.\n\n**Partial data is worse than no data.** A report where a small share of holders is unclassified does not look slightly wrong — it silently misattributes an entire category of ownership while looking perfectly polished.\n\n**Multi-entity, multi-role.** Each entity has its own IR owner who must not see another entity's book, while group-level roles need everything.\n\n**The deliverable is a deck, not a dashboard.** What actually reaches the board is a formatted presentation. Any tool that stops at the screen has relocated the manual work rather than removed it.",
+    "approach": "I treated this as a **data-governance problem with a dashboard attached**, not a reporting project.\n\nThe governing decision was to make entity resolution a first-class, human-supervised subsystem rather than a preprocessing step. Fuzzy matching *proposes*; a human *disposes*; the decision is stored and reused permanently. Automation handles volume, humans own judgement, and the system remembers — so the review queue shrinks every cycle instead of resetting.\n\nThe second decision was to put a **hard correctness gate between staging and publication**. Rather than validating at export time and warning the user, the platform continuously tracks unclassified holders and blocks every export path while any remain. I chose this over a warning banner deliberately: under a weekly board deadline, warnings get dismissed, and the failure mode here is a board pack that misstates ownership.\n\nEverything else followed from those two: staged writes so a bad file is a rejected review rather than a recovery incident, movement derived on read so late corrections propagate, and authorization enforced at the data layer so a UI bug cannot become a disclosure.",
+    "solution": "The platform owns the entire path from raw registry file to signed-off board deck.\n\nA weekly upload lands in a staging area, never directly in reporting tables. Raw holder strings are normalized and matched against an investor master of canonical names and parent groups — high-confidence matches auto-apply, everything else becomes a queued decision with ranked suggestions. While any holder is unclassified, exports stay locked.\n\nOnce approved, the platform computes week-over-week movement against the prior resolved position: category shifts, top buyers and sellers, new entries, complete exits, rank deltas. Analytics endpoints feed the dashboard, a retrieval assistant answers natural-language questions grounded in the same figures, and a single action produces the corporate-formatted deck and workbook from the approved dataset.",
+    "systemDesign": {
+        "overview": "A layered FastAPI service behind an Nginx reverse proxy, serving a React SPA. Strict separation of routes → services → repositories → models keeps business rules out of the data-access layer and query construction in one place. Per-entity analytical logic is isolated into its own module per business unit, behind a shared interface.",
+        "components": [
+            {
+                "name": "Ingestion & staging",
+                "responsibility": "Accepts the weekly registry upload, parses it, and writes to staging tables that are invisible to reporting until explicitly approved",
+                "tech": "FastAPI · Pandas · Azure PostgreSQL"
+            },
+            {
+                "name": "Entity resolution engine",
+                "responsibility": "Normalizes raw holder strings, matches against the investor master, auto-applies confident matches and queues the rest with ranked candidate suggestions",
+                "tech": "Fuzzy scoring · canonical investor master"
+            },
+            {
+                "name": "Pending-actions guard",
+                "responsibility": "Tracks unclassified holders in the active dataset and blocks every export and distribution path while any remain",
+                "tech": "Service-layer invariant enforced on all generators"
+            },
+            {
+                "name": "Movement engine",
+                "responsibility": "Diffs the current resolved week against the prior one to derive buyers, sellers, entries, exits and rank deltas — computed on read so corrections propagate",
+                "tech": "Azure PostgreSQL · Pandas"
+            },
+            {
+                "name": "Per-entity logic modules",
+                "responsibility": "Encapsulates each business unit's category treatment and disclosure quirks independently, so a change for one entity cannot silently alter another",
+                "tech": "One module per BU behind a shared interface"
+            },
+            {
+                "name": "Report generator",
+                "responsibility": "Produces the corporate-formatted presentation and workbook directly from approved data, removing the manual re-keying step",
+                "tech": "python-pptx · openpyxl"
+            },
+            {
+                "name": "Grounded assistant",
+                "responsibility": "Answers natural-language questions over the approved dataset with citations, using the same numbers shown on the dashboard",
+                "tech": "LlamaIndex · Azure OpenAI · Cohere embeddings"
+            },
+            {
+                "name": "Identity & access layer",
+                "responsibility": "Resolves the signed-in user to a role and an assigned-business-unit scope, applied inside the repository layer rather than the view",
+                "tech": "Entra ID SSO · MSAL · HttpOnly session cookies"
+            }
+        ],
+        "dataFlow": [
+            {
+                "stage": "1 · Upload",
+                "detail": "The weekly depository registry extract is uploaded and persisted verbatim before any processing, so the source is always recoverable."
+            },
+            {
+                "stage": "2 · Stage",
+                "detail": "Parsed rows land in staging tables. Nothing is visible to reporting, dashboards or exports until a reviewer approves it."
+            },
+            {
+                "stage": "3 · Resolve",
+                "detail": "Holder strings are normalized and matched to canonical investors. Confident matches apply automatically; ambiguous ones queue with ranked suggestions for a human decision."
+            },
+            {
+                "stage": "4 · Gate",
+                "detail": "While any holder in the active dataset is unclassified, every export and email path is locked. Reviewers see exactly what is outstanding."
+            },
+            {
+                "stage": "5 · Approve",
+                "detail": "Approved data enters the reporting tables as an immutable weekly position record, joining the historical series."
+            },
+            {
+                "stage": "6 · Derive",
+                "detail": "Week-over-week movement is computed against the prior resolved week at read time — buyers, sellers, new entries, complete exits, rank deltas."
+            },
+            {
+                "stage": "7 · Serve & export",
+                "detail": "Dashboards, the grounded assistant, and one-click deck and workbook generation all read from the same approved dataset."
+            }
+        ]
+    },
+    "decisions": [
+        {
+            "issue": "Entity resolution: full automation or human-in-the-loop",
+            "choice": "Fuzzy matching proposes ranked candidates; anything below the confidence threshold requires a human decision, and every decision is stored and reused permanently",
+            "rationale": "A wrong auto-merge silently corrupts every downstream movement figure and is nearly undetectable in a finished deck. Fully manual classification does not survive past the first week. Proposing-but-not-deciding puts automation where it is safe (recall) and humans where they are irreplaceable (judgement).",
+            "tradeoff": "Accepts an ongoing review queue in exchange for correctness — mitigated because stored decisions make the queue shrink monotonically instead of recurring each cycle."
+        },
+        {
+            "issue": "How to guarantee reports are never built from incomplete data",
+            "choice": "A hard system-level lock on all export paths while any holder is unclassified",
+            "rationale": "The alternative was a warning banner. Warnings get dismissed under deadline pressure, and the failure mode is a board pack with misattributed ownership. Making the incorrect action impossible rather than merely discouraged converts a process risk into a system invariant.",
+            "tradeoff": "Occasionally blocks a user who wants a quick draft — accepted, because the whole point is that there is no such thing as a safe partial export here."
+        },
+        {
+            "issue": "Per-entity analytics: one generic engine or a module per business unit",
+            "choice": "A separate logic module per entity behind a common interface",
+            "rationale": "The entities genuinely differ in category treatment. A single parameterised engine collapses into an unreadable configuration language where a change for one entity risks silently altering another.",
+            "tradeoff": "Some duplication across modules, traded for independent testability and blast-radius containment — the right trade when the output is board-facing."
+        },
+        {
+            "issue": "Staging versus direct writes on weekly upload",
+            "choice": "All uploads land in staging and require explicit approval before entering reporting tables",
+            "rationale": "Weekly data arrives with real defects. Writing straight to production makes a bad file a recovery incident; staging makes it a rejected review, and creates the audit trail a regulated reporting process needs.",
+            "tradeoff": "Adds an approval step to every cycle, which is exactly the control the process was missing."
+        },
+        {
+            "issue": "Where to enforce multi-tenant isolation",
+            "choice": "The assigned-business-unit scope is applied inside the repository layer, not the view",
+            "rationale": "Filtering only in the frontend means any routing or state bug can expose another entity's ownership book. Enforcing at the data layer means a UI mistake produces an empty view rather than a disclosure.",
+            "tradeoff": "Every query path must carry scope, which is deliberate friction in the right place."
+        }
+    ],
+    "challenges": [
+        {
+            "title": "The same investor under a dozen different names",
+            "description": "Depository extracts identify holders by free-text strings that drift between weeks and differ across entities — legal suffixes, custodian prefixes, sub-account codes, punctuation and spelling variation. Naive string equality fragments one investor into several, corrupting every movement figure while still producing a plausible-looking report.",
+            "solution": "An investor master maps raw strings to canonical names and parent groups, fronted by a fuzzy suggestion engine that ranks likely matches for any unseen string. Confident matches apply automatically; the rest queue for a reviewer with candidates pre-ranked so a decision takes seconds. Every decision persists and is reused across all entities and future weeks."
+        },
+        {
+            "title": "Guaranteeing a board deck can never be built from partial data",
+            "description": "The dangerous failure is not a crash — it is a beautifully formatted deck built from a dataset where a slice of holders was never classified. It looks correct and misstates ownership.",
+            "solution": "I inverted the control. Instead of validating at export time, the platform continuously tracks unclassified holders and blocks every export and distribution path while any remain, showing reviewers precisely what is outstanding. Correctness became a property of the system rather than a step someone might skip."
+        },
+        {
+            "title": "Week-over-week movement needs a trustworthy history",
+            "description": "Buyers, sellers, entries and exits are all diffs against the previous resolved state, so the platform cannot simply hold the latest upload — and a late correction to an old week has to propagate everywhere it was used.",
+            "solution": "Resolved positions are stored per entity per week as an immutable series, with movement computed on read rather than materialised at write time. Re-approving a corrected week naturally re-derives every dependent figure, so a retroactive fix cannot leave stale movement numbers behind."
+        },
+        {
+            "title": "Multi-tenancy where a UI bug must not become a data leak",
+            "description": "Several entities with different owners share one deployment. Filtering only in the frontend means any routing or state bug can expose another entity's ownership book.",
+            "solution": "The assigned-business-unit scope is applied inside the repository layer, constraining analytics queries, export generation and email distribution alike. The frontend filter is a convenience; the backend filter is the control, and an unassigned user is an explicit deny rather than an implicit allow."
+        },
+        {
+            "title": "Replacing the deck, not just the dashboard",
+            "description": "IR teams present slides to a board, not dashboards. A tool that stops at the screen relocates the manual work instead of removing it — and leaves copy-paste as the last error source.",
+            "solution": "The corporate-formatted presentation and workbook are generated directly from the approved dataset using templated generation, so the numbers in the deck are the numbers in the system by construction. This closed the final manual step, which was also where reporting errors were introduced."
+        }
+    ],
+    "techStack": [
+        {
+            "category": "Backend",
+            "technologies": [
+                "Python 3.11",
+                "FastAPI",
+                "Pydantic",
+                "Uvicorn",
+                "Repository / service layering",
+                "Async request handling"
+            ]
+        },
+        {
+            "category": "Data Platform",
+            "technologies": [
+                "Azure Database for PostgreSQL",
+                "Pandas",
+                "Weekly immutable position series",
+                "Staging + approval tables",
+                "Audit trail schema"
+            ]
+        },
+        {
+            "category": "AI & Retrieval",
+            "technologies": [
+                "LlamaIndex",
+                "Azure OpenAI (GPT-4.1 mini)",
+                "Cohere Embed v4.0",
+                "Hybrid BM25 + vector retrieval",
+                "Grounded Q&A with citations",
+                "Fuzzy entity-resolution scoring"
+            ]
+        },
+        {
+            "category": "Frontend",
+            "technologies": [
+                "React 18",
+                "TypeScript",
+                "Vite",
+                "Tailwind CSS",
+                "Recharts",
+                "Deep-linkable slug routing"
+            ]
+        },
+        {
+            "category": "Reporting",
+            "technologies": [
+                "python-pptx",
+                "openpyxl",
+                "Templated corporate deck generation",
+                "SMTP executive distribution"
+            ]
+        },
+        {
+            "category": "Cloud & Security",
+            "technologies": [
+                "Azure VM (application host)",
+                "Microsoft Entra ID SSO",
+                "MSAL",
+                "HttpOnly session cookies",
+                "Role-based access control",
+                "Nginx reverse proxy"
+            ]
+        }
+    ],
+    "diagrams": [
+        {
+            "title": "End-to-end pipeline",
+            "caption": "From raw registry extract to a signed-off board deck, with the correctness gate in the middle.",
+            "chart": "---\ntitle: \"Weekly Shareholding Pipeline\"\n---\nflowchart TD\n    A[\"Weekly depository registry extract\"] --> B[\"Upload and parse\"]\n    B --> C[(\"Staging tables<br/>invisible to reporting\")]\n    C --> D[\"Normalize holder strings\"]\n    D --> E{\"Match against investor master\"}\n    E -->|High confidence| F[\"Resolved to canonical investor\"]\n    E -->|Low confidence| G[\"Pending actions queue<br/>ranked suggestions\"]\n    G --> H[\"Human classification decision\"]\n    H --> I[(\"Investor master<br/>decision stored and reused\")]\n    I --> F\n    F --> J{\"Any holder still unclassified\"}\n    J -->|Yes| K[\"EXPORTS LOCKED\"]\n    K --> G\n    J -->|No| L[\"Approve into reporting tables\"]\n    L --> M[(\"Resolved weekly position series\")]\n    M --> N[\"Week-over-week diff engine\"]\n    N --> O[\"Dashboard analytics\"]\n    N --> P[\"Deck and workbook generation\"]\n    N --> Q[\"Grounded assistant\"]\n    P --> R[\"Executive distribution\"]\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef store fill:#F3F0F8,stroke:#8880AE,stroke-width:1px,color:#1F2933\n    classDef decision fill:#FDF6E7,stroke:#C9A85C,stroke-width:1px,color:#1F2933\n    classDef risk fill:#FBEDED,stroke:#C08383,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A input\n    class B,D,F,H,L,N process\n    class C,I,M store\n    class E,J decision\n    class K risk\n    class O,P,Q,R output"
+        },
+        {
+            "title": "Architecture and trust boundaries",
+            "caption": "Scope is enforced at the repository layer, so a UI bug yields an empty view rather than another entity's book.",
+            "chart": "---\ntitle: \"Platform Architecture\"\n---\nflowchart TD\n    U[\"IR analyst / BU manager / group role\"] -->|HTTPS| NG[\"Nginx reverse proxy\"]\n    NG --> SPA[\"React + TypeScript SPA\"]\n    SPA -->|OAuth redirect| AAD[\"Microsoft Entra ID\"]\n    AAD -->|token exchange| API[\"FastAPI gateway\"]\n    SPA -->|HttpOnly session cookie| API\n\n    API --> AUTH[\"Session and RBAC layer<br/>resolves assigned business units\"]\n    AUTH --> SVC[\"Service layer\"]\n\n    SVC --> BU[\"Per-entity logic modules\"]\n    SVC --> GATE[\"Pending-actions guard\"]\n    SVC --> RPT[\"Deck and workbook generator\"]\n    SVC --> BOT[\"Grounded assistant\"]\n\n    BU --> REPO[\"Repository layer<br/>scope filter applied here\"]\n    GATE --> REPO\n    RPT --> REPO\n    REPO --> DB[(\"Analytics store\")]\n    BOT --> VDB[(\"Vector store\")]\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef store fill:#F3F0F8,stroke:#8880AE,stroke-width:1px,color:#1F2933\n    classDef decision fill:#FDF6E7,stroke:#C9A85C,stroke-width:1px,color:#1F2933\n\n    class U,SPA input\n    class NG,API,AUTH,SVC,BU,RPT,BOT,REPO process\n    class DB,VDB store\n    class AAD,GATE decision"
+        },
+        {
+            "title": "Entity resolution loop",
+            "caption": "Where automation stops and human judgement starts — and why the queue shrinks over time.",
+            "chart": "---\ntitle: \"Investor Entity Resolution\"\n---\nflowchart LR\n    A[\"Raw holder string\"] --> B[\"Normalize<br/>case, punctuation, legal suffixes\"]\n    B --> C[\"Exact match on investor master\"]\n    C -->|Hit| H[\"Canonical investor\"]\n    C -->|Miss| D[\"Fuzzy candidate scoring\"]\n    D --> E{\"Above confidence threshold\"}\n    E -->|Yes| H\n    E -->|No| F[\"Queue with ranked suggestions\"]\n    F --> G[\"Reviewer picks or creates canonical name\"]\n    G --> I[(\"Persist decision\")]\n    I --> H\n    I -.->|reused across entities and future weeks| C\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef store fill:#F3F0F8,stroke:#8880AE,stroke-width:1px,color:#1F2933\n    classDef decision fill:#FDF6E7,stroke:#C9A85C,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A input\n    class B,C,D,G process\n    class E,F decision\n    class I store\n    class H output"
+        }
+    ],
+    "results": [
+        {
+            "metric": "Weekly reporting cycle",
+            "value": "Hours → minutes",
+            "description": "Consolidation, classification, analysis and deck production collapsed into a review-and-approve workflow."
+        },
+        {
+            "metric": "Entities served",
+            "value": "7 listed BUs",
+            "description": "One multi-tenant deployment with per-entity logic modules and strict access isolation."
+        },
+        {
+            "metric": "Partial-data reports",
+            "value": "Structurally impossible",
+            "description": "The export lock makes an incomplete export a blocked action rather than a reviewer's responsibility."
+        },
+        {
+            "metric": "Classification backlog",
+            "value": "Monotonically shrinking",
+            "description": "Every resolution decision is persisted and reused across entities and future weeks."
+        },
+        {
+            "metric": "Manual re-keying into slides",
+            "value": "Eliminated",
+            "description": "Decks and workbooks generate from approved data, removing the main source of reporting errors."
+        }
+    ],
+    "aiEngineering": {
+        "summary": "Two distinct AI surfaces, deliberately kept separate. A scoring layer that proposes investor-name matches for human review, and a retrieval-augmented assistant that answers ownership questions strictly from approved data. Neither is allowed to write a number into a report on its own.",
+        "models": [
+            {
+                "name": "Cohere Embed v4.0",
+                "role": "Document and query embeddings",
+                "why": "Strong retrieval quality on short, entity-dense finance text where the discriminating signal is a fund or custodian name rather than sentence semantics."
+            },
+            {
+                "name": "Azure OpenAI GPT-4.1 mini",
+                "role": "Answer synthesis over retrieved context",
+                "why": "Enterprise deployment keeps ownership data inside the tenant boundary, and the smaller model is sufficient because the task is grounded summarisation, not open reasoning. Cost per query stays low enough for interactive use."
+            },
+            {
+                "name": "Fuzzy string scorer",
+                "role": "Investor entity-resolution candidates",
+                "why": "Deterministic and explainable. An LLM proposing merges would be unauditable, and a wrong merge silently corrupts every movement figure — this is exactly where a transparent score beats a smarter black box."
+            }
+        ],
+        "retrieval": "Hybrid retrieval combining BM25 keyword matching with dense vectors. Pure vector search underperformed badly here because the important tokens are proper nouns — fund names, custodian codes, entity tickers — where exact lexical match carries most of the signal. Retrieval is scoped to the approved dataset only, so the assistant can never surface staged or unclassified data.",
+        "evaluation": "A golden set of real IR questions with verified answers is replayed against the assistant on every prompt or model change. Answers are checked for numeric agreement with the dashboard, not just plausibility, because a fluent answer with a wrong holding figure is the failure mode that matters. Retrieval is measured separately from generation so a regression can be attributed to the right stage.",
+        "guardrails": "The assistant answers only from retrieved context and cites the rows it used; when retrieval returns nothing relevant it declines rather than generalising. It has no write path — it can describe the dataset but never classify an investor or trigger an export, which keeps every number that reaches a board deck on the human-approved path."
+    },
+    "infrastructure": {
+        "hosting": "Azure VM behind an Nginx reverse proxy, with Azure Database for PostgreSQL as the managed data store and Entra ID for identity.",
+        "rationale": "Running on the group’s own Azure tenant meant shareholder data never left infrastructure the security team already governed — which is what made the platform approvable at all. Managed PostgreSQL removed backup, patching and failover from my scope, and because identity, compute and database sit in one tenant, access is administered through the same corporate controls as every other internal system rather than a bespoke one.",
+        "dataResidency": "Ownership data and generated board material stay within the enterprise Azure tenant. Model calls run against the tenant’s own Azure OpenAI deployment, so document content is never sent to a public API endpoint."
+    }
+}

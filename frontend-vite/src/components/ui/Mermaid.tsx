@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import mermaid from 'mermaid';
 import { ZoomIn, ZoomOut, RotateCcw, Maximize2, Minimize2, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Copy, Check } from 'lucide-react';
-import { useTheme } from '@/context/ThemeContext';
 
 interface MermaidProps {
     chart: string;
@@ -10,7 +9,6 @@ interface MermaidProps {
 }
 
 const Mermaid: React.FC<MermaidProps> = ({ chart, id = 'mermaid-diagram', className = '' }) => {
-    const { theme } = useTheme();
     const elementRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [scale, setScale] = useState(1);
@@ -189,10 +187,16 @@ const Mermaid: React.FC<MermaidProps> = ({ chart, id = 'mermaid-diagram', classN
                         </div>`;
                 }
 
-                // Initialize mermaid right before rendering
+                // Always the light theme. The classDef palettes authored in the
+                // posts are pale pastels with dark (#1F2933) text, i.e. drawn for
+                // a white page. Mermaid's dark theme leaves those fills alone but
+                // flips the edges, arrowheads, title and edge-label pills to light
+                // grey, which reads as washed out and half-themed. Rendering on a
+                // light plate in both site themes shows the authored colour coding
+                // exactly as intended - see the wrapper background below.
                 mermaid.initialize({
                     startOnLoad: false,
-                    theme: theme === 'dark' ? 'dark' : 'default',
+                    theme: 'default',
                     securityLevel: 'loose',
                     fontFamily: 'Inter, system-ui, sans-serif',
                 });
@@ -222,8 +226,8 @@ const Mermaid: React.FC<MermaidProps> = ({ chart, id = 'mermaid-diagram', classN
                             <div class="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
                                 <span class="text-red-500 text-2xl">!</span>
                             </div>
-                            <p class="text-foreground font-medium mb-1">Diagram Render Error</p>
-                            <p class="text-muted-foreground text-xs font-mono max-w-xs mb-4">${error instanceof Error ? error.message : 'Invalid Mermaid syntax'}</p>
+                            <p class="text-neutral-900 font-medium mb-1">Diagram Render Error</p>
+                            <p class="text-neutral-500 text-xs font-mono max-w-xs mb-4">${error instanceof Error ? error.message : 'Invalid Mermaid syntax'}</p>
                             <button onclick="window.location.reload()" class="px-4 py-2 rounded-lg bg-accent-blue/10 text-accent-blue text-xs font-mono uppercase tracking-widest hover:bg-accent-blue/20 transition-all">
                                 Reload Page
                             </button>
@@ -233,13 +237,13 @@ const Mermaid: React.FC<MermaidProps> = ({ chart, id = 'mermaid-diagram', classN
             }
         };
 
-        // Delay slightly to ensure theme and DOM are ready
+        // Delay slightly to ensure the DOM is ready
         const timeoutId = setTimeout(renderDiagram, 100);
         return () => {
             isMounted = false;
             clearTimeout(timeoutId);
         };
-    }, [chart, id, theme]);
+    }, [chart, id]);
 
     return (
         <div
@@ -248,14 +252,14 @@ const Mermaid: React.FC<MermaidProps> = ({ chart, id = 'mermaid-diagram', classN
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
-            className={`mermaid-wrapper group relative overflow-hidden rounded-2xl bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-xl transition-all duration-500 ${isFullscreen ? 'fixed inset-0 z-[100] bg-white dark:bg-black p-4 md:p-12' : 'h-[300px] sm:h-[400px] md:h-[550px] lg:h-[700px] xl:h-[800px]'} ${className}`}
+            className={`mermaid-wrapper group relative overflow-hidden rounded-2xl bg-white text-neutral-800 ring-1 ring-black/5 dark:ring-white/10 transition-all duration-500 ${isFullscreen ? 'fixed inset-0 z-[100] p-4 md:p-12' : 'h-[300px] sm:h-[400px] md:h-[550px] lg:h-[700px] xl:h-[800px]'} ${className}`}
         >
             {/* Control Bar (Top Right) */}
             <div className="absolute top-6 right-6 z-20 flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300">
                 <button
                     onMouseDown={(e) => e.stopPropagation()}
                     onClick={handleCopy}
-                    className="flex h-12 w-12 items-center justify-center rounded-2xl bg-black/5 dark:bg-white/5 text-black/50 dark:text-white/50 hover:bg-black/10 dark:hover:bg-white/10 hover:text-black dark:hover:text-white backdrop-blur-md transition-all active:scale-95"
+                    className="flex h-12 w-12 items-center justify-center rounded-2xl bg-black/5 text-black/50 hover:bg-black/10 hover:text-black backdrop-blur-md transition-all active:scale-95"
                     title="Copy SVG"
                 >
                     {isCopied ? <Check className="w-5 h-5 text-green-500" /> : <Copy className="w-5 h-5" />}
@@ -263,7 +267,7 @@ const Mermaid: React.FC<MermaidProps> = ({ chart, id = 'mermaid-diagram', classN
                 <button
                     onMouseDown={(e) => e.stopPropagation()}
                     onClick={toggleFullscreen}
-                    className="flex h-12 w-12 items-center justify-center rounded-2xl bg-black/5 dark:bg-white/5 text-black/50 dark:text-white/50 hover:bg-black/10 dark:hover:bg-white/10 hover:text-black dark:hover:text-white backdrop-blur-md transition-all active:scale-95"
+                    className="flex h-12 w-12 items-center justify-center rounded-2xl bg-black/5 text-black/50 hover:bg-black/10 hover:text-black backdrop-blur-md transition-all active:scale-95"
                     title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
                 >
                     {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
@@ -274,10 +278,10 @@ const Mermaid: React.FC<MermaidProps> = ({ chart, id = 'mermaid-diagram', classN
             <div className="absolute bottom-8 right-8 z-20 flex flex-col items-end gap-6 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
 
                 {/* Visual D-Pad Navigator */}
-                <div className="flex flex-col items-center gap-1 p-3 rounded-3xl bg-black/5 dark:bg-white/5 backdrop-blur-2xl" onMouseDown={(e) => e.stopPropagation()}>
-                    <button onClick={handlePanUp} className="p-3 text-black/30 dark:text-white/30 hover:text-black dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 rounded-2xl transition-all"><ChevronUp className="w-7 h-7" /></button>
+                <div className="flex flex-col items-center gap-1 p-3 rounded-3xl bg-black/5 backdrop-blur-2xl" onMouseDown={(e) => e.stopPropagation()}>
+                    <button onClick={handlePanUp} className="p-3 text-black/30 hover:text-black hover:bg-black/10 rounded-2xl transition-all"><ChevronUp className="w-7 h-7" /></button>
                     <div className="flex items-center gap-1">
-                        <button onClick={handlePanLeft} className="p-3 text-black/30 dark:text-white/30 hover:text-black dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 rounded-2xl transition-all"><ChevronLeft className="w-7 h-7" /></button>
+                        <button onClick={handlePanLeft} className="p-3 text-black/30 hover:text-black hover:bg-black/10 rounded-2xl transition-all"><ChevronLeft className="w-7 h-7" /></button>
                         <button
                             onClick={handleReset}
                             className="flex h-14 w-14 items-center justify-center rounded-xl bg-accent-blue/20 text-accent-blue hover:bg-accent-blue/30 transition-all active:rotate-180 duration-500"
@@ -285,15 +289,15 @@ const Mermaid: React.FC<MermaidProps> = ({ chart, id = 'mermaid-diagram', classN
                         >
                             <RotateCcw className="w-6 h-6" />
                         </button>
-                        <button onClick={handlePanRight} className="p-3 text-black/30 dark:text-white/30 hover:text-black dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 rounded-2xl transition-all"><ChevronRight className="w-7 h-7" /></button>
+                        <button onClick={handlePanRight} className="p-3 text-black/30 hover:text-black hover:bg-black/10 rounded-2xl transition-all"><ChevronRight className="w-7 h-7" /></button>
                     </div>
-                    <button onClick={handlePanDown} className="p-3 text-black/30 dark:text-white/30 hover:text-black dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 rounded-2xl transition-all"><ChevronDown className="w-7 h-7" /></button>
+                    <button onClick={handlePanDown} className="p-3 text-black/30 hover:text-black hover:bg-black/10 rounded-2xl transition-all"><ChevronDown className="w-7 h-7" /></button>
                 </div>
 
                 {/* Zoom Box */}
-                <div className="flex flex-col gap-1 p-1.5 rounded-xl bg-black/5 dark:bg-white/5 backdrop-blur-xl" onMouseDown={(e) => e.stopPropagation()}>
-                    <button onClick={handleZoomIn} className="p-4 text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 rounded-xl transition-all" title="Zoom In"><ZoomIn className="w-6 h-6" /></button>
-                    <button onClick={handleZoomOut} className="p-4 text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 rounded-xl transition-all" title="Zoom Out"><ZoomOut className="w-6 h-6" /></button>
+                <div className="flex flex-col gap-1 p-1.5 rounded-xl bg-black/5 backdrop-blur-xl" onMouseDown={(e) => e.stopPropagation()}>
+                    <button onClick={handleZoomIn} className="p-4 text-black/40 hover:text-black hover:bg-black/10 rounded-xl transition-all" title="Zoom In"><ZoomIn className="w-6 h-6" /></button>
+                    <button onClick={handleZoomOut} className="p-4 text-black/40 hover:text-black hover:bg-black/10 rounded-xl transition-all" title="Zoom Out"><ZoomOut className="w-6 h-6" /></button>
                 </div>
             </div>
 
@@ -310,10 +314,10 @@ const Mermaid: React.FC<MermaidProps> = ({ chart, id = 'mermaid-diagram', classN
 
             {/* Metadata Badges */}
             <div className="absolute bottom-8 left-8 z-20 flex gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                <div className="px-5 py-2.5 rounded-xl bg-white/60 dark:bg-black/60 backdrop-blur-md text-[11px] font-mono text-accent-blue tracking-widest uppercase">
+                <div className="px-5 py-2.5 rounded-xl bg-black/5 backdrop-blur-md text-[11px] font-mono text-[#1d4ed8] tracking-widest uppercase">
                     Scale {Math.round(scale * 100)}%
                 </div>
-                <div className="hidden sm:flex px-5 py-2.5 rounded-xl bg-white/60 dark:bg-black/60 backdrop-blur-md text-[11px] font-mono text-black/30 dark:text-white/30 tracking-widest uppercase">
+                <div className="hidden sm:flex px-5 py-2.5 rounded-xl bg-black/5 backdrop-blur-md text-[11px] font-mono text-black/30 tracking-widest uppercase">
                     Pos {Math.round(translateX)}, {Math.round(translateY)}
                 </div>
             </div>

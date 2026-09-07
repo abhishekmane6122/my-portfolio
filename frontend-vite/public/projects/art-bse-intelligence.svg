@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-label="Exchange Filing Intelligence">
+  <defs>
+    <linearGradient id="bgartbseintelligence" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#13233F"/><stop offset="100%" stop-color="#1D3557"/>
+    </linearGradient>
+    <radialGradient id="glartbseintelligence" cx="0.8" cy="0.1" r="0.7">
+      <stop offset="0%" stop-color="#7FB3D5" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#7FB3D5" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grartbseintelligence" width="44" height="44" patternUnits="userSpaceOnUse">
+      <path d="M44 0H0V44" fill="none" stroke="#FFFFFF" stroke-opacity="0.045" stroke-width="1"/>
+    </pattern>
+    <marker id="ar" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+      <path d="M0 0 L9 4.5 L0 9 z" fill="#7FB3D5" fill-opacity="0.55"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="675" fill="url(#bgartbseintelligence)"/>
+  <rect width="1200" height="675" fill="url(#grartbseintelligence)"/>
+  <rect width="1200" height="675" fill="url(#glartbseintelligence)"/>
+  <rect x="0" y="0" width="7" height="675" fill="#7FB3D5"/>
+
+  <rect x="150" y="250" width="240" height="300" rx="10" fill="#0D1A2E" fill-opacity="0.6" stroke="#7FB3D5" stroke-opacity="0.55" stroke-width="2"/>
+  <rect x="176" y="268" width="240" height="300" rx="10" fill="#0D1A2E" fill-opacity="0.6" stroke="#7FB3D5" stroke-opacity="0.43" stroke-width="2"/>
+  <rect x="202" y="286" width="240" height="300" rx="10" fill="#0D1A2E" fill-opacity="0.6" stroke="#7FB3D5" stroke-opacity="0.31" stroke-width="2"/>
+  <rect x="228" y="310" width="170" height="11" rx="5" fill="#7FB3D5" fill-opacity="0.34"/>
+  <rect x="228" y="346" width="132" height="11" rx="5" fill="#7FB3D5" fill-opacity="0.34"/>
+  <rect x="228" y="382" width="94" height="11" rx="5" fill="#7FB3D5" fill-opacity="0.34"/>
+  <rect x="228" y="418" width="170" height="11" rx="5" fill="#7FB3D5" fill-opacity="0.34"/>
+  <rect x="228" y="454" width="132" height="11" rx="5" fill="#7FB3D5" fill-opacity="0.34"/>
+  <rect x="228" y="490" width="94" height="11" rx="5" fill="#7FB3D5" fill-opacity="0.34"/>
+  <path d="M448 400 L560 400" stroke="#7FB3D5" stroke-opacity="0.5" stroke-width="2" marker-end="url(#ar)"/>
+  <rect x="580" y="280" width="480" height="52" rx="9" fill="#7FB3D5" fill-opacity="0.12" stroke="#7FB3D5" stroke-opacity="0.4"/>
+  <rect x="602" y="300" width="110" height="12" rx="6" fill="#7FB3D5" fill-opacity="0.55"/>
+  <rect x="736" y="300" width="300" height="12" rx="6" fill="#7FB3D5" fill-opacity="0.3"/>
+  <rect x="580" y="348" width="480" height="52" rx="9" fill="#7FB3D5" fill-opacity="0.17" stroke="#7FB3D5" stroke-opacity="0.4"/>
+  <rect x="602" y="368" width="110" height="12" rx="6" fill="#7FB3D5" fill-opacity="0.55"/>
+  <rect x="736" y="368" width="254" height="12" rx="6" fill="#7FB3D5" fill-opacity="0.3"/>
+  <rect x="580" y="416" width="480" height="52" rx="9" fill="#7FB3D5" fill-opacity="0.22" stroke="#7FB3D5" stroke-opacity="0.4"/>
+  <rect x="602" y="436" width="110" height="12" rx="6" fill="#7FB3D5" fill-opacity="0.55"/>
+  <rect x="736" y="436" width="208" height="12" rx="6" fill="#7FB3D5" fill-opacity="0.3"/>
+  <rect x="580" y="484" width="480" height="52" rx="9" fill="#7FB3D5" fill-opacity="0.27" stroke="#7FB3D5" stroke-opacity="0.4"/>
+  <rect x="602" y="504" width="110" height="12" rx="6" fill="#7FB3D5" fill-opacity="0.55"/>
+  <rect x="736" y="504" width="162" height="12" rx="6" fill="#7FB3D5" fill-opacity="0.3"/>
+
+  <text x="90" y="120" font-family="ui-monospace,SFMono-Regular,Menlo,monospace"
+        font-size="19" fill="#7FB3D5" letter-spacing="6">DOCUMENT AI</text>
+  <text x="90" y="182" font-family="Georgia,serif" font-size="52" fill="#FFFFFF">Exchange Filing Intelligence</text>
+</svg>

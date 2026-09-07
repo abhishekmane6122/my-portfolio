@@ -14,6 +14,69 @@ export interface ProjectData {
     flowDiagram?: { nodes: any[]; edges: any[]; height?: string; title?: string };
 }
 
+/**
+ * Case-study shape for the Projects section.
+ *
+ * Deliberately carries no code snippets - these are client engagements, and the
+ * showcase is about problem framing, system design and engineering judgement,
+ * not implementation listings.
+ */
+export interface ProjectCaseStudy {
+    id: string;
+    slug: string;
+    title: string;
+    tagline: string;
+    /** Short label used for filtering and the card chip, e.g. "Regulatory AI". */
+    category: string;
+    /** Business domain the system operates in, e.g. "Capital Markets". */
+    domain: string;
+    year: string;
+    role: string;
+    duration: string;
+    team: string[];
+    featured: boolean;
+    /** Path to the generated project artwork (SVG). */
+    art: string;
+    /** Accent hex used to theme the card and detail hero. */
+    accent: string;
+    /** One-line scannable outcome shown on the card. */
+    headline: string;
+    /** Three to five scannable wins. */
+    highlights: string[];
+    context: string;
+    problem: string;
+    approach: string;
+    solution: string;
+    systemDesign: {
+        overview: string;
+        components: { name: string; responsibility: string; tech: string }[];
+        dataFlow: { stage: string; detail: string }[];
+    };
+    /**
+     * The AI/ML engineering story: which models, why those models, how quality
+     * was measured, and what stops the system misbehaving. Surfaced as its own
+     * section because it is the part that matters most for AI roles.
+     */
+    aiEngineering?: {
+        summary: string;
+        models: { name: string; role: string; why: string }[];
+        retrieval?: string;
+        evaluation: string;
+        guardrails: string;
+    };
+    /** Why the hosting choice mattered to the business, not just the ops team. */
+    infrastructure?: {
+        hosting: string;
+        rationale: string;
+        dataResidency?: string;
+    };
+    decisions: { issue: string; choice: string; rationale: string; tradeoff?: string }[];
+    challenges: { title: string; description: string; solution: string }[];
+    techStack: { category: string; technologies: string[] }[];
+    diagrams: { title: string; caption?: string; chart: string }[];
+    results: { metric: string; value: string; description: string }[];
+}
+
 // Detailed project for case studies
 export interface ProjectDetailed {
     id: string;

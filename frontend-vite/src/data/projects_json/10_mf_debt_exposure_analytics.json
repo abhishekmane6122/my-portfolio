@@ -1,0 +1,257 @@
+{
+    "id": "mutual-fund-debt-exposure-analytics",
+    "slug": "mutual-fund-debt-exposure-analytics",
+    "title": "Mutual Fund Debt Exposure Analytics",
+    "tagline": "A treasury-grade analytics platform that replaces a 29,000-row monthly exposure spreadsheet with a governed data model, a deterministic derived-field engine, and a constrained self-service formula builder.",
+    "category": "Treasury Analytics",
+    "domain": "Debt Capital Markets · Treasury",
+    "year": "2026",
+    "role": "Full Stack Engineer — data modelling, backend architecture, normalization engine, SSO, deployment",
+    "duration": "Sprint-based delivery into production",
+    "team": [
+        "Solo build — architecture through production"
+    ],
+    "featured": false,
+    "art": "/projects/art-mf-exposure.svg",
+    "accent": "#A78BFA",
+    "headline": "Ends the monthly ritual of rebuilding pivot tables by making every derived field a server-side calculation with one definition.",
+    "highlights": [
+        "~29,000 holding rows parsed, validated, mapped and re-derived on every upload",
+        "Derived fields computed centrally, so two analysts can no longer produce two defensible answers",
+        "Name reconciliation held as admin-editable data with a visible fallback, never a silent drop",
+        "A formula builder over a whitelisted grammar — self-service without arbitrary query access",
+        "Header auto-detection and column aliasing that survive a hand-made input file"
+    ],
+    "context": "A debt markets team tracked mutual fund exposure through a monthly workbook of roughly 29,000 holding rows. Every question leadership asked — exposure by asset manager, issuer, corporate group, credit rating or tenor — was answered by rebuilding pivot tables by hand, from a file that arrived slightly different every month.",
+    "problem": "### Why this was a risk, not just a chore\n\n**Derived fields were recomputed by hand every cycle.** Group attribution, fund category, issuer category, long-term versus short-term classification, rating buckets and tenor bands are all *derived* from raw holdings. Each lived as a formula in someone's copy of the workbook. Two analysts could produce two different numbers from the same source and both be defensible.\n\n**Names never matched.** Three spellings of one asset manager split a single exposure into three modest positions, understating concentration — precisely the number a treasury desk cannot get wrong.\n\n**Month-over-month comparison was manual.** Comparing cycles meant opening two workbooks side by side and trusting that categories had been derived identically in both.\n\n**Ad-hoc questions had no path.** Every new question meant another bespoke pivot, which meant another chance to introduce an error.\n\n**None of these failures announce themselves.** A misclassified issuer or a split name produces a clean-looking chart with a wrong concentration figure — discovered, if at all, only when it matters.",
+    "approach": "The governing decision was to treat the uploaded workbook as **raw input only** and recalculate every derived field server-side on ingest, from one canonical implementation.\n\nThat single choice is what makes the rest work. A number cannot differ depending on whose copy of which file was opened, and changing a classification rule reprocesses history consistently instead of leaving old cycles on old logic.\n\nThe second decision was to hold name reconciliation as **data rather than code** — mapping tables editable through the admin UI, because a new asset-manager alias appearing next month is a data-entry task, not a deployment. Unmapped values land in a clearly labelled bucket rather than being silently dropped, because visible incompleteness gets fixed and invisible loss does not.\n\nThe third was to answer ad-hoc questions with a **constrained formula builder** rather than an endless bespoke-report queue. The expression surface is deliberately narrow — a whitelisted grammar over known dimensions and measures, compiled to parameterised queries — so analysts get self-service without the platform acquiring an arbitrary query engine over production data.",
+    "solution": "An upload is persisted verbatim, then parsed with header auto-detection and column aliasing so a shifted header row or renamed column does not break the cycle. Raw rows are stored alongside normalized ones, because when a number looks wrong the first question is always what the source actually said.\n\nRows are validated, with failures captured into a per-upload validation report rather than aborting the run. Surviving rows are normalized through reference and alias tables, then passed through the derived-field engine which recalculates group, category, LT/ST, rating bucket and tenor band deterministically.\n\nNormalized holdings feed the analytics APIs, the month-over-month comparison, and the formula builder. Access is governed by single sign-on with an admin and viewer split, and new users land on an access-request page pending approval.",
+    "systemDesign": {
+        "overview": "A layered FastAPI service — routes, services, repositories, models — with an ingest-time normalization pipeline and raw-row preservation. Parsing, validation, mapping, analytics, custom calculation and reporting are each their own service, and the repository boundary keeps the data-access layer swappable.",
+        "components": [
+            {
+                "name": "Upload service",
+                "responsibility": "Persists the original workbook before any processing, so the source is always recoverable for reconciliation",
+                "tech": "FastAPI · object storage"
+            },
+            {
+                "name": "Excel parser",
+                "responsibility": "Locates the real header row by column signature and resolves renamed columns through an alias table",
+                "tech": "openpyxl · Pandas · header auto-detection"
+            },
+            {
+                "name": "Validation service",
+                "responsibility": "Checks rows against expectations and captures failures into a per-upload report instead of aborting the run",
+                "tech": "Rule-based validation · validation report"
+            },
+            {
+                "name": "Mapping service",
+                "responsibility": "Resolves asset manager, issuer and group names through admin-editable reference and alias tables, with a visible fallback bucket",
+                "tech": "Reference tables · alias resolution"
+            },
+            {
+                "name": "Derived-field engine",
+                "responsibility": "Recalculates group, fund category, issuer category, LT/ST, rating bucket and tenor band from raw rows on every ingest",
+                "tech": "Deterministic calculation rules"
+            },
+            {
+                "name": "Analytics service",
+                "responsibility": "Serves grouped exposure across dimensions plus drilldown and month-over-month comparison",
+                "tech": "Azure PostgreSQL · Pandas"
+            },
+            {
+                "name": "Custom calculation service",
+                "responsibility": "Compiles analyst-composed specs over a whitelisted grammar into parameterised queries",
+                "tech": "Whitelisted dimension/measure grammar"
+            },
+            {
+                "name": "Identity & access",
+                "responsibility": "Single sign-on with admin and viewer roles, and an access-request approval flow for new users",
+                "tech": "Entra ID · MSAL · HttpOnly session cookie"
+            }
+        ],
+        "dataFlow": [
+            {
+                "stage": "1 · Upload",
+                "detail": "The monthly workbook is uploaded and the original file persisted before anything is parsed."
+            },
+            {
+                "stage": "2 · Parse",
+                "detail": "The real header row is located by scanning for a signature of expected columns; renamed columns resolve through the alias table."
+            },
+            {
+                "stage": "3 · Store raw",
+                "detail": "Raw rows are stored verbatim alongside what follows, so any figure can be traced back to exactly what the source said."
+            },
+            {
+                "stage": "4 · Validate",
+                "detail": "Rows are checked against expectations; failures land in a per-upload validation report rather than stopping the cycle."
+            },
+            {
+                "stage": "5 · Map",
+                "detail": "Asset manager, issuer and group names resolve through admin-maintained tables, with unmapped values routed to a visible bucket."
+            },
+            {
+                "stage": "6 · Derive",
+                "detail": "The derived-field engine recalculates category, LT/ST, rating bucket and tenor band from one canonical implementation."
+            },
+            {
+                "stage": "7 · Serve",
+                "detail": "Normalized holdings feed dashboards, drilldowns, month-over-month comparison and the formula builder."
+            }
+        ]
+    },
+    "aiEngineering": {
+        "summary": "Deliberately not an AI system. The failure mode here was inconsistent arithmetic, not unstructured text, and a deterministic rules engine is the correct — and more defensible — answer for a treasury desk. The judgement worth showing is knowing when a model is the wrong tool.",
+        "models": [
+            {
+                "name": "None in the calculation path",
+                "role": "Explicit non-use",
+                "why": "Exposure figures feed treasury decisions and must be reproducible and auditable to the exact rule that produced them. A model in that path would trade determinism for nothing — the classification logic is well-specified, so rules are both cheaper and provably correct in a way inference is not."
+            },
+            {
+                "name": "Fuzzy string scoring (deterministic)",
+                "role": "Name reconciliation assistance",
+                "why": "Suggests likely matches for unmapped names so an admin can resolve them quickly, but never auto-applies a merge. A wrong merge understates concentration silently, so the scorer proposes and a human decides — the same explainable-over-clever trade made elsewhere in the portfolio."
+            }
+        ],
+        "evaluation": "Correctness was validated by reconciling platform output against the existing manual workbook for prior cycles — every derived field, every aggregate, at row level where they disagreed. Discrepancies were as often errors in the manual process as in the platform, which is exactly the argument for centralising the calculation. The per-upload validation report then serves as the ongoing check: an unexpected jump in rejected rows or unmapped names signals an upstream format change before it reaches a chart.",
+        "guardrails": "Unmapped names surface in a labelled bucket rather than being dropped, so incompleteness is visible in the numbers themselves. Raw rows are retained so any figure can be reconciled to source. The formula builder compiles only whitelisted dimensions, measures and operators into parameterised queries — there is no expression evaluator and no string interpolation into SQL, which is what keeps a self-service feature from becoming arbitrary execution against the data."
+    },
+    "infrastructure": {
+        "hosting": "Azure VM serving both the API and the built SPA as a single process behind a shared Nginx portal, with Azure Database for PostgreSQL as the store.",
+        "rationale": "Holdings data reveals the group's credit exposure, so keeping it inside the corporate Azure tenant was the baseline requirement rather than an optimisation. Managed PostgreSQL meant backups, patching and point-in-time recovery came for free on a system whose whole value is being the authoritative record — losing a cycle would mean rebuilding from spreadsheets. Serving the SPA from the same process as the API kept deployment to one unit on the shared portal, which matters when a small team operates several internal applications.",
+        "dataResidency": "Uploaded workbooks, raw rows, normalized holdings and mappings all remain inside the enterprise Azure tenant."
+    },
+    "decisions": [
+        {
+            "issue": "Where derived fields should be computed",
+            "choice": "Recalculated server-side on every ingest from raw rows, never trusted from the workbook",
+            "rationale": "The workbook's own derived columns were the source of the inconsistency, since each analyst's copy could drift. Deriving centrally makes numbers reproducible and lets a corrected rule reprocess prior cycles rather than leaving history on stale logic.",
+            "tradeoff": "The platform now owns classification rules that used to live with the business, so a rule change is a code change — made acceptable by keeping the mappings those rules consume as editable data."
+        },
+        {
+            "issue": "Name reconciliation as hardcoded map or editable data",
+            "choice": "Admin-editable mapping and alias tables with an explicit fallback bucket",
+            "rationale": "New aliases appear every month. Hardcoding makes routine data maintenance a release, which guarantees the mappings rot. A visible fallback means incompleteness is something the desk can see and fix rather than a silent loss.",
+            "tradeoff": "Depends on someone maintaining mappings — surfaced directly in the UI so the backlog is visible rather than discovered later."
+        },
+        {
+            "issue": "Bespoke reports or a formula builder",
+            "choice": "A constrained, server-evaluated custom-calculation endpoint over a whitelisted grammar",
+            "rationale": "An unbounded report backlog was the actual failure mode of the old process. A narrow expression surface gives analysts self-service without exposing arbitrary evaluation against the data store.",
+            "tradeoff": "Some questions fall outside the grammar and still need engineering — the correct boundary when the alternative is an open query engine over exposure data."
+        },
+        {
+            "issue": "Aborting or continuing on bad rows",
+            "choice": "Capture failures into a per-upload validation report and continue processing",
+            "rationale": "The monthly file is produced by hand and always contains some defects. Aborting the whole cycle over a handful of malformed rows makes the platform unusable; silently skipping them makes it untrustworthy. A report does neither.",
+            "tradeoff": "Analysts must review the validation report to know their data is complete, which is deliberately made part of the cycle."
+        }
+    ],
+    "challenges": [
+        {
+            "title": "The input schema was never quite the same twice",
+            "description": "The monthly workbook is produced by hand upstream. Header rows shift position, column names drift between cycles, and blank or merged rows appear without warning. A parser assuming fixed positions breaks on the first cycle and, worse, silently mis-parses on the second.",
+            "solution": "Header auto-detection locates the real header row by scanning for a signature of expected columns, combined with an alias table so a renamed column still resolves to the same field. Rows failing validation are captured into a per-upload report rather than aborting, so an analyst sees exactly which rows were rejected and why."
+        },
+        {
+            "title": "Split entity names understating concentration risk",
+            "description": "Concentration is the entire point of the analysis, and name fragmentation is precisely what destroys it. Three spellings of one asset manager present as three modest positions rather than one large one — a wrong answer that looks completely normal.",
+            "solution": "Normalization resolves every asset manager, issuer and group through admin-maintained mapping tables before aggregation, with unmapped values routed to a visible fallback. Because mappings are data, the desk closes gaps as they appear; because the fallback is visible, nobody mistakes an incomplete mapping for a small position."
+        },
+        {
+            "title": "Self-service analysis without arbitrary code execution",
+            "description": "Analysts needed to compose their own filters and aggregations, but the naive implementation of a formula builder is a direct path to evaluating untrusted expressions against production data.",
+            "solution": "The builder compiles user selections into a constrained internal representation over a whitelist of known dimensions, measures and operators, then translates that into parameterised queries. There is no general-purpose evaluator and no string interpolation into SQL — a user can only express questions the model already understands."
+        },
+        {
+            "title": "Single sign-on across a shared multi-app portal",
+            "description": "Several internal applications share one reverse proxy and one registered identity-provider application, so every OAuth callback arrives at the same redirect URI and must be routed back to the correct backend.",
+            "solution": "The application identifier is embedded in the OAuth state parameter, and the proxy demultiplexes callbacks by matching on it before forwarding upstream. A new application could join the portal without registering a new identity-provider app or coordinating a redirect-URI change across teams."
+        }
+    ],
+    "techStack": [
+        {
+            "category": "Backend",
+            "technologies": [
+                "Python",
+                "FastAPI",
+                "Pydantic",
+                "Repository / service layering",
+                "Pytest"
+            ]
+        },
+        {
+            "category": "Data Platform",
+            "technologies": [
+                "Azure Database for PostgreSQL",
+                "Pandas",
+                "openpyxl",
+                "Header auto-detection & column aliasing",
+                "Deterministic derived-field engine",
+                "Raw-row preservation"
+            ]
+        },
+        {
+            "category": "Frontend",
+            "technologies": [
+                "React 18",
+                "TypeScript",
+                "Vite",
+                "Tailwind CSS v4",
+                "Interactive dashboards & drilldowns"
+            ]
+        },
+        {
+            "category": "Cloud & Security",
+            "technologies": [
+                "Azure VM",
+                "Microsoft Entra ID SSO (MSAL)",
+                "HttpOnly session cookies",
+                "Admin / viewer roles",
+                "Access-request approval flow",
+                "Nginx shared portal"
+            ]
+        }
+    ],
+    "diagrams": [
+        {
+            "title": "Ingestion and normalization",
+            "caption": "Raw rows are kept because the first question about a wrong number is always what the source said.",
+            "chart": "---\ntitle: \"Monthly Workbook Ingestion\"\n---\nflowchart TD\n    A[\"Monthly exposure workbook\"] --> B[\"Admin upload\"]\n    B --> C[\"Persist original file\"]\n    C --> D[\"Parse<br/>header auto-detect + column aliases\"]\n    D --> E[(\"Raw rows stored verbatim\")]\n    E --> F[\"Validate rows\"]\n    F --> G{\"Row valid\"}\n    G -->|No| H[\"Validation report<br/>rejected rows with reasons\"]\n    G -->|Yes| I[\"Normalize names<br/>AMC, issuer, group\"]\n    I --> J{\"Mapping found\"}\n    J -->|No| K[\"Visible fallback bucket\"]\n    J -->|Yes| L[\"Derived-field engine\"]\n    K --> L\n    L --> M[(\"Normalized holdings\")]\n    M --> N[\"Analytics APIs\"]\n    M --> O[\"Formula builder\"]\n    M --> P[\"Month-over-month comparison\"]\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef store fill:#F3F0F8,stroke:#8880AE,stroke-width:1px,color:#1F2933\n    classDef decision fill:#FDF6E7,stroke:#C9A85C,stroke-width:1px,color:#1F2933\n    classDef risk fill:#FBEDED,stroke:#C08383,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A,B input\n    class C,D,F,I,L process\n    class E,M store\n    class G,J decision\n    class H,K risk\n    class N,O,P output"
+        },
+        {
+            "title": "SSO callback demultiplexing",
+            "caption": "One registered redirect URI serving several internal applications.",
+            "chart": "---\ntitle: \"Shared Portal Sign-In\"\n---\nsequenceDiagram\n    participant U as User\n    participant N as Nginx portal\n    participant A as This application\n    participant E as Entra ID\n\n    U->>N: Open application path\n    N->>A: Proxy to reserved port\n    A->>U: Redirect to sign-in, app key embedded in state\n    U->>E: Authenticate\n    E->>N: Callback to the single shared redirect URI\n    N->>N: Inspect state, match app key\n    N->>A: Forward callback to the correct upstream\n    A->>A: Exchange code, resolve role, issue session cookie\n    A->>U: Redirect to dashboard\n"
+        }
+    ],
+    "results": [
+        {
+            "metric": "Monthly analysis cycle",
+            "value": "Pivots → upload & explore",
+            "description": "The recurring manual reconstruction of derived fields and pivot tables was replaced by one governed ingest."
+        },
+        {
+            "metric": "Rows normalized per cycle",
+            "value": "~29,000",
+            "description": "Parsed, validated, mapped and re-derived deterministically on every upload."
+        },
+        {
+            "metric": "Number consistency",
+            "value": "Single definition",
+            "description": "Derived fields computed once, server-side, so two analysts cannot produce two defensible answers."
+        },
+        {
+            "metric": "Ad-hoc questions",
+            "value": "Self-service",
+            "description": "The formula builder removed the bespoke-report backlog without opening arbitrary query access."
+        },
+        {
+            "metric": "Data loss on bad rows",
+            "value": "None, and visible",
+            "description": "Rejected rows and unmapped names surface in reports instead of disappearing."
+        }
+    ]
+}

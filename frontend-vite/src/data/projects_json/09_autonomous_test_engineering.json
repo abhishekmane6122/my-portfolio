@@ -1,0 +1,234 @@
+{
+    "id": "autonomous-test-engineering",
+    "slug": "autonomous-test-engineering-agent",
+    "title": "Autonomous Test Engineering Agent",
+    "tagline": "An agentic system that reads a web application, derives the requirements it appears to implement, and generates structured user stories, test plans and executable test cases — turning QA authoring from writing into reviewing.",
+    "category": "Agentic AI",
+    "domain": "Quality Engineering · Developer Tooling",
+    "year": "2026",
+    "role": "AI Engineer — agent design, decomposition strategy, output contracts, frontend",
+    "duration": "Self-initiated build",
+    "team": [
+        "Solo build — architecture through working product"
+    ],
+    "featured": false,
+    "art": "/projects/art-testmu.svg",
+    "accent": "#6FB6C9",
+    "headline": "Inverts QA authoring: the agent produces the first draft of requirements and tests, and the engineer's expertise goes into judging coverage rather than typing cases.",
+    "highlights": [
+        "Multi-stage decomposition — explore, infer requirements, derive stories, expand to cases — rather than one prompt",
+        "Schema-constrained output so every artefact is structured data, not prose to re-key",
+        "Explicit negative, boundary and error-path generation, which is where human authors under time pressure stop",
+        "Traceability from generated case back to the inferred requirement that justified it",
+        "Human-review-first design: the agent drafts, the engineer approves"
+    ],
+    "context": "Writing test plans and user stories is repetitive, time-consuming, and consistently the first thing sacrificed when a release date tightens. The irony is well known to every QA engineer: the documentation that would catch regressions is skipped precisely when the schedule makes regressions most likely. The knowledge required is real, but most of the effort is transcription rather than judgement.",
+    "problem": "### Why naive generation does not solve this\n\n**Asking a model for test cases produces plausible noise.** A single prompt yields generically correct cases untethered to the application in question — the kind of output that takes longer to correct than to have written.\n\n**Requirements are usually implicit.** Real projects rarely have a specification precise enough to generate from. The requirements exist in the application's behaviour and in people's heads, so anything useful must infer them from what the application actually does.\n\n**The valuable cases are the ones humans skip.** Happy paths are easy and get written. Negative inputs, boundary values, permission failures and error recovery are where defects live and where tired authors stop.\n\n**Free-text output creates work.** Test cases delivered as prose have to be re-keyed into a management tool. An artefact that cannot be consumed programmatically has moved the effort rather than removed it.\n\n**Nobody should trust generated tests blindly.** A test suite is a specification of intended behaviour. Accepting one unreviewed encodes a model's assumptions as the definition of correct.",
+    "approach": "I built this as **a decomposition pipeline rather than a generator**. Asking for test cases in one shot conflates four separate reasoning tasks; separating them gives each a narrow job it can do well and a checkable output.\n\nThe agent first explores the application surface to establish what exists — pages, forms, fields, controls, flows. From that it infers the requirements the application appears to implement. From requirements it derives user stories with acceptance criteria. Only then does it expand each acceptance criterion into concrete test cases.\n\nThis matters because each stage constrains the next. Cases generated from acceptance criteria that came from inferred requirements are anchored to the actual application; cases generated from a single prompt are anchored to nothing.\n\nThe second decision was **schema-constrained output at every stage**, so each artefact is structured data with stable fields rather than prose. That makes the output consumable by a test management tool and makes the pipeline checkable — a malformed stage fails loudly instead of producing convincing text.\n\nThe third was to explicitly generate **negative, boundary and error paths as their own expansion step**, because those are exactly what gets dropped under deadline pressure, and they are the reason this is worth automating at all.",
+    "solution": "The agent takes an application surface and walks it to build a structural inventory — routes, forms, input fields with their types and constraints, actions and navigation paths. That inventory is the grounding for everything downstream.\n\nA requirements inference stage proposes what each observed element implies about intended behaviour. A story derivation stage converts those into user stories with explicit acceptance criteria. A case expansion stage then produces test cases per criterion, deliberately generating positive, negative, boundary and error-path variants as separate categories rather than hoping they emerge.\n\nEvery artefact is emitted against a fixed schema and carries a link back to the requirement that justified it, so a reviewer can see why a case exists. The frontend presents the generated hierarchy for review, editing and export, with the engineer approving rather than authoring.",
+    "systemDesign": {
+        "overview": "A staged agent pipeline where each stage has one reasoning job and a schema-constrained output, and each stage's output is the next stage's grounding. The frontend is a review surface over the generated hierarchy rather than an authoring tool.",
+        "components": [
+            {
+                "name": "Surface explorer",
+                "responsibility": "Walks the application to inventory routes, forms, fields with types and constraints, controls and navigation paths",
+                "tech": "Structural traversal · DOM inspection"
+            },
+            {
+                "name": "Requirement inferrer",
+                "responsibility": "Proposes the behaviour each observed element implies, producing candidate requirements grounded in the inventory",
+                "tech": "Schema-constrained generation"
+            },
+            {
+                "name": "Story deriver",
+                "responsibility": "Converts requirements into user stories with explicit, testable acceptance criteria",
+                "tech": "Structured story schema"
+            },
+            {
+                "name": "Case expander",
+                "responsibility": "Expands each acceptance criterion into positive, negative, boundary and error-path cases as separate categories",
+                "tech": "Category-driven expansion"
+            },
+            {
+                "name": "Traceability linker",
+                "responsibility": "Maintains the chain from generated case back through story and requirement to the observed element",
+                "tech": "Artefact linkage graph"
+            },
+            {
+                "name": "Schema validator",
+                "responsibility": "Enforces the output contract at every stage so a malformed result fails loudly rather than passing on as plausible text",
+                "tech": "Schema validation gates"
+            },
+            {
+                "name": "Review workspace",
+                "responsibility": "Presents the generated hierarchy for inspection, editing, approval and export",
+                "tech": "React · TypeScript · Tailwind"
+            }
+        ],
+        "dataFlow": [
+            {
+                "stage": "1 · Explore",
+                "detail": "The application surface is walked to produce a structural inventory of routes, forms, fields, constraints and controls."
+            },
+            {
+                "stage": "2 · Infer",
+                "detail": "Each observed element is used to propose the behaviour it implies, producing candidate requirements grounded in what actually exists."
+            },
+            {
+                "stage": "3 · Derive",
+                "detail": "Requirements become user stories with explicit acceptance criteria, each phrased to be testable rather than aspirational."
+            },
+            {
+                "stage": "4 · Expand",
+                "detail": "Each acceptance criterion is expanded into cases by category — positive, negative, boundary, error path — so the hard categories are generated deliberately."
+            },
+            {
+                "stage": "5 · Link",
+                "detail": "Every case retains a traceable link back through its story and requirement to the element that justified it."
+            },
+            {
+                "stage": "6 · Validate",
+                "detail": "Schema validation at each boundary ensures artefacts are structured data, not prose that merely looks right."
+            },
+            {
+                "stage": "7 · Review",
+                "detail": "The engineer inspects, edits and approves the hierarchy, then exports it for use in the test management workflow."
+            }
+        ]
+    },
+    "aiEngineering": {
+        "summary": "An agentic decomposition system where the engineering is in the pipeline shape and the output contracts, not the prompt. Each stage does one reasoning task, is grounded in the previous stage's structured output, and fails loudly rather than producing convincing text.",
+        "models": [
+            {
+                "name": "Instruction-tuned LLM (schema-constrained)",
+                "role": "Requirement inference, story derivation, case expansion",
+                "why": "Every stage is a bounded transformation with a fixed output schema rather than open generation, so instruction-following and format adherence matter far more than reasoning depth. That makes a mid-tier model both sufficient and preferable — cheap enough to re-run the whole pipeline whenever a stage prompt changes, which is what made iterating on the decomposition practical."
+            }
+        ],
+        "retrieval": "Not a retrieval system. The equivalent grounding mechanism is the structural inventory: every generated artefact must be traceable to an element the explorer actually observed, which is what stops the agent inventing features the application does not have. Grounding comes from structure rather than from retrieved text.",
+        "evaluation": "The measure that mattered was coverage against a human-authored baseline: for a known application, did the agent produce the cases a competent QA engineer would write, and what did it miss. Category counts were tracked separately, because an agent producing forty happy-path cases and two negative ones is worse than useless — it looks thorough and is not. Schema validity is a hard gate rather than a metric; a stage either emits a valid artefact or fails.",
+        "guardrails": "Nothing is auto-approved. The output is explicitly a first draft for an engineer to review, because a test suite defines intended behaviour and accepting one unreviewed would encode the model's assumptions as the specification. Traceability links let a reviewer see why each case exists and reject cases whose justifying requirement was inferred wrongly. Schema gates prevent a malformed stage from silently degrading the artefacts downstream of it."
+    },
+    "infrastructure": {
+        "hosting": "Runs as a local development-time tool with a React frontend and a service backend; no persistent production infrastructure required.",
+        "rationale": "This is developer tooling, used during authoring rather than at runtime, so it runs where the engineer works instead of as a hosted service. That keeps application structure — which for internal systems reveals functionality and access paths — on the developer's machine, and it means adoption needs no platform provisioning or security review to try.",
+        "dataResidency": "Application structure and generated artefacts stay local to the developer environment; only the bounded prompt content for each stage reaches the model."
+    },
+    "decisions": [
+        {
+            "issue": "One generation call or a staged decomposition",
+            "choice": "Four distinct stages — explore, infer requirements, derive stories, expand cases",
+            "rationale": "A single prompt conflates four different reasoning tasks and produces generically plausible cases anchored to nothing. Staging means each step has a narrow job, a checkable output, and grounding from the step before it.",
+            "tradeoff": "More model calls, more latency and more prompt surface to maintain — paid for by output that is actually about the application under test."
+        },
+        {
+            "issue": "Free-text or schema-constrained artefacts",
+            "choice": "A fixed schema enforced at every stage boundary",
+            "rationale": "Prose test cases have to be re-keyed into a management tool, which moves the work rather than removing it. Structured output is consumable programmatically and makes the pipeline checkable — a malformed stage fails instead of passing on text that reads correctly.",
+            "tradeoff": "Less expressive than free text for unusual cases; the reviewer can edit anything the schema constrains awkwardly."
+        },
+        {
+            "issue": "Whether negative and boundary cases would emerge naturally",
+            "choice": "Generate them as explicit, separate expansion categories",
+            "rationale": "They do not emerge naturally — models, like tired humans, gravitate to the happy path. Since these categories are exactly where defects live and where manual authoring stops, generating them deliberately is the main reason the tool has value.",
+            "tradeoff": "Produces more cases than a reviewer may want, including some redundant ones. Over-generation is easy to prune; absence is invisible."
+        },
+        {
+            "issue": "Auto-accept generated tests or require review",
+            "choice": "Human review required; the tool drafts and the engineer approves",
+            "rationale": "A test suite is a specification of intended behaviour. Accepting one unreviewed encodes the model's inferences as the definition of correct, which is a subtle and expensive way to be wrong.",
+            "tradeoff": "The tool does not remove the engineer from the loop — it changes their work from authoring to judging, which is where their expertise is actually worth spending."
+        }
+    ],
+    "challenges": [
+        {
+            "title": "First attempt produced confident, useless cases",
+            "description": "A direct prompt for test cases returned output that read like professional QA work and was untethered from the application — testing features that did not exist and missing the ones that did. It was worse than nothing, because reviewing and correcting it took longer than authoring from scratch.",
+            "solution": "I restructured around grounding: nothing is generated that cannot be traced to an element the explorer actually observed. The requirement inference stage works from the structural inventory rather than from a description, so every downstream artefact inherits that anchoring."
+        },
+        {
+            "title": "The model kept writing happy paths",
+            "description": "Even with good grounding, generated cases skewed heavily toward successful flows. Asking for 'thorough coverage' in the prompt produced more happy-path cases rather than different categories of case.",
+            "solution": "I made category an explicit dimension of the expansion stage rather than an instruction inside it. Each acceptance criterion is expanded once per category — positive, negative, boundary, error path — so coverage of the hard categories is structural rather than dependent on the model choosing to be thorough."
+        },
+        {
+            "title": "Later stages inheriting earlier mistakes invisibly",
+            "description": "When requirement inference got something wrong, every story and case derived from it was confidently wrong too, and the error was hardest to spot at the point where the most output existed.",
+            "solution": "Traceability links let a reviewer collapse the hierarchy to requirements, judge those first, and reject a whole branch in one action rather than reading dozens of cases. Reviewing top-down turned out to be dramatically faster than reviewing the generated cases directly."
+        },
+        {
+            "title": "Keeping generated artefacts machine-consumable",
+            "description": "Any stage drifting into prose broke downstream parsing, and the failure surfaced late — as malformed exports rather than as an error at the point of generation.",
+            "solution": "Schema validation runs at every stage boundary, so a stage that fails to produce a valid artefact fails immediately with a clear cause. This converted a class of confusing downstream symptoms into a single obvious failure at the source."
+        }
+    ],
+    "techStack": [
+        {
+            "category": "AI & Agent Design",
+            "technologies": [
+                "Staged decomposition pipeline",
+                "Schema-constrained generation",
+                "Category-driven case expansion",
+                "Artefact traceability graph",
+                "Validation gates between stages"
+            ]
+        },
+        {
+            "category": "Frontend",
+            "technologies": [
+                "React",
+                "TypeScript",
+                "Vite",
+                "Tailwind CSS",
+                "Hierarchical review workspace"
+            ]
+        },
+        {
+            "category": "Tooling",
+            "technologies": [
+                "Application surface traversal",
+                "Structured export for test management",
+                "Local-first developer tooling"
+            ]
+        }
+    ],
+    "diagrams": [
+        {
+            "title": "Decomposition pipeline",
+            "caption": "Each stage grounds the next — which is what stops the agent inventing features.",
+            "chart": "---\ntitle: \"From Application Surface to Test Cases\"\n---\nflowchart TD\n    A[\"Web application under test\"] --> B[\"Surface exploration<br/>routes, forms, fields, controls\"]\n    B --> C[(\"Structural inventory\")]\n    C --> D[\"Requirement inference\"]\n    D --> E[\"User stories<br/>with acceptance criteria\"]\n    E --> F[\"Case expansion by category\"]\n\n    F --> G1[\"Positive path\"]\n    F --> G2[\"Negative input\"]\n    F --> G3[\"Boundary values\"]\n    F --> G4[\"Error and recovery\"]\n\n    G1 --> H{\"Schema valid\"}\n    G2 --> H\n    G3 --> H\n    G4 --> H\n    H -->|No| I[\"Fail loudly at the stage\"]\n    H -->|Yes| J[\"Linked artefact set\"]\n    J --> K[\"Engineer review and approval\"]\n    K --> L[\"Export to test management\"]\n\n    J -.->|traceability| D\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef store fill:#F3F0F8,stroke:#8880AE,stroke-width:1px,color:#1F2933\n    classDef decision fill:#FDF6E7,stroke:#C9A85C,stroke-width:1px,color:#1F2933\n    classDef risk fill:#FBEDED,stroke:#C08383,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A input\n    class B,D,E,F,G1,G2,G3,G4 process\n    class C store\n    class H decision\n    class I risk\n    class J,K,L output"
+        },
+        {
+            "title": "Reviewing top-down instead of case-by-case",
+            "caption": "Rejecting a wrong requirement removes its whole branch in one action.",
+            "chart": "---\ntitle: \"Traceability-Driven Review\"\n---\nflowchart LR\n    R1[\"Inferred requirement\"] --> S1[\"Story A\"]\n    R1 --> S2[\"Story B\"]\n    S1 --> C1[\"Case: positive\"]\n    S1 --> C2[\"Case: negative\"]\n    S2 --> C3[\"Case: boundary\"]\n    S2 --> C4[\"Case: error path\"]\n\n    R1 -.->|reviewer rejects requirement| X[\"Entire branch removed\"]\n\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n    classDef risk fill:#FBEDED,stroke:#C08383,stroke-width:1px,color:#1F2933\n\n    class R1,S1,S2 process\n    class C1,C2,C3,C4 output\n    class X risk"
+        }
+    ],
+    "results": [
+        {
+            "metric": "QA authoring effort",
+            "value": "Writing → reviewing",
+            "description": "The engineer's time shifts from transcription to judging coverage, which is where their expertise is worth spending."
+        },
+        {
+            "metric": "Hard-category coverage",
+            "value": "Generated deliberately",
+            "description": "Negative, boundary and error paths are their own expansion step rather than an afterthought."
+        },
+        {
+            "metric": "Output format",
+            "value": "Structured, not prose",
+            "description": "Schema-constrained artefacts export directly instead of needing re-keying."
+        },
+        {
+            "metric": "Review speed",
+            "value": "Top-down",
+            "description": "Traceability lets a reviewer reject an inferred requirement and drop its whole branch at once."
+        },
+        {
+            "metric": "Ungrounded output",
+            "value": "Structurally prevented",
+            "description": "Nothing is generated that cannot be traced to an observed application element."
+        }
+    ]
+}

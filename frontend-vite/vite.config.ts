@@ -53,10 +53,33 @@ function blogIndexPlugin(): Plugin {
   }
 }
 
+/**
+ * GitHub Pages has no server-side rewrite, so a direct hit on /blog/<slug>
+ * would return the stock GitHub 404 page instead of the app. Pages serves
+ * 404.html for any unmatched path, so shipping a copy of index.html there
+ * lets React Router take over and deep links work.
+ *
+ * Also drops a .nojekyll file so Pages skips Jekyll processing entirely
+ * (Jekyll silently ignores paths beginning with an underscore).
+ */
+function githubPagesSpaFallback(): Plugin {
+  return {
+    name: 'gh-pages-spa-fallback',
+    apply: 'build',
+    closeBundle() {
+      const outDir = path.resolve(__dirname, 'dist')
+      const indexHtml = path.join(outDir, 'index.html')
+      if (!fs.existsSync(indexHtml)) return
+      fs.copyFileSync(indexHtml, path.join(outDir, '404.html'))
+      fs.writeFileSync(path.join(outDir, '.nojekyll'), '')
+    },
+  }
+}
+
 // https://vitejs.dev/config/
 export default defineConfig({
   base: '/my-portfolio/',
-  plugins: [react(), blogIndexPlugin()],
+  plugins: [react(), blogIndexPlugin(), githubPagesSpaFallback()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

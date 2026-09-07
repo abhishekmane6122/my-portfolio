@@ -1,0 +1,248 @@
+{
+    "id": "equity-analytics-platform",
+    "slug": "equity-market-analytics-platform",
+    "title": "Equity Market Analytics Platform",
+    "tagline": "A dual-source market analytics platform that treats daily exchange files as the audited record and a commercial data feed as enrichment, keeping the two reconcilable rather than blended.",
+    "category": "Market Analytics",
+    "domain": "Capital Markets · Equity Research",
+    "year": "2026",
+    "role": "Full Stack Engineer — data architecture, ingestion, reconciliation design, dashboard",
+    "duration": "Phased delivery",
+    "team": [
+        "Solo build — architecture through production"
+    ],
+    "featured": false,
+    "art": "/projects/art-equity-analytics.svg",
+    "accent": "#5FC48E",
+    "headline": "Two data sources that disagree, kept deliberately separate — the exchange file is the record of truth, the API is enrichment, and every figure knows which it came from.",
+    "highlights": [
+        "Provenance carried per field, so any figure can be traced to exchange file or vendor feed",
+        "Daily exchange files treated as the immutable audited record, never overwritten by API data",
+        "Reconciliation surfaces disagreements between sources instead of silently preferring one",
+        "Delivery-volume and sector peer analysis derived from the audited base",
+        "Idempotent daily ingestion — re-running a date is safe and cheap"
+    ],
+    "context": "Equity analysis in Indian markets draws on two very different kinds of data. Exchanges publish daily files — trade summaries, delivery statistics, 52-week ranges — which are authoritative, free, and structurally awkward. Commercial data feeds provide the metadata that makes analysis possible: market capitalisation, sector classification, financial ratios. Neither is sufficient alone, and the two do not always agree.",
+    "problem": "### The trap is blending the sources\n\n**The obvious design is to merge them into one clean table.** That design quietly destroys the property that matters most: knowing which number came from where. When a figure looks wrong — and eventually one does — a blended table cannot tell you whether the exchange said it or a vendor did.\n\n**The sources genuinely disagree.** Vendor market capitalisation and sector classification are derived, occasionally stale, and reflect the vendor's own methodology. Exchange files are authoritative for what traded but carry almost no descriptive metadata.\n\n**Daily files are structurally awkward.** Formats shift, symbols change on corporate actions, and a symbol in one file does not always correspond to the same instrument in another.\n\n**Analysis is comparative, so gaps distort.** Sector peer comparison and delivery analysis break in misleading ways when a constituent is missing metadata — the chart still renders, just with a quietly wrong peer set.\n\n**Ingestion has to be safely repeatable.** Files get republished and runs get re-triggered; an ingest that double-counts on a re-run is worse than one that fails.",
+    "approach": "The organising decision was to **keep the two sources architecturally separate and carry provenance per field** rather than merging them into a single flattened record.\n\nExchange files are the audited base — ingested, stored immutably by trading date, and never overwritten by vendor data. API enrichment attaches alongside, clearly attributed. Where both sources cover the same concept, the platform records both and can surface the disagreement rather than picking a winner silently.\n\nThis costs some schema complexity and repays it the first time someone questions a number. It also means a vendor outage degrades enrichment without corrupting the audited record, and a vendor methodology change is visible as a divergence rather than as a mysterious shift in history.\n\nThe second decision was **idempotent ingestion keyed on trading date and instrument**, so re-running a day is always safe. Given that exchange files are occasionally republished and operators do re-trigger runs, anything else eventually produces double-counted volume that nobody notices until a chart looks strange.",
+    "solution": "Daily exchange files are collected, parsed and loaded into date-partitioned tables that form the audited base. Each load is keyed so that re-running a date replaces rather than appends, making repeated runs safe.\n\nInstrument identity is resolved through a symbol registry that maps exchange symbols and their historical variants to a stable internal instrument, so a corporate action or a symbol change does not fracture a time series.\n\nCommercial feed data is fetched and attached as enrichment against the resolved instrument, stored with its own source attribution and fetch timestamp. Where enrichment and exchange data cover overlapping concepts, both are retained.\n\nThe dashboard presents volume and delivery analysis, sector peer comparison, financial health indicators and technical range positioning — with each panel drawing from the audited base and showing enrichment as clearly attributed context.",
+    "systemDesign": {
+        "overview": "A two-track data architecture: an immutable, date-partitioned audited base from exchange files, and an enrichment layer from the commercial feed attached by resolved instrument. Provenance is a property of the data model rather than something reconstructed later.",
+        "components": [
+            {
+                "name": "Exchange file collector",
+                "responsibility": "Retrieves daily exchange files and stages them for parsing, tolerating format variation across file types",
+                "tech": "Scheduled collection · staged files"
+            },
+            {
+                "name": "Symbol registry",
+                "responsibility": "Maps exchange symbols and historical variants to a stable internal instrument so corporate actions do not fracture time series",
+                "tech": "Instrument reference table · alias history"
+            },
+            {
+                "name": "Audited base loader",
+                "responsibility": "Loads parsed exchange data into date-partitioned tables, keyed so re-running a date replaces rather than appends",
+                "tech": "Idempotent upsert by date + instrument"
+            },
+            {
+                "name": "Enrichment fetcher",
+                "responsibility": "Pulls market cap, sector classification and financial ratios from the commercial feed and attaches them with source attribution",
+                "tech": "Vendor API client · attributed storage"
+            },
+            {
+                "name": "Reconciliation view",
+                "responsibility": "Surfaces disagreements where both sources cover the same concept instead of silently preferring one",
+                "tech": "Comparison queries over provenance"
+            },
+            {
+                "name": "Analytics service",
+                "responsibility": "Derives delivery analysis, sector peer comparison, financial indicators and range positioning from the audited base",
+                "tech": "Azure PostgreSQL · Pandas"
+            },
+            {
+                "name": "Dashboard",
+                "responsibility": "Presents analysis with enrichment clearly attributed, so a user always knows the origin of a figure",
+                "tech": "React · TypeScript · Recharts"
+            }
+        ],
+        "dataFlow": [
+            {
+                "stage": "1 · Collect",
+                "detail": "Daily exchange files are retrieved and staged, with each file type parsed according to its own structure."
+            },
+            {
+                "stage": "2 · Resolve identity",
+                "detail": "Symbols are resolved through the registry to a stable internal instrument, so a renamed symbol continues an existing series."
+            },
+            {
+                "stage": "3 · Load audited base",
+                "detail": "Parsed rows load into date-partitioned tables keyed by date and instrument, so re-running a day replaces rather than double-counts."
+            },
+            {
+                "stage": "4 · Enrich",
+                "detail": "Commercial feed data is fetched against resolved instruments and stored alongside the base with its own source and timestamp."
+            },
+            {
+                "stage": "5 · Reconcile",
+                "detail": "Where both sources describe the same concept, both are retained and differences can be surfaced rather than resolved silently."
+            },
+            {
+                "stage": "6 · Derive",
+                "detail": "Delivery ratios, peer groupings, financial indicators and range positioning are computed from the audited base."
+            },
+            {
+                "stage": "7 · Present",
+                "detail": "The dashboard renders analysis with enrichment attributed, so provenance is visible at the point of reading."
+            }
+        ]
+    },
+    "aiEngineering": {
+        "summary": "Deliberately a data-engineering system rather than an AI one. The problem is source reconciliation and provenance, where determinism and traceability are the requirements — and inference would add uncertainty to figures whose entire value is being verifiable.",
+        "models": [
+            {
+                "name": "None in the data path",
+                "role": "Explicit non-use",
+                "why": "The platform's value proposition is that a number can be traced to the exchange file it came from. Introducing inference anywhere in that path would trade the one property the system exists to provide. The interesting engineering here is schema and provenance design, not modelling."
+            },
+            {
+                "name": "Deterministic symbol matching",
+                "role": "Instrument identity resolution",
+                "why": "Symbol changes are resolved through an explicit registry with recorded historical aliases rather than fuzzy matching. A wrong instrument match silently merges two companies' price histories — a failure that is nearly undetectable downstream, and exactly the case where an explainable lookup beats a clever guess."
+            }
+        ],
+        "evaluation": "Correctness was checked by reconciling loaded data against the source exchange files directly for sampled dates, and by comparing overlapping fields between the two sources to characterise where and how much they diverge — which turned out to be genuinely useful analysis in itself rather than merely a data-quality check. Ingestion is verified by re-running dates and confirming row counts and aggregates are unchanged, which is the practical test of idempotency.",
+        "guardrails": "No source silently overwrites another; the audited base is immutable once loaded for a date. Instruments missing enrichment are shown as missing rather than excluded, because a peer comparison that quietly drops a constituent is more misleading than one that admits a gap. Every enrichment value carries its source and fetch timestamp, so stale vendor data is identifiable rather than assumed current."
+    },
+    "infrastructure": {
+        "hosting": "Azure VM running the ingestion scheduler and API, with Azure Database for PostgreSQL holding the audited base and enrichment layer.",
+        "rationale": "The audited base is only worth building if it survives — its value grows with history, and losing it means losing years of daily files that cannot all be re-fetched. Managed PostgreSQL gives backups and point-in-time recovery without me operating them, which is the difference between a durable record and a database on a server someone eventually rebuilds. Running ingestion on an Azure VM in the same tenant keeps the vendor API credentials and the accumulated dataset inside governed infrastructure rather than on a workstation.",
+        "dataResidency": "Exchange files, the audited base and enrichment data all remain within the enterprise Azure tenant."
+    },
+    "decisions": [
+        {
+            "issue": "Blend both sources into one table, or keep them separate with provenance",
+            "choice": "Separate audited base and enrichment layer, with provenance carried per field",
+            "rationale": "A merged table cannot answer the question that eventually gets asked: where did this number come from. Keeping the sources distinct means a vendor outage degrades enrichment without touching the record, and a vendor methodology change appears as a visible divergence rather than as unexplained drift in history.",
+            "tradeoff": "More schema complexity and more joins than a flattened table — repaid the first time a figure is questioned."
+        },
+        {
+            "issue": "Which source wins when they disagree",
+            "choice": "Neither automatically; both are retained and the difference can be surfaced",
+            "rationale": "The sources measure subtly different things, so an automatic winner encodes an assumption that is wrong some of the time and invisible always. Retaining both turns a data-quality problem into information.",
+            "tradeoff": "Pushes an interpretation decision to the reader in the cases where it matters — which is where it belongs."
+        },
+        {
+            "issue": "Handling symbol changes and corporate actions",
+            "choice": "An explicit symbol registry with recorded historical aliases, not fuzzy matching",
+            "rationale": "A wrong instrument match merges two companies' histories into one series — a corruption that is very hard to detect downstream and easy to build analysis on top of. An explicit registry makes identity a maintained decision rather than a similarity score.",
+            "tradeoff": "The registry needs updating when instruments change, which is visible maintenance rather than silent breakage."
+        },
+        {
+            "issue": "Append-only or idempotent daily loads",
+            "choice": "Idempotent upsert keyed on trading date and instrument",
+            "rationale": "Exchange files are occasionally republished and runs do get re-triggered. Append-only ingestion double-counts volume on a re-run, and nobody notices until a chart looks strange weeks later.",
+            "tradeoff": "Slightly more complex load logic than a plain insert, in exchange for operations that can safely retry."
+        }
+    ],
+    "challenges": [
+        {
+            "title": "Two sources that quietly disagree",
+            "description": "Vendor market capitalisation and sector classification are derived using the vendor's methodology and are sometimes stale, while exchange files are authoritative for trading activity but carry almost no descriptive metadata. Blending them produces a table that looks authoritative and cannot be audited.",
+            "solution": "I separated the layers architecturally and attached provenance per field. The audited base is immutable once loaded; enrichment attaches alongside with its own source and fetch timestamp. Where both describe the same concept, both are kept and the divergence can be inspected — which turned a data-quality irritation into a usable signal."
+        },
+        {
+            "title": "Symbols that change underneath a time series",
+            "description": "Corporate actions and renames mean the same instrument appears under different symbols across dates, and occasionally a symbol is reused. Naive keying by symbol either splits one company's history or merges two.",
+            "solution": "A symbol registry maps exchange symbols and their historical variants to a stable internal instrument, with the alias history retained so a series remains continuous across a rename. Unrecognised symbols are logged for review rather than being assumed new, which is how reuse cases get caught before they corrupt a series."
+        },
+        {
+            "title": "Peer comparisons silently dropping constituents",
+            "description": "Sector peer analysis depends on enrichment metadata. When a constituent lacked sector classification it was excluded, and the chart rendered normally with a quietly incomplete peer set — the most misleading possible failure, because nothing looked wrong.",
+            "solution": "Instruments missing enrichment are surfaced as missing rather than filtered out, and peer views show the coverage they are based on. An incomplete comparison now announces itself instead of presenting as a complete one."
+        },
+        {
+            "title": "Re-runs that double-counted",
+            "description": "Early ingestion appended rows, so a republished exchange file or a re-triggered run inflated volume figures for that date. The distortion was small enough to pass unnoticed initially and invalidated any analysis built on the affected window.",
+            "solution": "Loads became idempotent upserts keyed on trading date and instrument, so re-running a day converges to the same state rather than accumulating. Verifying this is now part of the routine: re-run a date, confirm counts and aggregates are unchanged."
+        }
+    ],
+    "techStack": [
+        {
+            "category": "Backend",
+            "technologies": [
+                "Python",
+                "FastAPI",
+                "Repository / service layering",
+                "Scheduled ingestion",
+                "Idempotent upsert loading"
+            ]
+        },
+        {
+            "category": "Data Platform",
+            "technologies": [
+                "Azure Database for PostgreSQL",
+                "Pandas",
+                "Date-partitioned audited base",
+                "Per-field provenance",
+                "Symbol registry with alias history"
+            ]
+        },
+        {
+            "category": "Frontend",
+            "technologies": [
+                "React",
+                "Vite",
+                "TypeScript",
+                "Tailwind CSS",
+                "Recharts"
+            ]
+        },
+        {
+            "category": "Cloud",
+            "technologies": [
+                "Azure VM",
+                "Managed backups & point-in-time recovery",
+                "Tenant-scoped credentials"
+            ]
+        }
+    ],
+    "diagrams": [
+        {
+            "title": "Two-track data architecture",
+            "caption": "The exchange file is the record; the vendor feed is context. They never merge.",
+            "chart": "---\ntitle: \"Audited Base and Enrichment Layer\"\n---\nflowchart TD\n    A[\"Daily exchange files\"] --> B[\"Parse by file type\"]\n    B --> C[\"Resolve symbol to instrument\"]\n    C --> D{\"Symbol known\"}\n    D -->|No| E[\"Log for review\"]\n    D -->|Yes| F[\"Idempotent load<br/>keyed by date + instrument\"]\n    F --> G[(\"Audited base<br/>immutable, date-partitioned\")]\n\n    H[\"Commercial data feed\"] --> I[\"Fetch enrichment\"]\n    I --> J[(\"Enrichment layer<br/>source + timestamp per field\")]\n    C --> I\n\n    G --> K[\"Analytics service\"]\n    J --> K\n    G --> L[\"Reconciliation view\"]\n    J --> L\n    K --> M[\"Dashboard with attributed figures\"]\n    L --> M\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef store fill:#F3F0F8,stroke:#8880AE,stroke-width:1px,color:#1F2933\n    classDef decision fill:#FDF6E7,stroke:#C9A85C,stroke-width:1px,color:#1F2933\n    classDef risk fill:#FBEDED,stroke:#C08383,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A,H input\n    class B,C,F,I,K,L process\n    class G,J store\n    class D decision\n    class E risk\n    class M output"
+        },
+        {
+            "title": "Instrument identity across symbol changes",
+            "caption": "A rename continues a series; a reused symbol is caught before it corrupts one.",
+            "chart": "---\ntitle: \"Symbol Registry Resolution\"\n---\nflowchart LR\n    A[\"Symbol in daily file\"] --> B[\"Lookup in registry\"]\n    B --> C{\"Match found\"}\n    C -->|Current symbol| D[\"Stable instrument id\"]\n    C -->|Historical alias| D\n    C -->|No match| E[\"Log unrecognised symbol\"]\n    E -.->|reviewed, alias or new instrument added| F[(\"Symbol registry\")]\n    F --> B\n    D --> G[\"Continuous time series\"]\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef store fill:#F3F0F8,stroke:#8880AE,stroke-width:1px,color:#1F2933\n    classDef decision fill:#FDF6E7,stroke:#C9A85C,stroke-width:1px,color:#1F2933\n    classDef risk fill:#FBEDED,stroke:#C08383,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A input\n    class B process\n    class C decision\n    class E risk\n    class F store\n    class D,G output"
+        }
+    ],
+    "results": [
+        {
+            "metric": "Figure provenance",
+            "value": "Traceable per field",
+            "description": "Every number resolves to the exchange file or vendor feed it came from."
+        },
+        {
+            "metric": "Source disagreement",
+            "value": "Surfaced, not hidden",
+            "description": "Overlapping concepts retain both values so divergence is visible and analysable."
+        },
+        {
+            "metric": "Daily ingestion",
+            "value": "Safely repeatable",
+            "description": "Idempotent loading means a republished file or re-triggered run cannot double-count."
+        },
+        {
+            "metric": "Time-series continuity",
+            "value": "Survives renames",
+            "description": "The symbol registry keeps a company's history intact across corporate actions."
+        },
+        {
+            "metric": "Incomplete comparisons",
+            "value": "Announced",
+            "description": "Missing enrichment shows as a gap rather than silently shrinking a peer set."
+        }
+    ]
+}

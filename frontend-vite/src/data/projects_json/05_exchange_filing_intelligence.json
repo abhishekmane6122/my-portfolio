@@ -1,0 +1,266 @@
+{
+    "id": "exchange-filing-intelligence",
+    "slug": "exchange-filing-intelligence-platform",
+    "title": "Exchange Filing Intelligence Platform",
+    "tagline": "A document-AI platform that monitors stock-exchange corporate filings for a watchlist of entities, classifies and summarises them, and delivers a charted daily digest to market-facing teams.",
+    "category": "Document AI",
+    "domain": "Capital Markets · Corporate Disclosure",
+    "year": "2026",
+    "role": "AI Engineer — ingestion, extraction, RAG design, reporting automation, deployment",
+    "duration": "Production delivery with daily operation",
+    "team": [
+        "Solo build — architecture through production"
+    ],
+    "featured": false,
+    "art": "/projects/art-bse-intelligence.svg",
+    "accent": "#7FB3D5",
+    "headline": "Turns a firehose of exchange filings into a per-entity daily briefing, separating the handful that matter from the hundreds that do not.",
+    "highlights": [
+        "Entity-registry-driven monitoring so only watchlist companies are processed",
+        "Hybrid digital + OCR extraction, chosen per document by measured text yield",
+        "Filing classification before summarisation, so routine notices never consume model budget",
+        "Charted Excel digest generated directly from the processed corpus",
+        "Vector index over historical filings for semantic lookup across the archive"
+    ],
+    "context": "Stock exchanges publish a continuous stream of corporate filings — board outcomes, shareholding changes, credit rating actions, investor presentations, routine compliance notices. For a team tracking a defined set of listed entities, the signal is real but thin: a few filings a day matter, and finding them means opening a great many that do not.",
+    "problem": "### Why the volume is the problem\n\n**Most filings are noise for any given reader.** Routine compliance notices vastly outnumber the disclosures that change a view. A system that summarises everything equally has moved the reading problem rather than solved it — and burns model budget on documents nobody needed.\n\n**Filings are visually heterogeneous.** The same disclosure category arrives as clean digital text from one filer and a scanned board resolution from another. A text-only extractor silently produces empty documents for the scanned half.\n\n**Relevance is entity-scoped, not global.** The question is never \"what was filed today\" but \"what was filed today about the entities we track\" — and filer names in exchange data do not reliably match the names a business team uses.\n\n**The output has to be pushed, not pulled.** A dashboard that requires someone to remember to check it fails on exactly the busy day when a material filing appears.\n\n**History has value the daily view destroys.** Once a filing scrolls past, finding it again means knowing roughly when it was filed — which is precisely what someone researching a topic does not know.",
+    "approach": "The organising decision was to **classify before summarising**. Running a model over every filing is both expensive and unhelpful; deciding what kind of document something is first lets routine notices be recorded and skipped, while substantive disclosures get the full extraction and summarisation path. This is a cost decision and a signal-to-noise decision at the same time, and it is the reason the daily digest is readable.\n\nThe second decision was to drive everything from an **explicit entity registry** rather than trying to infer relevance. Filer names are inconsistent, so the registry maps the exchange's identifiers and name variants to the entities the business actually cares about. Anything outside the registry is never downloaded, which keeps the pipeline's cost proportional to the watchlist rather than to exchange volume.\n\nThe third was to make extraction adaptive rather than assuming a format — measuring what text extraction returned and falling back to OCR when the yield indicates a scanned document.",
+    "solution": "The pipeline resolves the entity registry against the exchange's filing feed and downloads only filings for tracked entities. Each document is hashed for deduplication, then extracted — digitally where possible, through OCR where text yield indicates a scanned filing.\n\nA classification step assigns each filing to a disclosure category. Routine categories are recorded and skipped; substantive ones proceed to structured extraction and summarisation, producing a concise, factual note suitable for a market-facing reader.\n\nProcessed filings are persisted to Azure PostgreSQL and embedded into a vector index so the historical archive can be searched semantically rather than by date. A daily digest is generated as a charted Excel workbook and emailed to stakeholders, so the output arrives rather than waiting to be found.",
+    "systemDesign": {
+        "overview": "An entity-scoped ingestion pipeline feeding a classify-then-summarise processing path, with a persistent store, a vector index over history, and automated report distribution. Each stage records per-document state so partial failures surface rather than disappear.",
+        "components": [
+            {
+                "name": "Entity registry",
+                "responsibility": "Maps exchange identifiers and filer-name variants to the entities the business tracks, scoping everything downstream",
+                "tech": "Reference table · alias resolution"
+            },
+            {
+                "name": "Filing collector",
+                "responsibility": "Polls the exchange feed, filters to registry entities, and downloads only relevant filings",
+                "tech": "Requests · scheduled polling"
+            },
+            {
+                "name": "Extraction router",
+                "responsibility": "Extracts text and measures yield, routing low-yield documents through OCR instead of passing empty content forward",
+                "tech": "PyMuPDF · Tesseract OCR"
+            },
+            {
+                "name": "Classifier",
+                "responsibility": "Assigns a disclosure category so routine notices are recorded and skipped while substantive filings continue",
+                "tech": "LLM classification · category taxonomy"
+            },
+            {
+                "name": "Summarizer",
+                "responsibility": "Produces a concise, factual note for substantive filings, constrained to the document's own content",
+                "tech": "Azure OpenAI · local model fallback"
+            },
+            {
+                "name": "Vector index",
+                "responsibility": "Embeds processed filings so the archive supports semantic lookup independent of filing date",
+                "tech": "Sentence Transformers · vector store"
+            },
+            {
+                "name": "Reporting engine",
+                "responsibility": "Builds the charted Excel digest from the processed corpus and emails it to stakeholders",
+                "tech": "openpyxl · chart generation · SMTP"
+            },
+            {
+                "name": "Persistence layer",
+                "responsibility": "Stores filings, classifications, summaries and run state for audit and reporting",
+                "tech": "Azure Database for PostgreSQL"
+            }
+        ],
+        "dataFlow": [
+            {
+                "stage": "1 · Scope",
+                "detail": "The entity registry resolves which filer identifiers and name variants belong to tracked entities, bounding everything that follows."
+            },
+            {
+                "stage": "2 · Collect",
+                "detail": "The exchange feed is polled and filtered to registry entities; only relevant filings are downloaded, and each is hashed for deduplication."
+            },
+            {
+                "stage": "3 · Extract",
+                "detail": "Text extraction runs and reports yield. Low yield indicates a scanned filing and routes the document through OCR."
+            },
+            {
+                "stage": "4 · Classify",
+                "detail": "Each filing is assigned a disclosure category. Routine categories are recorded and stop here, conserving both model budget and reader attention."
+            },
+            {
+                "stage": "5 · Summarise",
+                "detail": "Substantive filings are summarised into a concise factual note bound strictly to the document's own content."
+            },
+            {
+                "stage": "6 · Index",
+                "detail": "Processed filings are embedded into the vector store, making the historical archive searchable by meaning."
+            },
+            {
+                "stage": "7 · Distribute",
+                "detail": "A charted Excel digest is generated from the day's processed corpus and emailed, so material filings reach readers without being sought."
+            }
+        ]
+    },
+    "aiEngineering": {
+        "summary": "A cost-aware document-AI design. Classification acts as a gate ahead of summarisation, so model spend and reader attention are both concentrated on the filings that carry signal. Extraction is adaptive rather than format-assuming, and the summariser is deliberately constrained to the source document.",
+        "models": [
+            {
+                "name": "Azure OpenAI — GPT-4.1 mini",
+                "role": "Filing classification and summarisation",
+                "why": "Both tasks are constrained readings of supplied text rather than open reasoning, so a smaller model is sufficient and materially cheaper at daily filing volume. Tenant-deployed, so disclosure documents stay inside the corporate boundary."
+            },
+            {
+                "name": "Llama-4-Maverick (Azure AI)",
+                "role": "Alternate backend",
+                "why": "Available behind the same interface for longer filings such as investor presentations, without changing calling code."
+            },
+            {
+                "name": "Sentence Transformers (all-MiniLM-L6-v2)",
+                "role": "Local embeddings for the filing archive",
+                "why": "Runs locally at no per-call cost, which matters because the whole historical corpus is embedded and periodically re-embedded. Archive search does not need a frontier encoder to be useful."
+            }
+        ],
+        "retrieval": "Processed filings are chunked and embedded into a vector index so a user can find prior disclosures on a theme without knowing when they were filed — the exact lookup the daily digest cannot serve. Retrieval sits over already-summarised, already-classified documents, so results carry their disclosure category and entity, which is usually what narrows a search faster than semantic similarity alone.",
+        "evaluation": "Classification is the stage that matters most, because a misclassified substantive filing is silently dropped from the digest. It was validated against a manually labelled sample of real filings, with attention to recall on substantive categories specifically — a false 'routine' is far costlier than a false 'substantive', which merely wastes a summarisation call. Summaries were spot-checked against source documents for added claims, and per-run counts by category make an unexpected shift in the classification distribution visible immediately.",
+        "guardrails": "Summarisation is bound to the filing's own content, with no outside context supplied, so the model cannot blend in market commentary. Documents that extract to nothing are recorded as failures rather than summarised from empty input. Classification is biased toward escalation — when the category is uncertain, the filing is treated as substantive and summarised, because the failure mode of omission is worse than the cost of an extra call."
+    },
+    "infrastructure": {
+        "hosting": "Azure VM running the pipeline and scheduler, Azure Database for PostgreSQL for filings and run state, Azure OpenAI within the same tenant.",
+        "rationale": "Keeping the pipeline on an Azure VM inside the group's tenant meant corporate disclosure documents and the watchlist itself — which reveals commercial interest — never crossed an external boundary. Managed PostgreSQL gave a durable, queryable filing archive without me owning backups or patching, and it is what makes the historical corpus usable for reporting years later rather than being a folder of PDFs on a server.",
+        "dataResidency": "Filings, extracted text, classifications, summaries and embeddings all remain inside the enterprise tenant, with inference against the tenant's own model deployment."
+    },
+    "decisions": [
+        {
+            "issue": "Summarise every filing, or classify first",
+            "choice": "Classify each filing, then summarise only substantive categories",
+            "rationale": "Routine compliance notices dominate exchange volume. Summarising them equally burns model budget and, worse, buries the few filings that matter inside a digest nobody finishes reading. Classification is cheap relative to summarisation and improves both cost and signal.",
+            "tradeoff": "Introduces a stage that can be wrong. Mitigated by biasing the classifier toward escalation, so uncertainty costs an unnecessary summary rather than a missed disclosure."
+        },
+        {
+            "issue": "Infer relevance, or maintain an explicit entity registry",
+            "choice": "An explicit registry mapping exchange identifiers and name variants to tracked entities",
+            "rationale": "Filer names in exchange data do not match the names business teams use, and fuzzy inference at collection time would either miss filings or pull in noise. An explicit registry makes scope a maintained decision rather than a guess, and keeps pipeline cost proportional to the watchlist rather than exchange volume.",
+            "tradeoff": "The registry needs maintaining when entities or naming change — accepted, because it is a small, visible task compared with debugging silent relevance misses."
+        },
+        {
+            "issue": "Detecting scanned filings",
+            "choice": "Route to OCR on measured text yield rather than file metadata",
+            "rationale": "The same disclosure type arrives digital from one filer and scanned from another, and metadata does not distinguish them reliably. Measuring extraction output is the only signal that tracks the real problem, and it fails safe toward OCR.",
+            "tradeoff": "Occasional unnecessary OCR on sparse text filings — cheap relative to a silently empty document."
+        },
+        {
+            "issue": "Dashboard or pushed digest",
+            "choice": "A generated digest emailed on a schedule",
+            "rationale": "A dashboard requires the reader to remember to look, and the day they forget is precisely the day a material filing lands. Pushing the output makes the system work without depending on a habit.",
+            "tradeoff": "Less interactive than a live dashboard; the vector index over history covers the exploratory case instead."
+        }
+    ],
+    "challenges": [
+        {
+            "title": "Filer names that do not match the business's names",
+            "description": "Exchange filings identify companies by identifiers and legal names that drift from the names a business team uses, and related entities share name fragments. Matching loosely pulls in unrelated companies; matching strictly misses filings entirely.",
+            "solution": "An explicit entity registry maps exchange identifiers and known name variants to tracked entities, so scope is a maintained decision rather than a heuristic. Unmatched filers are logged rather than silently dropped, which is how new name variants get discovered and added before they cause a miss."
+        },
+        {
+            "title": "Half the filings extracting to nothing",
+            "description": "Board resolutions and signed disclosures are frequently scanned images. A text-only extractor returns an empty string for these, and an empty document either produces a hallucinated summary or vanishes from the digest.",
+            "solution": "Extraction measures characters per page and routes low-yield documents through OCR before classification. Documents failing both paths become explicit failure records visible in the run report, so a systematic extraction problem surfaces as a pattern rather than as a quiet gap."
+        },
+        {
+            "title": "A digest long enough that nobody read it",
+            "description": "The first version summarised everything collected. It was comprehensive, expensive, and functionally useless — the two filings that mattered sat among dozens of routine notices with equal visual weight.",
+            "solution": "Adding the classification gate ahead of summarisation cut the digest to substantive disclosures while still recording routine filings for completeness. The digest became short enough to read, which is the only measure that mattered, and model spend fell as a side effect rather than as the goal."
+        },
+        {
+            "title": "Finding a filing again months later",
+            "description": "The daily digest answers 'what happened today' and is useless for 'what has this entity disclosed about this topic'. Once a filing scrolls past, retrieving it required knowing approximately when it was filed.",
+            "solution": "Processed filings are embedded into a vector index carrying entity and disclosure category alongside the text, so archive search combines semantic matching with the structured filters that usually narrow it fastest. The historical corpus became an asset rather than a byproduct."
+        }
+    ],
+    "techStack": [
+        {
+            "category": "AI & Document Processing",
+            "technologies": [
+                "Azure OpenAI (GPT-4.1 mini)",
+                "Llama-4-Maverick",
+                "Sentence Transformers",
+                "LLM classification taxonomy",
+                "PyMuPDF",
+                "Tesseract OCR"
+            ]
+        },
+        {
+            "category": "Backend",
+            "technologies": [
+                "Python",
+                "Scheduled pipeline execution",
+                "Hash-based deduplication",
+                "Per-document run state"
+            ]
+        },
+        {
+            "category": "Data",
+            "technologies": [
+                "Azure Database for PostgreSQL",
+                "Vector index over filing archive",
+                "Entity registry with alias resolution",
+                "Pandas"
+            ]
+        },
+        {
+            "category": "Reporting",
+            "technologies": [
+                "openpyxl",
+                "Excel chart generation",
+                "SMTP digest distribution"
+            ]
+        },
+        {
+            "category": "Cloud",
+            "technologies": [
+                "Azure VM",
+                "Azure AI Services",
+                "Tenant-scoped inference"
+            ]
+        }
+    ],
+    "diagrams": [
+        {
+            "title": "Classify-then-summarise pipeline",
+            "caption": "The classification gate is what keeps both the digest readable and the model spend proportionate.",
+            "chart": "---\ntitle: \"Exchange Filing Intelligence Pipeline\"\n---\nflowchart TD\n    A[\"Exchange filing feed\"] --> B{\"Filer in entity registry\"}\n    B -->|No| C[\"Ignore - never downloaded\"]\n    B -->|Yes| D[\"Download filing\"]\n    D --> E{\"Hash already seen\"}\n    E -->|Yes| F[\"Skip\"]\n    E -->|No| G[\"Text extraction\"]\n    G --> H{\"Text yield sufficient\"}\n    H -->|No| I[\"OCR\"]\n    H -->|Yes| J[\"Extracted text\"]\n    I --> J\n    I -->|Still empty| X[\"Explicit failure record\"]\n\n    J --> K[\"Classify disclosure category\"]\n    K --> L{\"Substantive or routine\"}\n    L -->|Routine| M[\"Record only - no summarisation\"]\n    L -->|Substantive| N[\"Summarise\"]\n    N --> O[(\"Azure PostgreSQL\")]\n    M --> O\n    J --> P[\"Embed\"]\n    P --> Q[(\"Vector archive index\")]\n    O --> R[\"Charted Excel digest\"]\n    R --> S[\"Email distribution\"]\n    X --> O\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef store fill:#F3F0F8,stroke:#8880AE,stroke-width:1px,color:#1F2933\n    classDef decision fill:#FDF6E7,stroke:#C9A85C,stroke-width:1px,color:#1F2933\n    classDef risk fill:#FBEDED,stroke:#C08383,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A input\n    class D,G,I,J,K,N,P process\n    class O,Q store\n    class B,E,H,L decision\n    class C,F,X risk\n    class M,R,S output"
+        },
+        {
+            "title": "Entity scoping",
+            "caption": "Cost stays proportional to the watchlist rather than to exchange volume.",
+            "chart": "---\ntitle: \"Entity Registry Scoping\"\n---\nflowchart LR\n    A[\"Raw exchange feed<br/>all filers\"] --> B[\"Resolve filer identifier\"]\n    B --> C{\"Matches registry entry\"}\n    C -->|Exact identifier| D[\"Tracked entity\"]\n    C -->|Known name variant| D\n    C -->|No match| E[\"Log unmatched filer\"]\n    E -.->|reviewed, variant added| F[(\"Entity registry\")]\n    F --> C\n    D --> G[\"Enter processing pipeline\"]\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef store fill:#F3F0F8,stroke:#8880AE,stroke-width:1px,color:#1F2933\n    classDef decision fill:#FDF6E7,stroke:#C9A85C,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A input\n    class B,E process\n    class C decision\n    class F store\n    class D,G output"
+        }
+    ],
+    "results": [
+        {
+            "metric": "Daily filing review",
+            "value": "Automated",
+            "description": "Collection, extraction, classification, summarisation and distribution run without manual intervention."
+        },
+        {
+            "metric": "Digest length",
+            "value": "Signal only",
+            "description": "Classification keeps routine notices out of the reading path while still recording them."
+        },
+        {
+            "metric": "Scanned filings",
+            "value": "Recovered via OCR",
+            "description": "Yield-based routing prevents image-only board resolutions dropping out silently."
+        },
+        {
+            "metric": "Pipeline cost",
+            "value": "Scales with watchlist",
+            "description": "Entity scoping means exchange volume growth does not increase processing spend."
+        },
+        {
+            "metric": "Historical lookup",
+            "value": "Semantic, not by date",
+            "description": "The archive index answers topic questions the daily digest structurally cannot."
+        }
+    ]
+}

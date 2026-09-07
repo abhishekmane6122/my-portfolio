@@ -1,0 +1,301 @@
+{
+    "id": "sebi-regulatory-rag-pipeline",
+    "slug": "securities-regulator-intelligence-pipeline",
+    "title": "Securities Regulator Intelligence Pipeline",
+    "tagline": "A production RAG and summarization pipeline for securities-regulator circulars, built on multi-backend LLM orchestration, OCR recovery for scanned filings, and an LLM-as-judge quality gate.",
+    "category": "Regulatory AI",
+    "domain": "Capital Markets · Compliance",
+    "year": "2026",
+    "role": "AI Engineer — pipeline architecture, LLM orchestration, evaluation harness, observability, deployment",
+    "duration": "Production delivery with ongoing daily operation",
+    "team": [
+        "Solo build — architecture through production"
+    ],
+    "featured": true,
+    "art": "/projects/art-sebi-pipeline.svg",
+    "accent": "#4FC3D9",
+    "headline": "A daily compliance control that reads every regulator circular, scores its own output quality, and keeps running when the cloud model is throttled.",
+    "highlights": [
+        "Automatic failover from Azure OpenAI to a locally-hosted Phi-3 when the cloud endpoint rate-limits",
+        "OCR recovery routed on measured text yield, so scanned filings are never silently skipped",
+        "Recursive summarization that preserves the operative clauses at the end of long circulars",
+        "LLM-as-judge scoring on every summary, turning an unmeasurable component into a tracked metric",
+        "Full source-to-summary audit trail across runs, documents, evaluations, logs and traces"
+    ],
+    "context": "A securities regulator publishes circulars and notifications continuously. For a large listed group, someone has to read every one, decide whether it applies, and brief the teams who act on it — every working day, without missing one. The consequence of a miss is not an inconvenience; it is a compliance gap.",
+    "problem": "### Why naive automation fails here\n\n**The documents fight you.** Regulator portals are dynamic, JavaScript-rendered listings sitting behind corporate network controls. A meaningful share of filings are **scanned images** with no text layer — a plain extractor returns an empty string, and the pipeline silently skips exactly the documents nobody has read.\n\n**Length breaks context windows.** Regulatory documents routinely exceed what a single prompt can hold, and naive truncation drops the operative clauses, which tend to live at the end.\n\n**Tone is a compliance requirement, not a preference.** A summary that hedges, editorialises or adds markdown flourish is unusable in a compliance workflow. It has to read like a regulatory note: single paragraph, concise, no speculation.\n\n**Silence is the dangerous failure.** A pipeline that summarises 40 of 45 circulars and reports success is worse than one that fails loudly — the five missing ones are indistinguishable from a day when nothing was published.\n\n**Quality has no natural signal.** Unlike a test suite, a summarizer has no automatic notion of *wrong*. Degradation from a prompt edit or model change is invisible without deliberate measurement.",
+    "approach": "I treated this as **a data pipeline that happens to contain an LLM**, not an LLM application. That framing drove everything: explicit stages, per-document state, a fallback at every boundary, and output quality measured as a first-class stage rather than assumed.\n\nThe decision I would defend hardest is the **local model fallback**. A compliance control that stops because a vendor is throttling has failed at its actual job. A locally-hosted model that is somewhat less fluent but always available is strictly better for this workload than a better model that is sometimes absent.\n\nThe second is the **judge stage**. Without it, a prompt tweak or model swap degrades output invisibly until someone in compliance happens to notice a bad summary weeks later. An imperfect automated signal that is tracked over time beats no signal at all.",
+    "solution": "Headless browser automation drives the dynamic listing page and extracts document links; a local-folder ingestion path exists as an operational fallback for when the portal changes or the network blocks automation.\n\nText extraction runs first and **measures its own yield**. Below a character-density threshold — the signature of a scanned filing — the document is routed through OCR rather than passed on as an empty string. Documents that fail both paths become explicit failure records, never silent skips.\n\nSummarization runs against Azure OpenAI by default and falls back automatically to a locally-hosted Phi-3 on rate limits or endpoint failure. Documents exceeding the context window go through recursive summarization: chunk, summarise each chunk, then summarise the summaries.\n\nEvery generated summary is then scored by a separate judge prompt against explicit criteria — grounding, conciseness, absence of speculation, regulatory tone — with the score and written justification persisted per document. Results land in Azure Database for PostgreSQL, are exported as business and audit workbooks, synced to enterprise document storage in date-partitioned folders, and distributed by email.",
+    "systemDesign": {
+        "overview": "A staged ETL-AI pipeline with independent fallbacks at each boundary, fronted by a FastAPI control plane exposing synchronous and asynchronous run endpoints, health, config and audit queries. Each stage records per-document state so partial failure is visible rather than absorbed.",
+        "components": [
+            {
+                "name": "Ingestion",
+                "responsibility": "Drives the dynamic regulator listing page, extracts document links and downloads filings; accepts a local folder as an operational fallback path",
+                "tech": "Playwright · BeautifulSoup4"
+            },
+            {
+                "name": "Extraction & OCR router",
+                "responsibility": "Extracts text and measures yield per page, routing low-yield documents through OCR instead of emitting an empty string downstream",
+                "tech": "PyMuPDF · Tesseract OCR"
+            },
+            {
+                "name": "Summarization orchestrator",
+                "responsibility": "Selects a model backend, handles context-window overflow via recursive summarization, and fails over automatically on rate limits",
+                "tech": "Azure OpenAI · local Phi-3-mini"
+            },
+            {
+                "name": "Evaluation harness",
+                "responsibility": "Scores each summary against grounding, concision, speculation and tone criteria, persisting the score and its justification",
+                "tech": "LLM-as-judge · structured scoring"
+            },
+            {
+                "name": "Vector index",
+                "responsibility": "Embeds circulars for semantic search across the regulatory corpus",
+                "tech": "all-MiniLM-L6-v2 · Cohere Embed"
+            },
+            {
+                "name": "Observability store",
+                "responsibility": "Records runs, per-document state, model backend used, evaluations, logs, metrics and traces for audit",
+                "tech": "Azure Database for PostgreSQL"
+            },
+            {
+                "name": "Reporting & distribution",
+                "responsibility": "Generates business and audit workbooks, syncs to date-partitioned enterprise storage, and sends HTML digests on completion",
+                "tech": "openpyxl · Pandas · SharePoint · SMTP"
+            },
+            {
+                "name": "Control plane",
+                "responsibility": "Exposes run triggers, health, configuration and audit queries so the pipeline is operable without shell access",
+                "tech": "FastAPI · Uvicorn"
+            }
+        ],
+        "dataFlow": [
+            {
+                "stage": "1 · Discover",
+                "detail": "Headless browser automation loads the regulator's dynamic listing and extracts newly published circulars; a local folder path serves as a fallback source."
+            },
+            {
+                "stage": "2 · Extract",
+                "detail": "Text extraction runs and reports characters per page. Low yield indicates a scanned filing and triggers OCR rather than passing an empty document forward."
+            },
+            {
+                "stage": "3 · Fit",
+                "detail": "Documents within the context budget go to single-pass summarization; longer ones are chunked and recursively summarised so late clauses survive."
+            },
+            {
+                "stage": "4 · Summarize",
+                "detail": "Azure OpenAI serves by default. On a rate limit or connection failure the orchestrator fails over to the local model and records which backend produced the output."
+            },
+            {
+                "stage": "5 · Judge",
+                "detail": "A separate evaluation prompt scores grounding, concision, speculation and tone, storing both the score and a written justification per document."
+            },
+            {
+                "stage": "6 · Persist",
+                "detail": "Circulars, summaries, evaluations, logs, metrics and traces are committed to Azure PostgreSQL alongside the archived source PDF."
+            },
+            {
+                "stage": "7 · Distribute",
+                "detail": "Business and audit workbooks are generated, synced to date-partitioned enterprise storage, and emailed — with failures surfaced rather than absorbed."
+            }
+        ]
+    },
+    "aiEngineering": {
+        "summary": "The AI layer is built for availability and auditability before raw quality. Two summarization backends behind one interface, a chunking strategy that respects where regulatory meaning actually lives, and an automated judge that makes output quality a tracked metric rather than an assumption.",
+        "models": [
+            {
+                "name": "Azure OpenAI — GPT-4.1 mini",
+                "role": "Primary summarization",
+                "why": "Deployed inside the enterprise tenant, so regulatory documents never leave the corporate boundary. The smaller model is sufficient because the task is constrained summarisation against supplied text, not open-ended reasoning — and it keeps per-document cost low enough to run daily across the full publication volume."
+            },
+            {
+                "name": "Llama-4-Maverick (Azure AI)",
+                "role": "Alternate cloud backend",
+                "why": "Gives a second managed option behind the same interface, so a capacity or pricing change at one endpoint does not require a code change."
+            },
+            {
+                "name": "Microsoft Phi-3-mini-4k-instruct (local)",
+                "role": "Failover summarization",
+                "why": "Runs on the group's own GPU with no external dependency. Chosen specifically because it fits in modest VRAM while still producing acceptable compliance-tone summaries — availability under vendor throttling matters more here than a few points of fluency."
+            },
+            {
+                "name": "all-MiniLM-L6-v2 / Cohere Embed",
+                "role": "Embeddings for semantic search",
+                "why": "The local encoder keeps embedding fully offline for sensitive filings; the hosted option is available where throughput matters more than isolation. Both sit behind one embedding interface."
+            }
+        ],
+        "retrieval": "Circulars are chunked and embedded for semantic search across the regulatory corpus, letting compliance teams ask which past circulars relate to a new one rather than searching by date. Chunking is bounded well inside the embedding token limit, with oversized segments truncated deterministically — the root-cause fix for token-limit errors, rather than shrinking batch sizes until they stopped appearing.",
+        "evaluation": "Every summary is scored by an independent judge prompt on four explicit axes: grounded (claims traceable to the source), concise (single paragraph, no padding), non-speculative (no inference beyond the text), and tone (regulatory register). Scores and written justifications persist per document, so a prompt change or model swap shows up as a distribution shift rather than as a complaint weeks later. Because the serving backend is recorded alongside the score, cloud and local output can be compared instead of averaged together.",
+        "guardrails": "Empty or failed extractions are hard-stopped before reaching the model, so the summarizer can never produce confident output from no input. Generation is bound by a strict output contract, and the judge stage independently flags tone and speculation failures for review. Summaries below the quality floor are surfaced in the admin report rather than distributed silently."
+    },
+    "infrastructure": {
+        "hosting": "Azure VM with GPU for the local model, Azure Database for PostgreSQL for circulars and observability, Azure OpenAI within the same tenant, and enterprise document storage for archival.",
+        "rationale": "Hosting on the group's own Azure VM meant the GPU serving the fallback model sat inside the corporate network, so an outage at the vendor degraded quality rather than stopping the compliance control. Managed PostgreSQL removed backup, patching and failover from my scope on a system that has to produce an audit trail years later, and keeping compute, database and model endpoint in one tenant meant the whole pipeline inherited existing network and access governance instead of needing a bespoke security review.",
+        "dataResidency": "Regulatory documents, summaries and evaluation records stay inside the enterprise tenant. Model inference runs either against the tenant's own Azure OpenAI deployment or fully on-premises, so filing content is never sent to a public API endpoint."
+    },
+    "decisions": [
+        {
+            "issue": "Cloud LLM only, or cloud with a local fallback",
+            "choice": "Azure OpenAI as primary, locally-hosted Phi-3 as automatic failover on rate limit or endpoint failure",
+            "rationale": "The pipeline's job is that no circular goes unread. A dependency that can throttle turns a compliance control into a best-effort service. A local model that is slightly less fluent but always available is strictly better for this workload.",
+            "tradeoff": "Carries GPU capacity and a second prompt path to maintain, and summaries vary in style by backend — mitigated by recording the backend per document so quality can be compared rather than averaged."
+        },
+        {
+            "issue": "How to detect scanned documents needing OCR",
+            "choice": "Route on measured text yield per page after extraction, not on file metadata",
+            "rationale": "Scanned and digital PDFs are not reliably distinguishable by extension, MIME type or producer field. Measuring what extraction actually returned is the only signal that correlates with the real problem, and it fails safe — low yield triggers OCR rather than emitting an empty summary.",
+            "tradeoff": "Occasionally sends a sparse but legitimate text PDF through OCR unnecessarily. Wasted compute is a far cheaper error than an unread circular."
+        },
+        {
+            "issue": "Handling documents longer than the context window",
+            "choice": "Recursive summarization — chunk, summarise each, then summarise the summaries",
+            "rationale": "Truncation is the default and actively harmful here, because regulatory documents put the operative requirements late. Recursive summarization costs more calls but preserves the clauses that determine whether the circular applies at all.",
+            "tradeoff": "Higher token cost and latency on long documents, and some loss of cross-section nuance — acceptable because the alternative silently discards the most important content."
+        },
+        {
+            "issue": "Measuring summary quality with no ground truth",
+            "choice": "An independent LLM-as-judge stage scoring grounding, concision, speculation and tone, persisted per document",
+            "rationale": "A summarizer has no natural pass/fail signal. Without measurement, regressions from a prompt tweak are invisible until a human notices. The written justification makes a low score actionable rather than merely alarming.",
+            "tradeoff": "The judge is itself a model and can be wrong. It is used as a trend signal and triage filter, not as an automated gate that blocks distribution."
+        },
+        {
+            "issue": "Behaviour when a document cannot be processed",
+            "choice": "Per-document state with explicit failure records surfaced in reports and alerts",
+            "rationale": "A run that quietly skips documents and reports success is the worst available outcome, because the gap is indistinguishable from a quiet publishing day. Making partial failure loud is the difference between a control and a liability.",
+            "tradeoff": "Operators see more noise on bad days — which is the point."
+        }
+    ],
+    "challenges": [
+        {
+            "title": "Scanned circulars that extract to nothing",
+            "description": "A significant share of published filings are image-only PDFs. Standard text extraction returns an empty or near-empty string, which flows onward and produces either a hallucinated summary from no input, or a document silently dropped from the day's report.",
+            "solution": "Extraction measures its own yield in characters per page. Below the threshold, the document is routed through OCR before summarization; failing both paths produces an explicit failure record. The threshold approach also caught a subtler case that metadata inspection would have missed entirely — digital PDFs with a broken text layer."
+        },
+        {
+            "title": "Keeping a daily compliance control alive through vendor rate limits",
+            "description": "Cloud LLM endpoints throttle and occasionally fail. For a control that runs every working day, an outage does not mean 'retry tomorrow' — it means a day of regulatory publications went unreviewed.",
+            "solution": "The summarizer talks to a backend abstraction rather than a specific provider, with automatic failover to a locally-hosted model on rate-limit or connection errors. Each document records which backend produced it, so downstream quality analysis can separate cloud from local output instead of treating the corpus as homogeneous."
+        },
+        {
+            "title": "Enforcing regulatory tone from a general-purpose model",
+            "description": "Default LLM output is conversational, markdown-formatted and prone to hedging. In a compliance note all three are defects, and prompt instructions alone drift across long documents and between model backends.",
+            "solution": "Tone is enforced twice — in generation through a strict output contract, and after generation by the judge, which scores tone and speculation explicitly. A systematic drift after a model change surfaces as a cluster of low tone scores rather than as isolated complaints."
+        },
+        {
+            "title": "Embedding failures that looked like a batching problem",
+            "description": "Indexing intermittently failed against the embedding endpoint's token limit. The obvious fix — reducing batch size until errors stopped — made throughput poor and left the failure latent for any unusually long page.",
+            "solution": "I fixed the root cause instead: pages are split into bounded chunks before embedding, requests are packed under an explicit token budget, and genuinely oversized chunks are truncated deterministically. Throughput improved and the class of error disappeared rather than becoming rarer."
+        },
+        {
+            "title": "Making an AI pipeline auditable years later",
+            "description": "Regulatory workflows require answering 'where did this summary come from, and what produced it' long after the fact. A pipeline that stores only its final output cannot answer that.",
+            "solution": "The observability schema records runs, per-document processing state, the model and backend that generated each summary, the judge's score and justification, structured logs and traces. Combined with the source PDF archived to date-partitioned storage, every summary is traceable to its source and processing path."
+        }
+    ],
+    "techStack": [
+        {
+            "category": "AI & Orchestration",
+            "technologies": [
+                "Azure OpenAI (GPT-4.1 mini)",
+                "Llama-4-Maverick",
+                "Phi-3-mini-4k-instruct (local)",
+                "Recursive summarization",
+                "LLM-as-judge evaluation",
+                "HuggingFace Transformers",
+                "PyTorch"
+            ]
+        },
+        {
+            "category": "Retrieval",
+            "technologies": [
+                "all-MiniLM-L6-v2",
+                "Cohere Embed",
+                "Token-budgeted chunking",
+                "Vector index for semantic search"
+            ]
+        },
+        {
+            "category": "Ingestion & Extraction",
+            "technologies": [
+                "Playwright (Chromium)",
+                "BeautifulSoup4",
+                "PyMuPDF",
+                "Tesseract OCR",
+                "Local-folder fallback ingestion"
+            ]
+        },
+        {
+            "category": "Backend",
+            "technologies": [
+                "Python 3.11",
+                "FastAPI",
+                "Uvicorn",
+                "Async run orchestration"
+            ]
+        },
+        {
+            "category": "Data & Reporting",
+            "technologies": [
+                "Azure Database for PostgreSQL",
+                "openpyxl",
+                "Pandas",
+                "SharePoint sync",
+                "HTML email alerting"
+            ]
+        },
+        {
+            "category": "Cloud",
+            "technologies": [
+                "Azure VM (GPU host)",
+                "Azure AI Services",
+                "Corporate proxy enforcement",
+                "Date-partitioned archival"
+            ]
+        }
+    ],
+    "diagrams": [
+        {
+            "title": "Pipeline stages with fallbacks at every boundary",
+            "caption": "Every stage has a defined failure path — nothing is silently skipped.",
+            "chart": "---\ntitle: \"Regulatory Intelligence Pipeline\"\n---\nflowchart TD\n    A[\"Regulator portal<br/>dynamic listing\"] --> B[\"Headless browser scrape\"]\n    A2[\"Local PDF folder<br/>operational fallback\"] --> C\n    B --> C[\"Document queue\"]\n    C --> D[\"Text extraction\"]\n    D --> E{\"Text yield above threshold\"}\n    E -->|Yes| G[\"Clean text\"]\n    E -->|No, likely scanned| F[\"OCR\"]\n    F --> G\n    F -->|Still empty| X[\"Explicit failure record\"]\n\n    G --> H{\"Fits context window\"}\n    H -->|Yes| I[\"Single-pass summarize\"]\n    H -->|No| J[\"Recursive summarize\"]\n\n    I --> K{\"Primary model available\"}\n    J --> K\n    K -->|Yes| L[\"Azure OpenAI\"]\n    K -->|Rate limited| M[\"Local Phi-3 fallback\"]\n\n    L --> N[\"Compliance summary\"]\n    M --> N\n    N --> O[\"LLM-as-judge evaluation\"]\n    O --> P[(\"Azure PostgreSQL<br/>runs, docs, evaluations, traces\")]\n    P --> Q[\"Business and audit workbooks\"]\n    P --> R[\"Vector index\"]\n    Q --> S[\"SharePoint archive\"]\n    Q --> T[\"Email distribution\"]\n    X --> P\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef store fill:#F3F0F8,stroke:#8880AE,stroke-width:1px,color:#1F2933\n    classDef decision fill:#FDF6E7,stroke:#C9A85C,stroke-width:1px,color:#1F2933\n    classDef risk fill:#FBEDED,stroke:#C08383,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A,A2 input\n    class B,C,D,F,G,I,J,L,M,N,O process\n    class P,R store\n    class E,H,K decision\n    class X risk\n    class Q,S,T output"
+        },
+        {
+            "title": "Model failover sequence",
+            "caption": "Why a vendor rate limit degrades quality instead of stopping the control.",
+            "chart": "---\ntitle: \"Multi-Backend LLM Failover\"\n---\nsequenceDiagram\n    participant P as Pipeline\n    participant C as Azure OpenAI\n    participant L as Local Phi-3\n    participant D as Observability store\n\n    P->>C: Summarize document\n    alt Cloud responds\n        C-->>P: Summary\n        P->>D: Record backend = cloud\n    else Rate limited or unreachable\n        C-->>P: 429 / connection error\n        P->>D: Record failover event\n        P->>L: Summarize on local GPU\n        L-->>P: Summary\n        P->>D: Record backend = local\n    end\n    P->>P: Judge scores the summary\n    P->>D: Persist score and justification\n"
+        },
+        {
+            "title": "Recursive summarization",
+            "caption": "Long circulars keep their operative clauses instead of being truncated.",
+            "chart": "---\ntitle: \"Recursive Summarization\"\n---\nflowchart LR\n    A[\"Long circular<br/>exceeds context window\"] --> B[\"Split into bounded chunks\"]\n    B --> C1[\"Chunk 1 summary\"]\n    B --> C2[\"Chunk 2 summary\"]\n    B --> C3[\"Chunk N summary\"]\n    C1 --> D[\"Concatenate summaries\"]\n    C2 --> D\n    C3 --> D\n    D --> E{\"Still over budget\"}\n    E -->|Yes| B\n    E -->|No| F[\"Final compliance summary\"]\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef decision fill:#FDF6E7,stroke:#C9A85C,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A input\n    class B,C1,C2,C3,D process\n    class E decision\n    class F output"
+        }
+    ],
+    "results": [
+        {
+            "metric": "Daily regulatory review",
+            "value": "Fully automated",
+            "description": "Discover, extract, summarise, evaluate and distribute runs end to end without manual intervention."
+        },
+        {
+            "metric": "Scanned filings",
+            "value": "Recovered via OCR",
+            "description": "Image-only documents that a text-only pipeline drops silently are detected by yield and routed through OCR."
+        },
+        {
+            "metric": "Availability under throttling",
+            "value": "Maintained locally",
+            "description": "Automatic failover to an on-prem model keeps the control running when cloud endpoints rate-limit."
+        },
+        {
+            "metric": "Summary quality",
+            "value": "Continuously scored",
+            "description": "Every summary carries a judge score and justification, making regressions visible as a trend."
+        },
+        {
+            "metric": "Auditability",
+            "value": "Source-to-summary",
+            "description": "Runs, documents, model backend, evaluations, logs and traces persisted beside archived source filings."
+        }
+    ]
+}

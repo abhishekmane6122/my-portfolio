@@ -1,0 +1,254 @@
+{
+    "id": "sentinel-model-governance",
+    "slug": "ai-model-governance-platform",
+    "title": "Sentinel — AI Model Governance Platform",
+    "tagline": "A controlled, auditable on-ramp for open-source AI models: every model is hashed, statically scanned for unsafe serialization, licence-checked, risk-scored, routed through approval, and only then published to a registry that air-gapped GPU servers can deploy from.",
+    "category": "AI Governance",
+    "domain": "Enterprise Security · MLOps",
+    "year": "2026",
+    "role": "Full Stack & Security Engineer — threat modelling, scanner design, workflow architecture, frontend",
+    "duration": "Self-initiated build",
+    "team": [
+        "Solo build — problem framing through working platform"
+    ],
+    "featured": true,
+    "art": "/projects/art-sentinel.svg",
+    "accent": "#8FA8E0",
+    "headline": "Solves why enterprises with their own GPUs still cannot use open-source models: there is no auditable path from a public repository to production.",
+    "highlights": [
+        "Deterministic pickle opcode scanner that detects unsafe deserialization without ever executing the model",
+        "The security-critical path contains no LLM — the model only writes report narratives",
+        "Cryptographic integrity verification and publisher checks before a model enters the registry",
+        "Cyber, legal and governance approval workflow with a full audit trail",
+        "An internal registry air-gapped production servers can deploy from with provenance intact"
+    ],
+    "context": "Large enterprises in regulated sectors default to cloud-hosted, vendor-managed AI services — a deliberate choice driven by security, compliance and audit requirements. Yet many of these same organisations already own substantial on-premises GPU capacity and have strong incentives to run open-source models: lower cost at scale, offline operation for sensitive workloads, data residency, and freedom from per-seat pricing.\n\nAdoption stalls anyway. Not because the models do not work, but because there is no repeatable, auditable process for getting one from a public repository into production in a way that satisfies cybersecurity, legal and governance.",
+    "problem": "### Why 'just download it' is unacceptable in a governed enterprise\n\n**Integrity cannot be verified.** There is no standard step confirming a downloaded model matches what the publisher actually released, or that it was not modified in transit or at rest.\n\n**Model files are a genuine malware vector.** This is not hypothetical. Common serialization formats can execute arbitrary code on load. A model file is not inert data — loading one is running one, and the usual instinct of \"let's just test it\" is precisely the dangerous action.\n\n**Licensing is a legal exposure.** Open-source model licences vary in ways that matter commercially. Some restrict commercial use, some impose downstream obligations. Nobody checks this at download time.\n\n**There is no chain of custody.** Once a model is on a shared drive, its origin, version and approval status are folklore. An auditor asking \"who approved this model, and against what evidence\" has no answer.\n\n**Security review is a bottleneck without tooling.** Asking a cyber team to assess each model manually does not scale, so the practical outcome is that nothing gets approved and teams quietly use cloud APIs instead.",
+    "approach": "The insight that shaped the design: **the security-critical component must be deterministic, and must never execute the artefact it is inspecting**.\n\nIt would be easy — and wrong — to build this as an LLM-powered analysis tool. An LLM's judgement about whether a file is malicious is unauditable, non-reproducible, and itself vulnerable to manipulation by the content it reads. So the scanner performs **static opcode analysis on the serialized structure**: it walks the pickle instruction stream looking for opcodes capable of invoking arbitrary callables, without ever unpickling. Two runs over the same file always agree, and the finding can be explained to an auditor mechanically.\n\nThe LLM is deliberately confined to the part where it adds value and carries no risk: turning deterministic findings into readable report narratives, and powering an assistant over the dashboard. If the API key is absent the platform degrades to rule-based narratives and remains fully functional — the security posture does not depend on a model being available.\n\nThe rest is workflow design: an artefact moves through defined states, each transition requires an explicit approval from a named role, and nothing reaches the registry without passing every gate.",
+    "solution": "A model submitted for review is downloaded to an isolated staging area and hashed. The platform verifies integrity against the publisher's declared checksum, records publisher and source provenance, and extracts licence metadata for legal classification.\n\nThe scanner then performs static analysis on the serialized payload. It walks the opcode stream identifying instructions capable of invoking arbitrary callables, reports every finding with its location, and never deserializes the file. Findings feed a risk score combining serialization safety, publisher trust, licence category and provenance completeness.\n\nThe scored artefact enters an approval workflow with distinct cyber, legal and governance stages. Each decision is recorded with its reviewer, timestamp and the evidence available at the time. Only a fully approved model is published to the internal registry, from which air-gapped GPU servers can pull it with its provenance and approval record intact.",
+    "systemDesign": {
+        "overview": "A staged review pipeline with a deterministic security core and an LLM confined to presentation. Backend services handle acquisition, scanning, scoring and workflow state; the registry is the only publication path, and it can only be reached through a completed approval chain.",
+        "components": [
+            {
+                "name": "Acquisition & staging",
+                "responsibility": "Downloads a candidate model into an isolated staging area, never a shared or production path",
+                "tech": "FastAPI · isolated filesystem staging"
+            },
+            {
+                "name": "Integrity verifier",
+                "responsibility": "Hashes the artefact and checks it against the publisher's declared checksum, recording source and publisher provenance",
+                "tech": "SHA-256 · publisher metadata"
+            },
+            {
+                "name": "Static serialization scanner",
+                "responsibility": "Walks the pickle opcode stream to detect instructions capable of invoking arbitrary callables — without deserializing the file",
+                "tech": "pickletools opcode analysis (deterministic)"
+            },
+            {
+                "name": "Licence classifier",
+                "responsibility": "Extracts and categorises licence metadata so legal review starts from a classification rather than a raw licence file",
+                "tech": "Licence metadata extraction"
+            },
+            {
+                "name": "Risk scorer",
+                "responsibility": "Combines serialization findings, publisher trust, licence category and provenance completeness into an explainable score",
+                "tech": "Rule-based weighted scoring"
+            },
+            {
+                "name": "Approval workflow",
+                "responsibility": "Moves an artefact through cyber, legal and governance stages, recording each decision with reviewer, timestamp and evidence",
+                "tech": "State machine · audit log"
+            },
+            {
+                "name": "Report narrator",
+                "responsibility": "Turns deterministic findings into readable narratives for reviewers; falls back to rule-based text when no model is configured",
+                "tech": "Groq API (server-side) · rule-based fallback"
+            },
+            {
+                "name": "Internal registry",
+                "responsibility": "Publishes only fully approved models, carrying provenance and approval record, for air-gapped servers to deploy from",
+                "tech": "Registry service · provenance manifest"
+            }
+        ],
+        "dataFlow": [
+            {
+                "stage": "1 · Submit",
+                "detail": "A model is nominated with its source and publisher. Nothing is trusted yet, and nothing is loaded."
+            },
+            {
+                "stage": "2 · Stage & hash",
+                "detail": "The artefact is downloaded into isolated staging and hashed, establishing the identity every later record refers to."
+            },
+            {
+                "stage": "3 · Verify integrity",
+                "detail": "The hash is checked against the publisher's declared checksum; a mismatch stops the process immediately."
+            },
+            {
+                "stage": "4 · Scan statically",
+                "detail": "The serialized payload is analysed at the opcode level for unsafe instructions. The file is never executed or deserialized."
+            },
+            {
+                "stage": "5 · Classify & score",
+                "detail": "Licence category, publisher trust, provenance completeness and scan findings combine into an explainable risk score."
+            },
+            {
+                "stage": "6 · Approve",
+                "detail": "Cyber, legal and governance reviewers act in sequence, each decision recorded with its reviewer and the evidence available."
+            },
+            {
+                "stage": "7 · Publish",
+                "detail": "Only a fully approved artefact reaches the internal registry, from which air-gapped GPU servers deploy with provenance intact."
+            }
+        ]
+    },
+    "aiEngineering": {
+        "summary": "The defining AI decision here was where *not* to use a model. Security verdicts are produced by deterministic static analysis; the model is confined to explaining findings and answering questions about the dashboard, where being wrong is inconvenient rather than dangerous.",
+        "models": [
+            {
+                "name": "Groq-hosted LLM (server-side only)",
+                "role": "Report narration and dashboard assistant",
+                "why": "Chosen for low-latency generation on short, structured inputs — it is turning an already-computed finding into prose, not making a judgement. Kept strictly server-side so no key is ever exposed to the browser, and made entirely optional: with no key configured the platform emits rule-based narratives and loses nothing security-relevant."
+            },
+            {
+                "name": "Deterministic opcode analyser (no model)",
+                "role": "Security verdict",
+                "why": "This is the deliberate absence of AI. A security control has to be reproducible and explainable to an auditor, and an LLM is neither — it can also be influenced by the very content it is inspecting. Static analysis gives identical results on identical input every time, which is the property the control actually requires."
+            }
+        ],
+        "retrieval": "The dashboard assistant answers over the platform's own structured records — scan findings, risk scores, approval history — rather than over free text. Because the underlying data is already structured, the assistant queries it directly instead of embedding and retrieving, which keeps answers exact rather than approximate.",
+        "evaluation": "The scanner was validated against deliberately constructed unsafe artefacts containing known dangerous opcode patterns, and against known-good models, checking both detection and false-positive behaviour. Because the analysis is deterministic, these cases form a genuine regression suite — a change to the scanner either still passes them or does not, with no variance to explain away. Narrative generation is evaluated only for readability, since it carries no verdict.",
+        "guardrails": "The strongest guardrail is architectural: the model has no input into any security decision, and the scanner never executes the artefact it inspects. The LLM path is server-side only and optional. Publication is gated on completed approvals rather than on a score threshold, so a low risk score never auto-approves anything — a human in each of the three roles must act."
+    },
+    "infrastructure": {
+        "hosting": "Backend and frontend run as a self-contained local platform designed to sit inside the enterprise network, publishing to a registry that air-gapped GPU servers pull from.",
+        "rationale": "The entire premise is that the enterprise already owns GPU capacity and wants to use it without sending data outside. So the platform is built to run wholly inside the network with no cloud dependency in the critical path, and the registry is the deliberate boundary — production inference servers never reach the public internet, they pull only from an internal source where every artefact carries an approval record. That is what converts 'we have GPUs' into 'we can actually deploy open models on them'.",
+        "dataResidency": "Complete. Model artefacts, scan findings, approval records and the registry all remain inside the enterprise network; the optional narration call sends only structured findings, never model files."
+    },
+    "decisions": [
+        {
+            "issue": "Whether to use an LLM for security analysis",
+            "choice": "No. Verdicts come from deterministic static opcode analysis; the LLM only writes narratives",
+            "rationale": "A security control must be reproducible and explainable to an auditor. An LLM verdict is neither, and it is additionally vulnerable to being influenced by the content it inspects. Putting a model in the critical path would have made the tool less trustworthy than the manual process it replaces.",
+            "tradeoff": "The scanner catches the patterns it is written to catch and will not reason about a novel technique the way a human researcher might — the correct trade for a control that must never be non-deterministic."
+        },
+        {
+            "issue": "How to inspect a model file safely",
+            "choice": "Static opcode-stream analysis without deserializing",
+            "rationale": "Loading the file is the attack. Any approach that inspects a model by opening it in the usual way has already executed whatever it contained, which means the natural instinct — sandbox it and see what happens — is strictly more dangerous than reading the bytes.",
+            "tradeoff": "Cannot observe runtime behaviour, so it detects unsafe capability rather than proving malicious intent. Capability is the right thing to gate on."
+        },
+        {
+            "issue": "Auto-approve on a good risk score, or always require humans",
+            "choice": "Score informs reviewers; publication requires explicit cyber, legal and governance approvals",
+            "rationale": "The score exists to make review fast, not to replace accountability. Auto-approval would recreate exactly the ungoverned path the platform exists to close, and an auditor's question is who approved it, not what the tool computed.",
+            "tradeoff": "A human step remains in every deployment — which is the product, not a limitation."
+        },
+        {
+            "issue": "Making the platform depend on an AI service",
+            "choice": "Graceful rule-based fallback when no API key is configured",
+            "rationale": "A governance tool that stops working because an external service is unavailable is not a governance tool. Since the model only writes prose, its absence should cost polish and nothing else.",
+            "tradeoff": "Fallback narratives read as more mechanical — an acceptable cost for a control that never has an external dependency in its critical path."
+        }
+    ],
+    "challenges": [
+        {
+            "title": "Inspecting a file whose format is designed to execute code",
+            "description": "The common model serialization format can invoke arbitrary callables on load. Any inspection approach that deserializes the file has already run whatever it contained, so the obvious methods — load it and introspect, or run it in a sandbox and watch — are the dangerous ones.",
+            "solution": "I built the scanner on static analysis of the serialized instruction stream. It walks the opcodes looking for those capable of invoking callables, reporting each with its position, and never calls the deserializer. The file is treated as untrusted bytes throughout, which is the only assumption that holds."
+        },
+        {
+            "title": "Distinguishing capability from intent without false-alarm fatigue",
+            "description": "Static analysis reports what a file *could* do. Many legitimate models contain constructs that look concerning in isolation. A scanner that flags everything gets ignored within a week, and an ignored scanner is worse than none because it creates false assurance.",
+            "solution": "Findings are reported with their opcode context and severity rather than as a binary verdict, and they feed a composite score alongside publisher trust and provenance rather than dominating it. Reviewers see why something was flagged and can weigh it, which is what keeps the tool credible in use."
+        },
+        {
+            "title": "Designing a workflow that security teams would actually accept",
+            "description": "A governance tool that security does not trust gets bypassed. It must produce evidence a cyber reviewer can act on, and a record an auditor can follow months later — neither of which is satisfied by a pass/fail badge.",
+            "solution": "Every artefact carries an immutable record: source, publisher, hash, integrity check result, every scan finding with location, licence classification, score composition, and each approval with reviewer and timestamp. The approval chain is a state machine, so an artefact cannot reach the registry through any path that skips a stage."
+        },
+        {
+            "title": "Keeping the security core independent of the AI features",
+            "description": "Adding an LLM for reports and an assistant risks the model's output being mistaken for a finding, or the platform quietly becoming dependent on an external service for something security-relevant.",
+            "solution": "The boundary is enforced structurally. Narratives are generated from already-computed findings and are visually distinguished from the findings themselves; the model never sees a model file, only structured results. With no key configured the platform runs on rule-based text, so nothing security-relevant depends on an external service being reachable."
+        }
+    ],
+    "techStack": [
+        {
+            "category": "Security Core",
+            "technologies": [
+                "Static pickle opcode analysis",
+                "SHA-256 integrity verification",
+                "Publisher & provenance tracking",
+                "Licence classification",
+                "Deterministic risk scoring"
+            ]
+        },
+        {
+            "category": "Backend",
+            "technologies": [
+                "Python 3.13",
+                "FastAPI",
+                "Approval state machine",
+                "Immutable audit log",
+                "Internal model registry"
+            ]
+        },
+        {
+            "category": "AI Layer",
+            "technologies": [
+                "Groq API (server-side only)",
+                "Rule-based narrative fallback",
+                "Structured-record assistant"
+            ]
+        },
+        {
+            "category": "Frontend",
+            "technologies": [
+                "React 18",
+                "TypeScript",
+                "Vite",
+                "Tailwind CSS",
+                "Full light + dark theme parity"
+            ]
+        }
+    ],
+    "diagrams": [
+        {
+            "title": "Model review pipeline",
+            "caption": "Nothing reaches the registry without passing every gate — and nothing is ever executed to inspect it.",
+            "chart": "---\ntitle: \"Governed On-Ramp for Open-Source Models\"\n---\nflowchart TD\n    A[\"Public model repository\"] --> B[\"Submit for review\"]\n    B --> C[\"Download to isolated staging\"]\n    C --> D[\"SHA-256 hash\"]\n    D --> E{\"Matches publisher checksum\"}\n    E -->|No| F[\"Reject - integrity failure\"]\n    E -->|Yes| G[\"Static opcode scan<br/>never deserialized\"]\n    G --> H{\"Unsafe opcodes found\"}\n    H -->|Yes| I[\"Findings with severity and location\"]\n    H -->|No| J[\"Clean scan record\"]\n    I --> K[\"Licence classification\"]\n    J --> K\n    K --> L[\"Composite risk score\"]\n    L --> M[\"Cyber review\"]\n    M --> N[\"Legal review\"]\n    N --> O[\"Governance review\"]\n    O --> P{\"All approvals granted\"}\n    P -->|No| Q[\"Blocked - recorded with reason\"]\n    P -->|Yes| R[(\"Internal registry<br/>with provenance\")]\n    R --> S[\"Air-gapped GPU servers deploy\"]\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef store fill:#F3F0F8,stroke:#8880AE,stroke-width:1px,color:#1F2933\n    classDef decision fill:#FDF6E7,stroke:#C9A85C,stroke-width:1px,color:#1F2933\n    classDef risk fill:#FBEDED,stroke:#C08383,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A,B input\n    class C,D,G,I,J,K,L,M,N,O process\n    class R store\n    class E,H,P decision\n    class F,Q risk\n    class S output"
+        },
+        {
+            "title": "Where AI is and is not allowed",
+            "caption": "The security verdict path contains no model. That is the design, not an omission.",
+            "chart": "---\ntitle: \"Trust Boundary Around the AI Layer\"\n---\nflowchart TD\n    subgraph DET[\"Deterministic - security critical\"]\n        A[\"Model artefact bytes\"] --> B[\"Static opcode analysis\"]\n        B --> C[\"Findings\"]\n        C --> D[\"Risk score\"]\n        D --> E[\"Approval gates\"]\n    end\n\n    subgraph LLM[\"LLM layer - presentation only, optional\"]\n        F[\"Narrative writer\"]\n        G[\"Dashboard assistant\"]\n    end\n\n    C -.->|structured findings only| F\n    D -.->|structured records only| G\n    F -.->|prose, never a verdict| H[\"Reviewer report\"]\n    G -.-> H\n    A -.->|never| LLM\n\n    E --> I[(\"Registry\")]\n\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef decision fill:#FDF6E7,stroke:#C9A85C,stroke-width:1px,color:#1F2933\n    classDef store fill:#F3F0F8,stroke:#8880AE,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A,B,C,D process\n    class E decision\n    class F,G output\n    class H output\n    class I store"
+        }
+    ],
+    "results": [
+        {
+            "metric": "Security verdicts",
+            "value": "Fully deterministic",
+            "description": "Reproducible static analysis, explainable to an auditor, with no model in the critical path."
+        },
+        {
+            "metric": "Model execution during review",
+            "value": "Never",
+            "description": "Artefacts are analysed at the opcode level and are never deserialized or run."
+        },
+        {
+            "metric": "Chain of custody",
+            "value": "Complete",
+            "description": "Source, hash, findings, licence, score and every approval recorded per artefact."
+        },
+        {
+            "metric": "External dependency in critical path",
+            "value": "None",
+            "description": "The platform runs fully without an AI key, losing only narrative polish."
+        },
+        {
+            "metric": "Outcome enabled",
+            "value": "Open models on owned GPUs",
+            "description": "Converts existing on-prem GPU capacity into a usable, governed deployment target."
+        }
+    ]
+}

@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { Home, BookOpen, Mail } from 'lucide-react'
+import { Home, BookOpen, Mail, Briefcase, FolderGit2 } from 'lucide-react'
 
 interface NavLinkItem {
     to: string
@@ -10,6 +10,8 @@ interface NavLinkItem {
 
 const navLinks: NavLinkItem[] = [
     { to: '/', label: 'Home', icon: <Home className="w-4 h-4" /> },
+    { to: '/services', label: 'Services', icon: <Briefcase className="w-4 h-4" /> },
+    { to: '/projects', label: 'Projects', icon: <FolderGit2 className="w-4 h-4" /> },
     { to: '/blog', label: 'Blog', icon: <BookOpen className="w-4 h-4" /> },
     { to: 'mailto:abhishek.mane.work@gmail.com', label: 'Get in Touch', icon: <Mail className="w-4 h-4" />, isExternal: true },
 ]

@@ -1,144 +1,140 @@
-import { useState, useEffect } from 'react'
-import { useSearchParams, Link } from 'react-router-dom'
+import { useState, useMemo } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Search, Home, Briefcase, Code2 } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { Helmet } from 'react-helmet-async'
 import ProjectCard from '@/components/projects/ProjectCard'
-import { detailedProjects } from '@/data/projects-detailed'
-import { ProjectDetailed } from '@/types/schema'
+import { caseStudies, getProjectCategories } from '@/data/projects-detailed'
+import { ProjectCaseStudy } from '@/types/schema'
 
 export default function Projects() {
     const [searchParams, setSearchParams] = useSearchParams()
+    const [query, setQuery] = useState(searchParams.get('search') || '')
+    const [category, setCategory] = useState(searchParams.get('category') || 'all')
 
-    // Initialize state from URL params
-    const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '')
-    const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'all')
+    const categories = useMemo(() => ['all', ...getProjectCategories()], [])
 
-    const categories = [
-        'all',
-        'AI',
-        'Backend',
-        'Frontend',
-        'Full Stack',
-        'Data'
-    ]
-
-    // Update URL when search/filter changes
-    useEffect(() => {
+    const apply = (nextQuery: string, nextCategory: string) => {
+        setQuery(nextQuery)
+        setCategory(nextCategory)
         const params = new URLSearchParams()
-        if (searchQuery) params.set('search', searchQuery)
-        if (selectedCategory && selectedCategory !== 'all') params.set('category', selectedCategory)
+        if (nextQuery) params.set('search', nextQuery)
+        if (nextCategory !== 'all') params.set('category', nextCategory)
         setSearchParams(params, { replace: true })
-    }, [searchQuery, selectedCategory, setSearchParams])
+    }
 
-    const filteredProjects = detailedProjects.filter((project: ProjectDetailed) => {
-        const matchesSearch = project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            project.tagline.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            project.techStack.some(stack => stack.technologies.some(tech => tech.toLowerCase().includes(searchQuery.toLowerCase())))
+    const filtered = useMemo(() => {
+        const q = query.toLowerCase()
+        return caseStudies.filter((p: ProjectCaseStudy) => {
+            const matchesQuery =
+                !q ||
+                p.title.toLowerCase().includes(q) ||
+                p.tagline.toLowerCase().includes(q) ||
+                p.domain.toLowerCase().includes(q) ||
+                p.techStack.some((g) => g.technologies.some((t) => t.toLowerCase().includes(q)))
+            const matchesCategory = category === 'all' || p.category === category
+            return matchesQuery && matchesCategory
+        })
+    }, [query, category])
 
-        const matchesCategory = selectedCategory === 'all' || 
-            project.techStack.some(stack => stack.category.toLowerCase().includes(selectedCategory.toLowerCase()))
-
-        return matchesSearch && matchesCategory
-    })
+    const isFiltering = Boolean(query) || category !== 'all'
+    const [lead, ...rest] = filtered
 
     return (
         <>
             <Helmet>
                 <title>Projects | Abhishek Mane</title>
-                <meta name="description" content="Technical case studies of production-grade AI systems, multi-agent platforms, and enterprise solutions." />
+                <meta
+                    name="description"
+                    content="Production AI, data and platform engineering case studies — problem framing, system design and engineering decisions."
+                />
             </Helmet>
 
-
             <div className="min-h-screen bg-background text-foreground">
-                {/* Header - Mirroring Blog Style */}
-                <div className="relative overflow-hidden bg-[#faf9f6] dark:bg-background border-b border-neutral-200 dark:border-white/10 transition-colors duration-300">
-                    <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-10 md:py-14 text-center">
-                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-                            <span className="text-[10px] font-mono font-medium uppercase tracking-[0.3em] text-[#d4a373] mb-2 block">
-                                Technical Portfolio
+                {/* Header */}
+                <div className="border-b border-neutral-200 bg-[#faf9f6] transition-colors duration-300 dark:border-white/10 dark:bg-background">
+                    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 md:py-16">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5 }}
+                            className="max-w-3xl"
+                        >
+                            <span className="mb-3 block font-mono text-[10px] font-medium uppercase tracking-[0.3em] text-[#8a5827] dark:text-[#d4a373]">
+                                Selected Work
                             </span>
-                            <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif font-light text-foreground mb-3 leading-tight">
-                                Engineering Case Studies
+                            <h1 className="mb-5 font-serif text-3xl font-light leading-tight text-foreground sm:text-4xl md:text-5xl">
+                                Systems built for production,<br className="hidden sm:block" /> not for demos.
                             </h1>
-                            <p className="text-neutral-500 dark:text-muted-foreground text-sm max-w-xl mx-auto font-light leading-relaxed">
-                                Deep dives into production-grade AI orchestration, multi-agent architectures, and measurable business impact.
+                            <p className="max-w-2xl text-base font-light leading-relaxed text-neutral-500 dark:text-muted-foreground">
+                                Each case study covers the problem as it actually presented itself, the approach
+                                I took, the system design, and the engineering decisions — including the
+                                trade-offs I would have to defend.
                             </p>
+
+                            <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-3 font-mono text-[10px] uppercase tracking-[0.2em] text-neutral-500 dark:text-neutral-400">
+                                <span>{caseStudies.length} case studies</span>
+                                <span className="h-px w-8 bg-neutral-300 dark:bg-white/15" />
+                                <span>Client names and data withheld</span>
+                            </div>
                         </motion.div>
                     </div>
-                    {/* Background Glows */}
-                    <div className="absolute top-1/2 left-1/4 h-64 w-64 bg-[#d4a373]/5 blur-[100px] rounded-full pointer-events-none" />
                 </div>
 
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-12">
-                    {/* Search and filter */}
-                    <div className="mb-8 md:mb-12 flex flex-col gap-4">
-                        {/* Search */}
-                        <div className="relative group">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 group-focus-within:text-[#d4a373] transition-colors" />
-                            <input
-                                type="text"
-                                placeholder="Search by tech stack, project name, or domain..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-11 pr-4 py-3 md:py-4 rounded-2xl bg-card border border-neutral-200 dark:border-white/10 text-foreground placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#d4a373]/20 focus:border-[#d4a373] transition-all shadow-sm text-sm"
-                            />
-                        </div>
-
-                        {/* Category filter */}
-                        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap">
-                            {categories.map((category) => (
+                <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 md:py-14">
+                    {/* Controls */}
+                    <div className="mb-10 flex flex-col gap-4 md:mb-14 md:flex-row md:items-center md:justify-between">
+                        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                            {categories.map((c) => (
                                 <button
-                                    key={category}
-                                    onClick={() => setSelectedCategory(category)}
-                                    className={`flex-shrink-0 px-3 sm:px-4 py-2 rounded-xl font-mono text-[9px] sm:text-[10px] font-medium uppercase tracking-widest transition-all ${selectedCategory === category
+                                    key={c}
+                                    onClick={() => apply(query, c)}
+                                    className={`flex-shrink-0 rounded-xl px-4 py-2.5 font-mono text-[10px] font-medium uppercase tracking-widest transition-all ${category === c
                                         ? 'bg-[#d4a373] text-white shadow-lg shadow-[#d4a373]/20'
-                                        : 'bg-card text-neutral-500 dark:text-muted-foreground hover:bg-neutral-100 dark:hover:bg-white/10 border border-neutral-200 dark:border-white/10'
+                                        : 'border border-neutral-200 bg-card text-neutral-500 hover:bg-neutral-100 dark:border-white/10 dark:text-muted-foreground dark:hover:bg-white/10'
                                         }`}
                                 >
-                                    {category}
+                                    {c === 'all' ? 'All work' : c}
                                 </button>
                             ))}
                         </div>
+
+                        <div className="group relative md:w-72">
+                            <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500 dark:text-neutral-400 transition-colors group-focus-within:text-[#8a5827] dark:group-focus-within:text-[#d4a373]" />
+                            <input
+                                type="text"
+                                placeholder="Search projects or tech..."
+                                value={query}
+                                onChange={(e) => apply(e.target.value, category)}
+                                className="w-full rounded-2xl border border-neutral-200 bg-card py-3 pl-11 pr-4 text-sm text-foreground placeholder:text-neutral-500 dark:placeholder:text-neutral-500 transition-all focus:border-[#d4a373] focus:outline-none focus:ring-2 focus:ring-[#d4a373]/20 dark:border-white/10"
+                            />
+                        </div>
                     </div>
 
-                    {/* Projects grid */}
-                    <div>
-                        <h2 className="text-xl md:text-2xl font-serif font-light text-foreground mb-6 md:mb-8 flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                <Briefcase className="w-5 h-5 text-[#d4a373]" />
-                                {searchQuery || selectedCategory !== 'all' ? 'Filtered Engineering' : 'Featured Work'}
-                            </div>
-                            <span className="text-neutral-400 text-sm font-mono font-normal">
-                                // {filteredProjects.length} projects
-                            </span>
-                        </h2>
+                    {filtered.length > 0 ? (
+                        <div className="space-y-6 md:space-y-8">
+                            {/* Lead case study gets the wide treatment */}
+                            {lead && !isFiltering && <ProjectCard project={lead} index={0} feature />}
 
-                        {filteredProjects.length > 0 ? (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                                {filteredProjects.map((project, index) => (
-                                    <ProjectCard key={project.id} project={project} index={index} />
+                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8 xl:grid-cols-3">
+                                {(isFiltering ? filtered : rest).map((p, i) => (
+                                    // Serial numbers stay tied to the full catalogue order, so a
+                                    // filtered view still shows a project's real number.
+                                    <ProjectCard
+                                        key={p.id}
+                                        project={p}
+                                        index={i}
+                                        serialNo={caseStudies.findIndex((c) => c.id === p.id)}
+                                    />
                                 ))}
                             </div>
-                        ) : (
-                            <div className="text-center py-20 bg-card/30 rounded-3xl border border-dashed border-neutral-200 dark:border-white/10">
-                                <div className="text-5xl mb-4">🚀</div>
-                                <h3 className="text-lg font-serif font-light text-foreground mb-2">No projects found</h3>
-                                <p className="text-muted-foreground text-sm">Try adjusting your filters to see other engineering work.</p>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* Engineering Footer */}
-                <div className="bg-neutral-50 dark:bg-[#050505] py-12 mt-16 border-t border-neutral-100 dark:border-white/5">
-                    <div className="max-w-4xl mx-auto px-4 text-center">
-                        <Code2 className="w-8 h-8 text-[#d4a373] mx-auto mb-4" />
-                        <h2 className="text-xl font-serif font-light text-foreground mb-2">The Production Standard</h2>
-                        <p className="text-muted-foreground text-[13px] leading-relaxed">
-                            Every project in this archive is built with a focus on modularity, security, and measurable ROI. From enterprise-scale multi-agent ecosystems saving 250+ hours/quarter to clinical AI delivering real-time multimodal inference.
-                        </p>
-                    </div>
+                        </div>
+                    ) : (
+                        <div className="py-20 text-center">
+                            <h3 className="mb-2 font-serif text-xl font-light text-foreground">No projects found</h3>
+                            <p className="text-sm text-muted-foreground">Try a different search or category.</p>
+                        </div>
+                    )}
                 </div>
             </div>
         </>

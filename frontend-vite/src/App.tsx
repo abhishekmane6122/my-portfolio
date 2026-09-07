@@ -17,6 +17,7 @@ const Blog = lazy(() => import('./pages/Blog'))
 const BlogPost = lazy(() => import('./pages/BlogPost'))
 const Projects = lazy(() => import('./pages/Projects'))
 const ProjectDetail = lazy(() => import('./pages/ProjectDetail'))
+const Services = lazy(() => import('./pages/Services'))
 const LLMOpsPage = lazy(() => import('./pages/LLMOpsPage'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 
@@ -88,6 +89,7 @@ function App() {
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={<Portfolio />} />
+            <Route path="/services" element={<Services />} />
             <Route path="/projects" element={<Projects />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogPost />} />

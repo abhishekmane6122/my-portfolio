@@ -315,3 +315,41 @@
 .react-flow__background {
   @apply !opacity-20;
 }
+/* ------------------------------------------------------------------
+   Project accent colours
+   The per-project accents are picked to look good as fills and borders,
+   which makes them too light for small text on a white page (#d4a373 on
+   white is only 2.15:1). --accent-ink is a darkened variant used wherever
+   the accent carries *text*; on dark backgrounds the raw accent is already
+   high-contrast, so it passes straight through.
+   ------------------------------------------------------------------ */
+.accent-scope {
+    --accent-ink: color-mix(in srgb, var(--accent, #d4a373) 68%, #0d0d0d);
+}
+
+.dark .accent-scope {
+    --accent-ink: var(--accent, #d4a373);
+}
+
+/* ------------------------------------------------------------------
+   Mermaid diagrams render on a white plate in both themes so the
+   hand-authored classDef palettes read as designed. Mermaid's HTML
+   labels inherit `color` from the page, though, so in dark mode any
+   label without an explicit classDef colour arrived near-invisible on
+   that white plate. Pin label text to the dark ink; classDef rules are
+   emitted with !important and still win where they apply.
+   ------------------------------------------------------------------ */
+.mermaid-wrapper .nodeLabel,
+.mermaid-wrapper .edgeLabel,
+.mermaid-wrapper .nodeLabel p,
+.mermaid-wrapper .edgeLabel p,
+.mermaid-wrapper .cluster-label,
+.mermaid-wrapper .titleText,
+.mermaid-wrapper text {
+    color: #1f2933;
+    fill: #1f2933;
+}
+
+.mermaid-wrapper .edgeLabel {
+    background-color: #ffffff;
+}

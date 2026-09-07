@@ -1,0 +1,303 @@
+{
+    "id": "ir-research-intelligence-platform",
+    "slug": "ir-meeting-and-research-intelligence",
+    "title": "IR Meeting & Research Intelligence Platform",
+    "tagline": "A unified Investor Relations console combining meeting and contact management with a multi-agent RAG pipeline that extracts structured financial estimates from sell-side broker research and answers role-tailored questions with citations.",
+    "category": "Multi-Agent RAG",
+    "domain": "Capital Markets · Equity Research",
+    "year": "2026",
+    "role": "Lead Developer & AI Engineer — architecture, extraction pipeline, RAG design, SSO, E2E testing",
+    "duration": "Two sprints to production",
+    "team": [
+        "Solo build — architecture through production"
+    ],
+    "featured": true,
+    "art": "/projects/art-ir-mom.svg",
+    "accent": "#C084C7",
+    "headline": "Turns unstructured broker PDFs into verified, per-company financial estimates and answers executive questions through a persona lens — with an anti-hallucination check on every answer.",
+    "highlights": [
+        "Extracts revenue, EBITDA, PAT, rating and target price for every company in a broker report, from any broker's layout",
+        "Hybrid retrieval (BM25 + vector + semantic reranking) because the discriminating tokens are company names and ratios",
+        "Role-aware answering — the same question returns a different lens for IR, CFO, Treasury or Strategy",
+        "Verification pass that checks each generated claim against retrieved context before the answer is returned",
+        "Pluggable vector store: managed hybrid search in production, local store on a laptop, identical interface"
+    ],
+    "context": "Investor Relations teams run on two streams of information that never met each other. One is transactional — minutes of meetings, investor feedback, and contact logs across the group's listed entities. The other is analytical — a steady flow of sell-side broker research PDFs, each containing the estimates and ratings that shape how the market values the company. Both were handled manually, and neither informed the other.",
+    "problem": "### Two problems that look unrelated and are not\n\n**Broker reports are structured data trapped in prose.** Every report contains the numbers that matter — revenue, EBITDA, margin, PAT, rating, target price, implied upside — but each broker formats them differently. Tables span pages, some are images, some report consolidated and some standalone, and a single report frequently covers **several companies**. Extracting this by hand is slow, and it is the kind of slow that gets skipped under pressure.\n\n**The question is never the same twice.** An IR manager, a CFO, a treasury lead and a strategy head reading the same report want genuinely different things from it. A single generic summary serves none of them well.\n\n**Retrieval on financial text is not ordinary retrieval.** The discriminating tokens are proper nouns and ratios — a company name, `EV/EBITDA`, a specific target price. Pure semantic similarity retrieves passages that are *about the same topic* while missing the one containing the actual number.\n\n**A wrong number is worse than no number.** If the platform reports a target price that is not in the source, it has actively misinformed an executive. Fluency is not the bar; correctness is.\n\n**Meeting history was write-only.** Minutes were recorded and never queried, so the institutional memory of what an investor said last quarter existed but could not be reached.",
+    "approach": "I built this as **one platform with two capabilities that share an index**: a deterministic extraction path for structured estimates, and a retrieval path for open questions.\n\nThe decision that shaped the AI design was refusing to treat extraction and Q&A as the same problem. Extraction runs against a single report with a strict output contract and per-company scoping — it must be exhaustive and structured. Q&A runs across the whole indexed corpus and must be conservative and cited. Collapsing them into one prompt would have made both worse.\n\nOn retrieval, I moved deliberately from pure vector search to **hybrid search**. In finance the exact string matters more than the paraphrase, and BM25 recovers precisely what dense vectors lose.\n\nOn correctness, I added a **verification pass** rather than trusting the generation step. The model proposes an answer; a separate check confirms each claim is supported by retrieved context before anything reaches a user. A declined answer is an acceptable outcome. A confidently wrong target price is not.",
+    "solution": "Broker PDFs are parsed with layout awareness, with OCR recovery for image-based tables. An extraction agent identifies every company covered in the report and produces a structured estimate record per company — revenue, EBITDA and margin, PAT, rating, target price and implied upside — against a strict schema rather than free text.\n\nThe same documents are chunked into bounded, coherent segments and indexed into a hybrid store combining keyword and vector search with optional semantic reranking. A question is answered by retrieving across the corpus, generating a grounded response through the requested persona lens, and then running a verification pass that checks each claim against the retrieved passages. Answers return with citations to the source pages.\n\nAlongside this, the transactional console tracks minutes of meetings, investor feedback and contact history across the group's listed entities, so the qualitative record and the quantitative estimates finally sit in one system.",
+    "systemDesign": {
+        "overview": "A monorepo delivering a React SPA and a FastAPI backend, split into a transactional module for meeting and contact management and an AI module for extraction and retrieval. Both share identity, access control and the Azure PostgreSQL store; the AI module additionally maintains a pluggable vector index.",
+        "components": [
+            {
+                "name": "Document ingestion",
+                "responsibility": "Parses broker PDFs with layout awareness, recovering image-based tables through OCR before anything reaches a model",
+                "tech": "PyMuPDF · Docling · Tesseract OCR"
+            },
+            {
+                "name": "Extraction agent",
+                "responsibility": "Identifies every company covered in a report and emits a structured estimate record per company against a strict schema",
+                "tech": "Azure OpenAI · schema-constrained output"
+            },
+            {
+                "name": "Chunker",
+                "responsibility": "Splits pages into bounded, semantically coherent chunks sized well inside the embedding token limit, with deterministic truncation for outliers",
+                "tech": "Token-budgeted chunking"
+            },
+            {
+                "name": "Hybrid retrieval store",
+                "responsibility": "Serves BM25 keyword matching, dense vector similarity and optional semantic reranking behind one interface",
+                "tech": "Azure AI Search · local JSON store"
+            },
+            {
+                "name": "Persona answering layer",
+                "responsibility": "Generates a grounded answer through the requested role lens — IR, CFO, Treasury, Strategy — from the same retrieved evidence",
+                "tech": "Azure OpenAI · persona prompt contracts"
+            },
+            {
+                "name": "Verification pass",
+                "responsibility": "Checks each generated claim against retrieved context and declines rather than answering when support is absent",
+                "tech": "Claim-level grounding check"
+            },
+            {
+                "name": "Meeting & contact console",
+                "responsibility": "Tracks minutes, investor feedback and contact history across the group's listed entities",
+                "tech": "FastAPI · Azure PostgreSQL"
+            },
+            {
+                "name": "Identity & access",
+                "responsibility": "Single sign-on with role resolution shared across both the transactional and AI modules",
+                "tech": "Entra ID · MSAL · JWT"
+            }
+        ],
+        "dataFlow": [
+            {
+                "stage": "1 · Upload",
+                "detail": "A broker research PDF is uploaded; the original is retained so any extracted figure can be traced back to its page."
+            },
+            {
+                "stage": "2 · Parse",
+                "detail": "Layout-aware parsing recovers text and tables, with OCR applied to image-based tables that would otherwise yield nothing."
+            },
+            {
+                "stage": "3 · Extract",
+                "detail": "The extraction agent enumerates every company in the report and produces a structured estimate record per company against a fixed schema."
+            },
+            {
+                "stage": "4 · Index",
+                "detail": "The same document is chunked under an explicit token budget and embedded into the hybrid store for corpus-wide retrieval."
+            },
+            {
+                "stage": "5 · Retrieve",
+                "detail": "A question triggers hybrid retrieval — BM25 for exact company names and ratios, vectors for paraphrase, with optional semantic reranking."
+            },
+            {
+                "stage": "6 · Answer",
+                "detail": "The answer is generated through the requested persona lens, using only retrieved evidence."
+            },
+            {
+                "stage": "7 · Verify",
+                "detail": "A verification pass confirms each claim against the retrieved passages. Unsupported claims cause the system to decline rather than assert."
+            }
+        ]
+    },
+    "aiEngineering": {
+        "summary": "Two distinct AI paths sharing one index. Extraction is exhaustive and schema-bound; question answering is conservative, cited and verified. The hardest engineering was not generation — it was retrieval quality on text where the meaningful tokens are proper nouns and numbers.",
+        "models": [
+            {
+                "name": "Cohere Embed v4.0",
+                "role": "Document and query embeddings",
+                "why": "Strong on short, entity-dense financial passages. Company names, tickers and ratio labels carry most of the signal here, and this encoder preserves that better than general-purpose alternatives in testing."
+            },
+            {
+                "name": "Azure OpenAI — GPT-4.1 mini",
+                "role": "Structured extraction and grounded answering",
+                "why": "Reliable at schema-constrained output, which is what extraction actually needs — the task is reading a table correctly, not reasoning creatively. Tenant-deployed so broker research never leaves the corporate boundary, and cheap enough to re-extract a whole corpus after a prompt change."
+            },
+            {
+                "name": "Llama-4-Maverick-17B (Azure AI)",
+                "role": "Alternate backend for longer-context extraction",
+                "why": "Gives headroom on long multi-company reports behind the same interface, so switching is a configuration change rather than a rewrite."
+            },
+            {
+                "name": "Azure AI Search semantic reranker",
+                "role": "Second-stage ranking",
+                "why": "Reorders the hybrid candidate set by relevance to the actual question. It matters most on questions where several companies appear in one report and naive ranking surfaces the wrong one's numbers."
+            }
+        ],
+        "retrieval": "Hybrid retrieval combining BM25 keyword search, dense vectors and an optional semantic reranker. This replaced pure vector search after it repeatedly retrieved passages that were topically right and factually useless — an answer about the correct company but the wrong metric, or the right metric for a peer. Exact lexical matching is what recovers company names, tickers and terms like EV/EBITDA. Chunks are deliberately small and coherent, bounded well inside the embedding token limit, which improved retrieval precision and eliminated a whole class of token-limit failures at the same time. The store is pluggable — managed hybrid search in production, a local store for laptop development, one interface either way.",
+        "evaluation": "Extraction is measured per field against manually verified reports: did it find every company in the document, and is each figure correct. Field-level accuracy matters more than an aggregate score, because a pipeline that gets revenue right and target price wrong is not 90% useful. For Q&A, a golden set of real IR, CFO and treasury questions with verified answers is replayed on every prompt or model change, scoring both retrieval (was the right passage retrieved) and generation (was the answer correct and cited) separately, so a regression can be attributed to the right stage.",
+        "guardrails": "Answers are generated only from retrieved context and carry citations to source pages. A verification pass checks each claim against that context before the answer is returned; unsupported claims cause the system to decline rather than assert. The persona layer changes emphasis and framing only — it never changes the underlying figures, so two roles asking the same question receive the same numbers with different commentary."
+    },
+    "infrastructure": {
+        "hosting": "Azure VM behind Nginx serving the SPA and API, Azure Database for PostgreSQL for transactional and extracted data, Azure AI Search for hybrid retrieval, and Azure OpenAI within the same tenant.",
+        "rationale": "Broker research and investor meeting notes are commercially sensitive, so running entirely inside the group's Azure tenant is what made the platform approvable rather than a security exception. Managed PostgreSQL and managed search removed backup, scaling and index maintenance from my scope on a two-sprint timeline, which is the difference between shipping the AI capability and spending the sprint on infrastructure. Because identity, compute, database, search and model endpoint sit in one tenant, access is governed by the same corporate controls as every other internal system.",
+        "dataResidency": "Research documents, extracted estimates, meeting minutes and embeddings all remain inside the enterprise tenant. Inference runs against the tenant's own Azure OpenAI deployment, so no document content reaches a public API."
+    },
+    "decisions": [
+        {
+            "issue": "One model call for extraction and Q&A, or two separate paths",
+            "choice": "Separate paths sharing one index — schema-bound extraction, and conservative cited retrieval for questions",
+            "rationale": "The two tasks have opposite failure modes. Extraction must be exhaustive and will be re-run in bulk; Q&A must be cautious and declines when evidence is missing. A single prompt trying to satisfy both is either too permissive for extraction or too rigid for questions.",
+            "tradeoff": "Two prompt surfaces and two evaluation regimes to maintain, rather than one."
+        },
+        {
+            "issue": "Pure vector retrieval versus hybrid search",
+            "choice": "Hybrid BM25 + vector with optional semantic reranking",
+            "rationale": "Financial questions hinge on exact tokens — a company name, a ratio label, a specific figure. Pure vector search kept returning passages that were about the right topic while missing the one holding the number. Keyword matching recovers precisely what dense retrieval loses on this text.",
+            "tradeoff": "More retrieval infrastructure and a ranking layer to tune, in exchange for the accuracy the use case actually requires."
+        },
+        {
+            "issue": "Whether to trust generation or verify it",
+            "choice": "A separate verification pass checking each claim against retrieved context, with declining permitted",
+            "rationale": "The output feeds executive decisions. A fluent answer containing an invented target price is worse than no answer at all, and generation confidence is not correlated with correctness.",
+            "tradeoff": "Extra latency and cost per question, and the system sometimes declines a question a human could have answered from context — the right side to err on here."
+        },
+        {
+            "issue": "Fixing embedding token-limit errors",
+            "choice": "Bounded chunking with an explicit request token budget, rather than shrinking batch size",
+            "rationale": "Reducing batch size until errors stopped was treating the symptom — it hurt throughput and left the failure latent for any unusually long page. Bounding chunks addressed the cause and improved retrieval precision as a side effect, because smaller coherent chunks match better.",
+            "tradeoff": "More chunks to store and search, which the hybrid index absorbs comfortably."
+        },
+        {
+            "issue": "Vector store choice for a platform that had to run locally too",
+            "choice": "A store factory selecting managed hybrid search when configured, and a local store otherwise, behind one interface",
+            "rationale": "Development and demos needed to work on a laptop with zero infrastructure, while production needed managed scale and reranking. Coding against one interface meant the environment difference never leaked into application logic.",
+            "tradeoff": "The local path lacks semantic reranking, so local retrieval quality is a floor rather than a faithful preview of production."
+        }
+    ],
+    "challenges": [
+        {
+            "title": "One report, several companies, and numbers that must not cross",
+            "description": "A single broker report frequently covers multiple companies with parallel estimate tables. The dangerous failure is subtle — attributing one company's target price to another produces a plausible, confidently wrong record that a reader has no way to spot.",
+            "solution": "Extraction explicitly enumerates the covered companies first, then scopes each estimate record to one company with its supporting page reference retained. Retrieval-side, the reranking stage is what prevents a question about one company surfacing a peer's numbers from the same document — the failure that pure vector search produced most often."
+        },
+        {
+            "title": "Broker layouts that share no common structure",
+            "description": "Every broker formats research differently. Tables span page breaks, some are rendered as images with no text layer, and consolidated versus standalone figures are labelled inconsistently.",
+            "solution": "Layout-aware parsing with OCR recovery for image tables handles the mechanics, and extraction is driven by a strict output schema rather than positional assumptions — the model is asked what the fields are, not where they sit. This made adding a new broker a zero-code change in the common case."
+        },
+        {
+            "title": "Retrieval that was topically right and factually useless",
+            "description": "Early pure-vector retrieval consistently returned passages discussing the right subject while missing the passage containing the actual figure. Semantic similarity treats 'revenue grew strongly' and 'revenue of X' as near-equivalent; for this use case they are not remotely equivalent.",
+            "solution": "Moving to hybrid retrieval restored exact matching on company names, tickers and ratio labels, with the vector side still handling paraphrased questions. Smaller, coherent chunks compounded the improvement, since a tight chunk containing a figure ranks far more precisely than a whole page containing it somewhere."
+        },
+        {
+            "title": "Four roles, four different readings of the same report",
+            "description": "IR, CFO, treasury and strategy readers need different emphasis from identical underlying evidence. Generating four separate answer pipelines would have quadrupled the surface that could drift out of sync.",
+            "solution": "The persona layer sits after retrieval and constrains framing and emphasis only — never the figures. All roles are answered from the same retrieved evidence and the same verification pass, so the numbers are identical across personas and only the commentary differs."
+        },
+        {
+            "title": "Proving it works before it reached executives",
+            "description": "An extraction and Q&A system that is 'usually right' cannot be handed to a CFO without evidence, and 'we tested it manually' is not evidence that survives a model upgrade.",
+            "solution": "I built field-level extraction accuracy checks against manually verified reports, and a golden question set replayed on every prompt or model change with retrieval and generation scored separately. End-to-end browser tests cover the transactional console. When a model changed, the question was answered by the harness rather than by hope."
+        }
+    ],
+    "techStack": [
+        {
+            "category": "AI & Retrieval",
+            "technologies": [
+                "Azure OpenAI (GPT-4.1 mini)",
+                "Llama-4-Maverick-17B",
+                "Cohere Embed v4.0",
+                "Azure AI Search (hybrid BM25 + vector)",
+                "Semantic reranking",
+                "Claim-level verification",
+                "Persona prompt contracts"
+            ]
+        },
+        {
+            "category": "Document Processing",
+            "technologies": [
+                "PyMuPDF",
+                "Docling",
+                "Tesseract OCR",
+                "Token-budgeted chunking",
+                "Schema-constrained extraction"
+            ]
+        },
+        {
+            "category": "Backend",
+            "technologies": [
+                "Python",
+                "FastAPI",
+                "Uvicorn",
+                "Pydantic",
+                "Azure Database for PostgreSQL"
+            ]
+        },
+        {
+            "category": "Frontend",
+            "technologies": [
+                "React 18",
+                "TypeScript",
+                "Vite",
+                "Tailwind CSS",
+                "Axios"
+            ]
+        },
+        {
+            "category": "Quality & Testing",
+            "technologies": [
+                "Golden-set evaluation",
+                "Field-level extraction accuracy",
+                "Playwright E2E",
+                "Pytest"
+            ]
+        },
+        {
+            "category": "Cloud & Security",
+            "technologies": [
+                "Azure VM",
+                "Entra ID SSO (MSAL)",
+                "JWT",
+                "Nginx",
+                "Role-based access control"
+            ]
+        }
+    ],
+    "diagrams": [
+        {
+            "title": "Two capabilities, one index",
+            "caption": "Extraction and question answering diverge deliberately — different contracts, different failure modes.",
+            "chart": "---\ntitle: \"Extraction and Retrieval Paths\"\n---\nflowchart TD\n    A[\"Broker research PDF\"] --> B[\"Layout-aware parsing\"]\n    B --> C{\"Table has text layer\"}\n    C -->|No| D[\"OCR recovery\"]\n    C -->|Yes| E[\"Parsed content\"]\n    D --> E\n\n    E --> F[\"Extraction agent<br/>enumerate companies\"]\n    F --> G[\"Structured estimate record<br/>per company\"]\n    G --> H[(\"Azure PostgreSQL\")]\n\n    E --> I[\"Token-budgeted chunker\"]\n    I --> J[(\"Hybrid index<br/>BM25 + vector\")]\n\n    K[\"User question + role\"] --> L[\"Hybrid retrieval\"]\n    J --> L\n    L --> M[\"Semantic rerank\"]\n    M --> N[\"Persona-framed generation\"]\n    N --> O{\"Every claim supported\"}\n    O -->|Yes| P[\"Cited answer\"]\n    O -->|No| Q[\"Decline rather than assert\"]\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef store fill:#F3F0F8,stroke:#8880AE,stroke-width:1px,color:#1F2933\n    classDef decision fill:#FDF6E7,stroke:#C9A85C,stroke-width:1px,color:#1F2933\n    classDef risk fill:#FBEDED,stroke:#C08383,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A,K input\n    class B,D,E,F,I,L,M,N process\n    class H,J store\n    class C,O decision\n    class Q risk\n    class G,P output"
+        },
+        {
+            "title": "Why hybrid retrieval beat pure vectors",
+            "caption": "The discriminating tokens in financial text are proper nouns and ratios.",
+            "chart": "---\ntitle: \"Hybrid Retrieval on Financial Text\"\n---\nflowchart LR\n    Q[\"Question mentioning a company and a metric\"] --> B[\"BM25 keyword search\"]\n    Q --> V[\"Dense vector search\"]\n    B --> F[\"Candidate union\"]\n    V --> F\n    F --> R[\"Semantic reranker\"]\n    R --> T[\"Top passages\"]\n\n    B -.->|\"recovers exact names,<br/>tickers, EV/EBITDA\"| N1[\"Exact match strength\"]\n    V -.->|\"handles paraphrase<br/>and synonymy\"| N2[\"Semantic strength\"]\n    R -.->|\"stops a peer company's<br/>numbers ranking first\"| N3[\"Disambiguation\"]\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n    classDef note fill:#FDF6E7,stroke:#C9A85C,stroke-width:1px,color:#1F2933\n\n    class Q input\n    class B,V,F,R process\n    class T output\n    class N1,N2,N3 note"
+        },
+        {
+            "title": "Answer verification",
+            "caption": "The model proposes; a separate check decides whether it may speak.",
+            "chart": "---\ntitle: \"Anti-Hallucination Verification\"\n---\nsequenceDiagram\n    participant U as User\n    participant R as Retriever\n    participant G as Generator\n    participant V as Verifier\n\n    U->>R: Question + role\n    R-->>G: Retrieved passages with citations\n    G-->>V: Draft answer through persona lens\n    V->>V: Check each claim against retrieved passages\n    alt All claims supported\n        V-->>U: Answer with citations\n    else Any claim unsupported\n        V-->>U: Decline, with what was and was not found\n    end\n"
+        }
+    ],
+    "results": [
+        {
+            "metric": "Broker report processing",
+            "value": "Manual → structured",
+            "description": "Every company in a report yields a structured estimate record instead of hand-copied figures."
+        },
+        {
+            "metric": "Retrieval accuracy",
+            "value": "Materially improved",
+            "description": "Hybrid search plus bounded chunking fixed the topically-right, factually-wrong failures of pure vector search."
+        },
+        {
+            "metric": "Unsupported answers",
+            "value": "Declined, not invented",
+            "description": "Claim-level verification stops fabricated figures reaching an executive."
+        },
+        {
+            "metric": "Role coverage",
+            "value": "One evidence set, many lenses",
+            "description": "IR, CFO, treasury and strategy views share identical figures with different framing."
+        },
+        {
+            "metric": "Deployment portability",
+            "value": "Laptop to cloud",
+            "description": "The pluggable store runs with zero infrastructure locally and managed hybrid search in production."
+        }
+    ]
+}

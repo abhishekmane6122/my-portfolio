@@ -1,23 +1,44 @@
 import { useParams, Link, Navigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Github, ExternalLink, Calendar, Users, Trophy, Home } from 'lucide-react'
+import { ArrowLeft, Home, Calendar, User, Layers, ArrowRight } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
-import rehypeHighlight from 'rehype-highlight'
-import rehypeRaw from 'rehype-raw'
 import remarkGfm from 'remark-gfm'
-import { detailedProjects } from '@/data/projects-detailed'
-import FlowDiagram from '@/components/ui/FlowDiagram';
-import FloatingThemeToggle from '@/components/ui/FloatingThemeToggle';
-import 'highlight.js/styles/github-dark.css'
+import { getProjectBySlug, caseStudies } from '@/data/projects-detailed'
+import Mermaid from '@/components/ui/Mermaid'
+import FloatingThemeToggle from '@/components/ui/FloatingThemeToggle'
+
+const REMARK = [remarkGfm]
+
+const proseClass =
+    'prose prose-neutral dark:prose-invert max-w-none ' +
+    'prose-headings:font-serif prose-headings:font-light prose-headings:tracking-tight ' +
+    'prose-p:text-neutral-700 dark:prose-p:text-neutral-300 prose-p:leading-relaxed ' +
+    'prose-strong:text-foreground prose-strong:font-semibold ' +
+    'prose-li:text-neutral-700 dark:prose-li:text-neutral-300 ' +
+    'prose-a:text-[#8a5827] dark:prose-a:text-[#d4a373] prose-code:text-[#8a5827] dark:prose-code:text-[#d4a373] prose-code:before:content-[\'\'] prose-code:after:content-[\'\']'
+
+function SectionHeading({ eyebrow, title, lead }: { eyebrow: string; title: string; lead?: string }) {
+    return (
+        <div className="mb-10">
+            <span className="mb-3 block font-mono text-[10px] font-medium uppercase tracking-[0.3em] text-[#8a5827] dark:text-[#d4a373]">
+                {eyebrow}
+            </span>
+            <h2 className="font-serif text-2xl font-light tracking-tight text-foreground md:text-3xl">{title}</h2>
+            {lead && <p className="mt-3 max-w-2xl text-base leading-relaxed text-neutral-700 dark:text-neutral-300">{lead}</p>}
+        </div>
+    )
+}
 
 export default function ProjectDetail() {
     const { slug } = useParams<{ slug: string }>()
-    const project = slug ? detailedProjects.find(p => p.slug === slug) : undefined
+    const project = slug ? getProjectBySlug(slug) : undefined
 
-    if (!project) {
-        return <Navigate to="/#projects" replace />
-    }
+    if (!project) return <Navigate to="/projects" replace />
+
+    const accent = project.accent || '#d4a373'
+    const others = caseStudies.filter((p) => p.slug !== project.slug).slice(0, 2)
+    const serial = String(caseStudies.findIndex((p) => p.slug === project.slug) + 1).padStart(2, '0')
 
     return (
         <>
@@ -26,309 +47,309 @@ export default function ProjectDetail() {
                 <meta name="description" content={project.tagline} />
             </Helmet>
 
-            <div className="min-h-screen bg-background text-foreground">
+            <FloatingThemeToggle />
 
-                {/* Hero */}
-                <div className="relative overflow-hidden bg-background/50 border-b border-neutral-200 dark:border-white/10 transition-colors duration-300">
-                    <div className="absolute inset-0 bg-[#d4a373]/5 blur-[120px] rounded-full pointer-events-none" />
+            {/* Warm off-white rather than pure white - a flat white page reads as unfinished */}
+            <div className="accent-scope min-h-screen bg-[#faf9f6] text-foreground dark:bg-background" style={{ ['--accent' as string]: accent }}>
+                {/* ---------- Hero ---------- */}
+                <header className="relative overflow-hidden border-b border-neutral-200 dark:border-white/10">
+                    <img
+                        src={`${import.meta.env.BASE_URL}${project.art.replace(/^\//, '')}`}
+                        alt=""
+                        aria-hidden="true"
+                        className="absolute inset-0 h-full w-full object-cover opacity-[0.18] dark:opacity-25"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/90 to-background" />
 
-                    <div className="relative max-w-6xl mx-auto px-6 py-12">
-                        <div className="flex flex-wrap items-center gap-4 mb-8">
-                            <button
-                                onClick={() => window.history.back()}
-                                className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
-                                aria-label="Go back to previous page"
-                            >
-                                <ArrowLeft className="w-4 h-4" />
-                                Back
-                            </button>
-                            <span className="text-white/20">|</span>
-                            <Link
-                                to="/"
-                                className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
-                            >
-                                <Home className="w-4 h-4" />
-                                Home
+                    <div className="relative mx-auto max-w-5xl px-4 pb-14 pt-6 sm:px-6 md:pb-20 md:pt-8">
+                        <nav className="mb-10 flex flex-wrap items-center gap-4 font-mono text-[10px] uppercase tracking-widest sm:gap-6">
+                            <Link to="/projects" className="inline-flex items-center gap-2 text-[#8a5827] dark:text-[#d4a373] no-underline transition-opacity hover:opacity-70">
+                                <ArrowLeft className="h-3.5 w-3.5" /> All work
                             </Link>
-                            <span className="text-white/20">|</span>
-                            <FloatingThemeToggle />
-                        </div>
+                            <span className="text-neutral-300 dark:text-white/20">/</span>
+                            <Link to="/" className="inline-flex items-center gap-2 text-neutral-500 no-underline transition-colors hover:text-[#8a5827] dark:hover:text-[#d4a373]">
+                                <Home className="h-3.5 w-3.5" /> Home
+                            </Link>
+                        </nav>
 
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5 }}
-                            className="text-center"
-                        >
-                            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-light text-foreground mb-4 md:mb-6 tracking-tight">
+                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+                            <div className="mb-5 flex flex-wrap items-center gap-2.5">
+                                <span className="font-serif text-2xl font-light leading-none text-[color:var(--accent-ink)]">
+                                    {serial}
+                                </span>
+                                <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-neutral-600 dark:text-neutral-400">
+                                    of {String(caseStudies.length).padStart(2, '0')}
+                                </span>
+                                <span className="mx-1 h-4 w-px bg-neutral-300 dark:bg-white/15" />
+                                <span className="rounded-full px-3 py-1.5 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-[#0f0f0f]" style={{ background: accent }}>
+                                    {project.category}
+                                </span>
+                                <span className="rounded-full border border-neutral-300 px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.18em] text-neutral-500 dark:border-white/15 dark:text-neutral-400">
+                                    {project.domain}
+                                </span>
+                            </div>
+
+                            <h1 className="mb-5 max-w-4xl font-serif text-3xl font-light leading-[1.12] tracking-tight text-foreground sm:text-4xl md:text-5xl lg:text-6xl">
                                 {project.title}
                             </h1>
-                            <p className="text-base md:text-lg lg:text-xl text-muted-foreground mb-8 md:mb-10 max-w-2xl mx-auto font-light leading-relaxed">
+
+                            <p className="mb-10 max-w-3xl text-lg leading-relaxed text-neutral-700 dark:text-neutral-300 md:text-xl">
                                 {project.tagline}
                             </p>
 
-                            <div className="flex flex-wrap justify-center gap-4">
-                                {project.githubUrl && (
-                                    <a
-                                        href={project.githubUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-neutral-100 dark:bg-white/5 hover:bg-neutral-200 dark:hover:bg-white/10 border border-neutral-200 dark:border-white/10 text-foreground transition-all font-medium text-sm"
-                                    >
-                                        <Github className="w-4 h-4" />
-                                        View Code
-                                    </a>
-                                )}
-                                {project.liveUrl && (
-                                    <a
-                                        href={project.liveUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#d4a373] text-white hover:bg-[#c49363] transition-all shadow-lg shadow-[#d4a373]/20 font-medium text-sm"
-                                    >
-                                        <ExternalLink className="w-4 h-4" />
-                                        Live Demo
-                                    </a>
-                                )}
+                            <div className="grid grid-cols-2 gap-6 border-t border-neutral-200 pt-8 dark:border-white/10 md:grid-cols-4">
+                                {[
+                                    { icon: <User className="h-3.5 w-3.5" />, label: 'Role', value: project.role.split('—')[0].trim() },
+                                    { icon: <Calendar className="h-3.5 w-3.5" />, label: 'Timeline', value: project.duration },
+                                    { icon: <Layers className="h-3.5 w-3.5" />, label: 'Year', value: project.year },
+                                    { icon: <User className="h-3.5 w-3.5" />, label: 'Team', value: project.team[0] },
+                                ].map((m) => (
+                                    <div key={m.label}>
+                                        <div className="mb-1.5 flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.2em] text-neutral-500 dark:text-neutral-400">
+                                            {m.icon} {m.label}
+                                        </div>
+                                        <div className="text-sm leading-snug text-foreground">{m.value}</div>
+                                    </div>
+                                ))}
                             </div>
                         </motion.div>
                     </div>
-                </div>
+                </header>
 
-                <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 md:py-12">
-                    {/* Project info cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-16 md:mb-24">
-                        <div className="group p-6 md:p-8 rounded-2xl md:rounded-3xl bg-card border border-neutral-200 dark:border-white/10 backdrop-blur-md transition-all hover:border-[#d4a373] dark:hover:border-[#d4a373]/50 hover:shadow-xl">
-                            <div className="flex items-center gap-4 mb-4">
-                                <div className="p-3 rounded-2xl bg-[#d4a373]/10 text-[#d4a373]">
-                                    <Calendar className="w-6 h-6" />
-                                </div>
-                                <span className="text-xs font-mono font-medium uppercase tracking-[0.2em] text-[#d4a373]">Duration</span>
-                            </div>
-                            <div className="text-xl font-medium text-foreground">{project.duration}</div>
-                        </div>
-
-                        <div className="group p-6 md:p-8 rounded-2xl md:rounded-3xl bg-card border border-neutral-200 dark:border-white/10 backdrop-blur-md transition-all hover:border-[#d4a373] dark:hover:border-[#d4a373]/50 hover:shadow-xl">
-                            <div className="flex items-center gap-4 mb-4">
-                                <div className="p-3 rounded-2xl bg-[#d4a373]/10 text-[#d4a373]">
-                                    <Users className="w-6 h-6" />
-                                </div>
-                                <span className="text-xs font-mono font-medium uppercase tracking-[0.2em] text-[#d4a373]">My Role</span>
-                            </div>
-                            <div className="text-xl font-medium text-foreground">{project.role}</div>
-                        </div>
-
-                        <div className="group p-6 md:p-8 rounded-2xl md:rounded-3xl bg-card border border-neutral-200 dark:border-white/10 backdrop-blur-md transition-all hover:border-[#d4a373] dark:hover:border-[#d4a373]/50 hover:shadow-xl">
-                            <div className="flex items-center gap-4 mb-4">
-                                <div className="p-3 rounded-2xl bg-[#d4a373]/10 text-[#d4a373]">
-                                    <Trophy className="w-6 h-6" />
-                                </div>
-                                <span className="text-xs font-mono font-medium uppercase tracking-[0.2em] text-[#d4a373]">The Team</span>
-                            </div>
-                            <div className="text-xl font-medium text-foreground">{project.team.join(', ')}</div>
-                        </div>
-                    </div>
-
-                    {/* Problem */}
-                    <section className="mb-24">
-                        <div className="text-center mb-10">
-                            <h2 className="text-3xl font-serif font-light text-foreground tracking-tight">The Challenge</h2>
-                        </div>
-                        <div className="p-6 md:p-12 rounded-2xl md:rounded-3xl bg-card border border-neutral-200 dark:border-white/10 backdrop-blur-xl shadow-xl transition-all hover:shadow-2xl text-left">
-                            <div className="prose prose-lg dark:prose-invert max-w-none prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:font-light prose-headings:text-foreground prose-headings:font-serif prose-headings:font-light">
-                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                    {project.problem}
-                                </ReactMarkdown>
-                            </div>
-                        </div>
-                    </section>
-
-                    {/* Solution */}
-                    <section className="mb-24">
-                        <div className="text-center mb-10">
-                            <h2 className="text-3xl font-serif font-light text-foreground tracking-tight">The Solution</h2>
-                        </div>
-                        <div className="p-6 md:p-12 rounded-2xl md:rounded-3xl bg-card border border-neutral-200 dark:border-white/10 backdrop-blur-xl shadow-xl transition-all hover:shadow-2xl">
-                            <div className="prose prose-lg dark:prose-invert max-w-none prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:font-light prose-headings:text-foreground prose-headings:font-serif prose-headings:font-light">
-                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                    {project.solution}
-                                </ReactMarkdown>
-                            </div>
-                        </div>
-                    </section>
-
-                    {/* Architecture Diagrams */}
-                    {(project.flowDiagram || (project.flowDiagrams && project.flowDiagrams.length > 0)) && (
-                        <section className="mb-24">
-                            <div className="text-center mb-12">
-                                <h2 className="text-3xl font-serif font-light text-foreground tracking-tight mb-4">System Architecture</h2>
-                                <p className="text-muted-foreground text-lg font-light max-w-2xl mx-auto">Detailed blueprint of the multi-agent orchestration and data pipelines.</p>
-                            </div>
-
-                            {project.flowDiagrams && project.flowDiagrams.length > 0 ? (
-                                <div className="space-y-16">
-                                    {project.flowDiagrams.map((diag, index) => (
-                                        <div key={index} className="space-y-6">
-                                            {diag.title && (
-                                                <div className="flex items-center justify-center gap-3 mb-6">
-                                                    <div className="h-2 w-2 rounded-full bg-[#d4a373]" />
-                                                    <h3 className="text-xl font-medium text-foreground/80">
-                                                        {diag.title}
-                                                    </h3>
-                                                </div>
-                                            )}
-                                            <FlowDiagram
-                                                nodes={diag.nodes}
-                                                edges={diag.edges}
-                                                height={diag.height || '600px'}
-                                                title={diag.title}
-                                            />
-                                        </div>
+                <main className="mx-auto max-w-5xl px-4 sm:px-6">
+                    {/* ---------- Highlights ---------- */}
+                    {project.highlights?.length > 0 && (
+                        <section className="py-14 md:py-20">
+                            <div className="rounded-3xl border p-8 md:p-10" style={{ borderColor: `${accent}33`, background: `${accent}0D` }}>
+                                <span className="mb-6 block font-mono text-[10px] font-medium uppercase tracking-[0.3em] text-[color:var(--accent-ink)]">
+                                    At a glance
+                                </span>
+                                <p className="mb-8 font-serif text-xl font-light leading-snug text-foreground md:text-2xl">
+                                    {project.headline}
+                                </p>
+                                <ul className="grid gap-3 md:grid-cols-2">
+                                    {project.highlights.map((h) => (
+                                        <li key={h} className="flex gap-3 text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">
+                                            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: accent }} />
+                                            {h}
+                                        </li>
                                     ))}
-                                </div>
-                            ) : (
-                                project.flowDiagram && (
-                                    <FlowDiagram
-                                        nodes={project.flowDiagram.nodes}
-                                        edges={project.flowDiagram.edges}
-                                        height={project.flowDiagram.height || '600px'}
-                                        title={project.flowDiagram.title}
-                                    />
-                                )
-                            )}
+                                </ul>
+                            </div>
                         </section>
                     )}
 
-                    {/* Architecture & Design Deep Dive */}
-                    {project.architecture && (
-                        <section className="mb-24">
-                            <div className="text-center mb-12">
-                                <h2 className="text-3xl font-serif font-light text-foreground tracking-tight">Design Deep Dive</h2>
-                                <p className="text-muted-foreground text-lg font-light max-w-2xl mx-auto mt-4">Architectural decisions and system infrastructure for production-grade reliability.</p>
+                    {/* ---------- Narrative ---------- */}
+                    <section className="border-t border-neutral-200 py-14 dark:border-white/10 md:py-20">
+                        <SectionHeading eyebrow="Context" title="The setting" />
+                        <div className={proseClass}><ReactMarkdown remarkPlugins={REMARK}>{project.context}</ReactMarkdown></div>
+                    </section>
+
+                    <section className="border-t border-neutral-200 py-14 dark:border-white/10 md:py-20">
+                        <SectionHeading eyebrow="Problem" title="What made this hard" />
+                        <div className={proseClass}><ReactMarkdown remarkPlugins={REMARK}>{project.problem}</ReactMarkdown></div>
+                    </section>
+
+                    <section className="border-t border-neutral-200 py-14 dark:border-white/10 md:py-20">
+                        <SectionHeading eyebrow="Approach" title="How I framed it" />
+                        <div className={proseClass}><ReactMarkdown remarkPlugins={REMARK}>{project.approach}</ReactMarkdown></div>
+                    </section>
+
+                    <section className="border-t border-neutral-200 py-14 dark:border-white/10 md:py-20">
+                        <SectionHeading eyebrow="Solution" title="What I built" />
+                        <div className={proseClass}><ReactMarkdown remarkPlugins={REMARK}>{project.solution}</ReactMarkdown></div>
+                    </section>
+
+                    {/* ---------- System design ---------- */}
+                    <section className="border-t border-neutral-200 py-14 dark:border-white/10 md:py-20">
+                        <SectionHeading eyebrow="System design" title="How the system is put together" lead={project.systemDesign.overview} />
+
+                        <div className="mb-14 overflow-hidden rounded-2xl border border-neutral-200 dark:border-white/10">
+                            <div className="hidden grid-cols-12 gap-4 border-b border-neutral-200 bg-neutral-50 px-6 py-3 font-mono text-[9px] uppercase tracking-[0.2em] text-neutral-500 dark:text-neutral-400 dark:border-white/10 dark:bg-white/[0.03] md:grid">
+                                <div className="col-span-3">Component</div>
+                                <div className="col-span-6">Responsibility</div>
+                                <div className="col-span-3">Tech</div>
                             </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-                                {[
-                                    { label: 'Pattern', value: project.architecture.pattern, icon: <div className="w-5 h-5" /> },
-                                    { label: 'Deployment', value: project.architecture.deployment, icon: <div className="w-5 h-5" /> },
-                                    { label: 'Security', value: project.architecture.security, icon: <div className="w-5 h-5" /> },
-                                    { label: 'Database', value: project.architecture.database.join(', '), icon: <div className="w-5 h-5" /> },
-                                    { label: 'Monitoring', value: project.architecture.monitoring, icon: <div className="w-5 h-5" /> },
-                                ].map((item, idx) => (
-                                    <div key={idx} className="p-6 rounded-3xl bg-card border border-neutral-200 dark:border-white/10 hover:border-[#d4a373]/30 transition-all">
-                                        <div className="text-[10px] font-mono uppercase tracking-widest text-[#d4a373] mb-2">{item.label}</div>
-                                        <div className="text-sm font-medium text-foreground leading-relaxed">{item.value}</div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            {project.architecture.decisions && project.architecture.decisions.length > 0 && (
-                                <div className="p-6 md:p-10 rounded-2xl md:rounded-[2.5rem] bg-neutral-50 dark:bg-white/5 border border-neutral-200 dark:border-white/10">
-                                    <h3 className="text-xl font-serif font-light mb-8 flex items-center gap-3">
-                                        <span className="h-2 w-2 rounded-full bg-[#d4a373]" />
-                                        Architectural Decisions (ADR)
-                                    </h3>
-                                    <div className="space-y-8">
-                                        {project.architecture.decisions.map((decision, idx) => (
-                                            <div key={idx} className="grid grid-cols-1 md:grid-cols-12 gap-6">
-                                                <div className="md:col-span-4">
-                                                    <div className="text-xs font-mono text-[#d4a373] uppercase tracking-wider mb-1">Issue</div>
-                                                    <div className="text-base font-medium">{decision.issue}</div>
-                                                </div>
-                                                <div className="md:col-span-3">
-                                                    <div className="text-xs font-mono text-neutral-500 uppercase tracking-wider mb-1">Choice</div>
-                                                    <div className="text-base font-medium">{decision.choice}</div>
-                                                </div>
-                                                <div className="md:col-span-5">
-                                                    <div className="text-xs font-mono text-neutral-500 uppercase tracking-wider mb-1">Rationale</div>
-                                                    <div className="text-sm text-muted-foreground leading-relaxed font-light">{decision.rationale}</div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                        </section>
-                    )}
-
-                    {/* Tech Stack */}
-                    <section className="mb-24">
-                        <div className="text-center mb-12">
-                            <h2 className="text-3xl font-serif font-light text-foreground tracking-tight">Technology Stack</h2>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            {project.techStack.map((category, index) => (
+                            {project.systemDesign.components.map((c, i) => (
                                 <div
-                                    key={index}
-                                    className="p-8 rounded-3xl bg-card border border-neutral-200 dark:border-white/10 backdrop-blur-md transition-all hover:shadow-xl group"
+                                    key={c.name}
+                                    className={`grid grid-cols-1 gap-2 px-6 py-5 md:grid-cols-12 md:gap-4 ${i % 2 ? 'bg-neutral-50/50 dark:bg-white/[0.015]' : ''
+                                        }`}
                                 >
-                                    <h3 className="text-xl font-medium text-foreground mb-6 flex items-center gap-3">
-                                        <span className="h-1.5 w-1.5 rounded-full bg-[#d4a373]" />
-                                        {category.category}
-                                    </h3>
-                                    <div className="flex flex-wrap gap-3">
-                                        {category.technologies.map((tech) => (
-                                            <span
-                                                key={tech}
-                                                className="px-4 py-2 rounded-xl bg-neutral-100 dark:bg-white/5 border border-neutral-200 dark:border-white/10 text-neutral-600 dark:text-neutral-400 text-sm font-light transition-all group-hover:border-[#d4a373]/30"
-                                            >
-                                                {tech}
-                                            </span>
-                                        ))}
-                                    </div>
+                                    <div className="col-span-3 font-medium text-foreground">{c.name}</div>
+                                    <div className="col-span-6 text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">{c.responsibility}</div>
+                                    <div className="col-span-3 font-mono text-[10px] leading-relaxed text-neutral-500 dark:text-neutral-400">{c.tech}</div>
                                 </div>
                             ))}
                         </div>
+
+                        <h3 className="mb-8 font-serif text-xl font-light text-foreground">Data flow</h3>
+                        <ol className="relative space-y-6 border-l border-neutral-200 pl-8 dark:border-white/10">
+                            {project.systemDesign.dataFlow.map((s) => (
+                                <li key={s.stage} className="relative">
+                                    <span
+                                        className="absolute -left-[38px] mt-1.5 h-3 w-3 rounded-full border-2 border-background"
+                                        style={{ background: accent }}
+                                    />
+                                    <div className="mb-1 font-mono text-[10px] uppercase tracking-[0.2em] text-[color:var(--accent-ink)]">
+                                        {s.stage}
+                                    </div>
+                                    <p className="text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">{s.detail}</p>
+                                </li>
+                            ))}
+                        </ol>
                     </section>
 
-                    {/* Results */}
-                    {project.results.length > 0 && (
-                        <section className="mb-24">
-                            <div className="text-center mb-12">
-                                <h2 className="text-3xl font-serif font-light text-foreground tracking-tight">Impact & Results</h2>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                                {project.results.map((result, index) => (
+                    {/* ---------- AI engineering ---------- */}
+                    {project.aiEngineering && (
+                        <section className="border-t border-neutral-200 py-14 dark:border-white/10 md:py-20">
+                            <SectionHeading
+                                eyebrow="AI engineering"
+                                title="The AI system"
+                                lead={project.aiEngineering.summary}
+                            />
+
+                            <div className="mb-12 overflow-hidden rounded-2xl border border-neutral-200 dark:border-white/10">
+                                <div className="hidden grid-cols-12 gap-4 border-b border-neutral-200 bg-neutral-100/70 px-6 py-3 font-mono text-[9px] uppercase tracking-[0.2em] text-neutral-600 dark:border-white/10 dark:bg-white/[0.04] dark:text-neutral-400 md:grid">
+                                    <div className="col-span-3">Model</div>
+                                    <div className="col-span-3">Role</div>
+                                    <div className="col-span-6">Why this one</div>
+                                </div>
+                                {project.aiEngineering.models.map((m, i) => (
                                     <div
-                                        key={index}
-                                        className="p-6 md:p-8 rounded-2xl md:rounded-3xl bg-card border border-neutral-200 dark:border-white/10 text-center backdrop-blur-sm transition-all hover:shadow-xl"
+                                        key={m.name}
+                                        className={`grid grid-cols-1 gap-2 px-6 py-5 md:grid-cols-12 md:gap-4 ${i % 2 ? 'bg-neutral-50 dark:bg-white/[0.02]' : ''}`}
                                     >
-                                        <div className="text-4xl font-light text-[#d4a373] mb-3">{result.value}</div>
-                                        <div className="text-base font-medium text-foreground mb-2">{result.metric}</div>
-                                        <div className="text-sm text-muted-foreground leading-relaxed font-light">{result.description}</div>
+                                        <div className="col-span-3 font-medium text-foreground">{m.name}</div>
+                                        <div className="col-span-3 text-sm text-neutral-700 dark:text-neutral-300">{m.role}</div>
+                                        <div className="col-span-6 text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">{m.why}</div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="grid gap-5 md:grid-cols-3">
+                                {[
+                                    { label: 'Retrieval', body: project.aiEngineering.retrieval },
+                                    { label: 'Evaluation', body: project.aiEngineering.evaluation },
+                                    { label: 'Guardrails', body: project.aiEngineering.guardrails },
+                                ]
+                                    .filter((b) => b.body)
+                                    .map((b) => (
+                                        <div key={b.label} className="rounded-2xl border border-neutral-200 bg-neutral-50 p-6 dark:border-white/10 dark:bg-white/[0.02]">
+                                            <div className="mb-3 font-mono text-[9px] uppercase tracking-[0.2em] text-[color:var(--accent-ink)]">
+                                                {b.label}
+                                            </div>
+                                            <p className="text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">{b.body}</p>
+                                        </div>
+                                    ))}
+                            </div>
+                        </section>
+                    )}
+
+                    {/* ---------- Infrastructure ---------- */}
+                    {project.infrastructure && (
+                        <section className="border-t border-neutral-200 py-14 dark:border-white/10 md:py-20">
+                            <SectionHeading eyebrow="Infrastructure" title="Where it runs, and why that mattered" />
+                            <div className="grid gap-5 md:grid-cols-3">
+                                {[
+                                    { label: 'Hosting', body: project.infrastructure.hosting },
+                                    { label: 'Why it helped', body: project.infrastructure.rationale },
+                                    { label: 'Data residency', body: project.infrastructure.dataResidency },
+                                ]
+                                    .filter((b) => b.body)
+                                    .map((b) => (
+                                        <div key={b.label} className="rounded-2xl border p-6" style={{ borderColor: `${accent}33`, background: `${accent}0A` }}>
+                                            <div className="mb-3 font-mono text-[9px] uppercase tracking-[0.2em] text-[color:var(--accent-ink)]">
+                                                {b.label}
+                                            </div>
+                                            <p className="text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">{b.body}</p>
+                                        </div>
+                                    ))}
+                            </div>
+                        </section>
+                    )}
+
+                    {/* ---------- Diagrams ---------- */}
+                    {project.diagrams?.length > 0 && (
+                        <section className="border-t border-neutral-200 py-14 dark:border-white/10 md:py-20">
+                            <SectionHeading eyebrow="Architecture" title="Diagrams" lead="Drag to pan, scroll controls to zoom, or open any diagram fullscreen." />
+                            <div className="space-y-14">
+                                {project.diagrams.map((d, i) => (
+                                    <figure key={i} className="m-0">
+                                        <figcaption className="mb-4">
+                                            <h3 className="font-serif text-lg font-light text-foreground">{d.title}</h3>
+                                            {d.caption && <p className="mt-1 text-sm text-neutral-700 dark:text-neutral-300">{d.caption}</p>}
+                                        </figcaption>
+                                        <Mermaid chart={d.chart} id={`${project.slug}-d${i}`} />
+                                    </figure>
+                                ))}
+                            </div>
+                        </section>
+                    )}
+
+                    {/* ---------- Decisions ---------- */}
+                    {project.decisions?.length > 0 && (
+                        <section className="border-t border-neutral-200 py-14 dark:border-white/10 md:py-20">
+                            <SectionHeading
+                                eyebrow="Engineering decisions"
+                                title="Choices worth defending"
+                                lead="The decisions that shaped the system, why they went the way they did, and what each one cost."
+                            />
+                            <div className="space-y-5">
+                                {project.decisions.map((d, i) => (
+                                    <div key={i} className="rounded-2xl border border-neutral-200 p-6 transition-colors hover:border-[var(--accent)]/40 dark:border-white/10 md:p-8">
+                                        <div className="mb-5 flex items-start gap-4">
+                                            <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full font-mono text-[10px] text-[color:var(--accent-ink)]" style={{ background: `${accent}1A` }}>
+                                                {String(i + 1).padStart(2, '0')}
+                                            </span>
+                                            <h3 className="text-lg font-medium leading-snug text-foreground">{d.issue}</h3>
+                                        </div>
+                                        <div className="space-y-4 md:pl-11">
+                                            <div>
+                                                <div className="mb-1.5 font-mono text-[9px] uppercase tracking-[0.2em] text-[color:var(--accent-ink)]">Decision</div>
+                                                <p className="text-sm font-light leading-relaxed text-foreground/90">{d.choice}</p>
+                                            </div>
+                                            <div>
+                                                <div className="mb-1.5 font-mono text-[9px] uppercase tracking-[0.2em] text-neutral-500 dark:text-neutral-400">Why</div>
+                                                <p className="text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">{d.rationale}</p>
+                                            </div>
+                                            {d.tradeoff && (
+                                                <div className="rounded-xl border-l-2 bg-neutral-50 px-4 py-3 dark:bg-white/[0.03]" style={{ borderColor: accent }}>
+                                                    <div className="mb-1 font-mono text-[9px] uppercase tracking-[0.2em] text-neutral-500 dark:text-neutral-400">Trade-off accepted</div>
+                                                    <p className="text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">{d.tradeoff}</p>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 ))}
                             </div>
                         </section>
                     )}
 
-                    {/* Challenges */}
-                    {project.challenges.length > 0 && (
-                        <section className="mb-24">
-                            <div className="text-center mb-12">
-                                <h2 className="text-3xl font-serif font-light text-foreground tracking-tight">Key Challenges & Solutions</h2>
-                            </div>
-                            <div className="space-y-6">
-                                {project.challenges.map((challenge, index) => (
-                                    <details
-                                        key={index}
-                                        className="group p-8 rounded-3xl bg-card border border-neutral-200 dark:border-white/10 hover:border-[#d4a373]/30 transition-all shadow-md"
-                                    >
-                                        <summary className="cursor-pointer font-medium text-foreground text-xl list-none flex items-center justify-between">
+                    {/* ---------- Challenges ---------- */}
+                    {project.challenges?.length > 0 && (
+                        <section className="border-t border-neutral-200 py-14 dark:border-white/10 md:py-20">
+                            <SectionHeading eyebrow="Hard parts" title="Problems that took real work" />
+                            <div className="space-y-4">
+                                {project.challenges.map((c, i) => (
+                                    <details key={i} className="group rounded-2xl border border-neutral-200 p-6 transition-colors open:border-[var(--accent)]/40 dark:border-white/10 md:p-8">
+                                        <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
                                             <div className="flex items-center gap-4">
-                                                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#d4a373]/10 text-[#d4a373] text-sm font-mono">{index + 1}</span>
-                                                {challenge.title}
+                                                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full font-mono text-[10px] text-[color:var(--accent-ink)]" style={{ background: `${accent}1A` }}>
+                                                    {i + 1}
+                                                </span>
+                                                <h3 className="text-base font-medium leading-snug text-foreground md:text-lg">{c.title}</h3>
                                             </div>
-                                            <span className="text-muted-foreground group-open:rotate-180 transition-transform duration-300">▼</span>
+                                            <span className="shrink-0 text-xs text-neutral-500 dark:text-neutral-400 transition-transform duration-300 group-open:rotate-180">▼</span>
                                         </summary>
-                                        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-neutral-100 dark:border-white/5 pt-8">
-                                            <div className="space-y-3">
-                                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/5 text-red-500 text-xs font-mono uppercase tracking-wider">The Challenge</div>
-                                                <p className="text-muted-foreground text-lg leading-relaxed font-light">{challenge.description}</p>
+                                        <div className="mt-6 grid gap-6 border-t border-neutral-100 pt-6 dark:border-white/5 md:grid-cols-2 md:pl-11">
+                                            <div>
+                                                <div className="mb-2 inline-block rounded-full bg-red-500/10 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-red-700 dark:text-red-400">The problem</div>
+                                                <p className="text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">{c.description}</p>
                                             </div>
-                                            <div className="space-y-3">
-                                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#d4a373]/10 text-[#d4a373] text-xs font-mono uppercase tracking-wider">Our Solution</div>
-                                                <p className="text-muted-foreground text-lg leading-relaxed font-light">{challenge.solution}</p>
+                                            <div>
+                                                <div className="mb-2 inline-block rounded-full px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-[color:var(--accent-ink)]" style={{ background: `${accent}1A` }}>How I solved it</div>
+                                                <p className="text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">{c.solution}</p>
                                             </div>
                                         </div>
                                     </details>
@@ -337,82 +358,76 @@ export default function ProjectDetail() {
                         </section>
                     )}
 
+                    {/* ---------- Tech stack ---------- */}
+                    <section className="border-t border-neutral-200 py-14 dark:border-white/10 md:py-20">
+                        <SectionHeading eyebrow="Stack" title="Technology" />
+                        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                            {project.techStack.map((group) => (
+                                <div key={group.category}>
+                                    <h3 className="mb-4 font-mono text-[10px] uppercase tracking-[0.2em] text-[color:var(--accent-ink)]">
+                                        {group.category}
+                                    </h3>
+                                    <div className="flex flex-wrap gap-2">
+                                        {group.technologies.map((t) => (
+                                            <span key={t} className="rounded-lg border border-neutral-200 px-2.5 py-1.5 font-mono text-[10px] text-neutral-600 dark:border-white/10 dark:text-neutral-400">
+                                                {t}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
 
-                    {/* Project Gallery */}
-                    {project.images && project.images.length > 0 && (
-                        <section className="mb-24">
-                            <div className="text-center mb-12">
-                                <h2 className="text-3xl font-serif font-light text-foreground tracking-tight">Project Gallery</h2>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                {project.images.map((image, index) => (
-                                    <div
-                                        key={index}
-                                        className="group relative aspect-video rounded-3xl overflow-hidden border border-black/10 dark:border-white/10 shadow-2xl transition-all hover:scale-[1.02] hover:border-[#d4a373]/30"
-                                    >
-                                        <img
-                                            src={`${import.meta.env.BASE_URL}${image.startsWith('/') ? image.slice(1) : image}`}
-                                            alt={`${project.title} screenshot ${index + 1}`}
-                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                        />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-8">
-                                            <p className="text-white text-lg font-medium">Interface Preview {index + 1}</p>
-                                        </div>
+                    {/* ---------- Results ---------- */}
+                    {project.results?.length > 0 && (
+                        <section className="border-t border-neutral-200 py-14 dark:border-white/10 md:py-20">
+                            <SectionHeading eyebrow="Outcome" title="What changed" />
+                            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                                {project.results.map((r) => (
+                                    <div key={r.metric} className="rounded-2xl border border-neutral-200 p-6 dark:border-white/10">
+                                        <div className="mb-2 font-serif text-2xl font-light leading-tight text-[color:var(--accent-ink)]">{r.value}</div>
+                                        <div className="mb-3 font-mono text-[9px] uppercase tracking-[0.2em] text-neutral-500 dark:text-neutral-400">{r.metric}</div>
+                                        <p className="text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">{r.description}</p>
                                     </div>
                                 ))}
                             </div>
                         </section>
                     )}
 
-                    {/* Testimonial */}
-                    {project.testimonial && (
-                        <section className="mb-24">
-                            <div className="relative p-8 md:p-16 rounded-2xl md:rounded-[3rem] bg-card border border-neutral-200 dark:border-white/10 overflow-hidden group shadow-3xl">
-                                <div className="absolute top-0 right-0 p-12 text-8xl text-[#d4a373]/5 font-serif select-none transition-transform group-hover:-translate-y-2">"</div>
-                                <div className="relative z-10">
-                                    <p className="text-2xl md:text-3xl text-foreground font-light italic mb-10 leading-relaxed tracking-tight">
-                                        {project.testimonial.text}
-                                    </p>
-                                    <div className="flex items-center gap-6">
-                                        <div className="w-16 h-16 rounded-2xl bg-[#d4a373]/10 flex items-center justify-center text-[#d4a373] text-2xl font-serif font-light shadow-lg">
-                                            {project.testimonial.author.charAt(0)}
-                                        </div>
-                                        <div>
-                                            <div className="text-xl font-medium text-foreground">{project.testimonial.author}</div>
-                                            <div className="text-muted-foreground font-light">{project.testimonial.role}</div>
-                                        </div>
-                                    </div>
-                                </div>
+                    {/* ---------- Next ---------- */}
+                    {others.length > 0 && (
+                        <section className="border-t border-neutral-200 py-14 dark:border-white/10 md:py-20">
+                            <SectionHeading eyebrow="Keep reading" title="Other case studies" />
+                            <div className="grid gap-5 md:grid-cols-2">
+                                {others.map((p) => (
+                                    <Link
+                                        key={p.slug}
+                                        to={`/projects/${p.slug}`}
+                                        className="group flex flex-col rounded-2xl border border-neutral-200 p-6 no-underline transition-all hover:-translate-y-0.5 dark:border-white/10"
+                                        style={{ ['--accent' as string]: p.accent }}
+                                    >
+                                        <span className="mb-2 font-mono text-[9px] uppercase tracking-[0.2em] text-[color:var(--accent-ink)]">{p.category}</span>
+                                        <span className="mb-2 font-serif text-lg font-light leading-snug text-foreground">{p.title}</span>
+                                        <span className="mb-4 line-clamp-2 text-sm text-neutral-700 dark:text-neutral-300">{p.tagline}</span>
+                                        <span className="mt-auto inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest transition-all group-hover:gap-2.5 text-[color:var(--accent-ink)]">
+                                            Read <ArrowRight className="h-3 w-3" />
+                                        </span>
+                                    </Link>
+                                ))}
                             </div>
                         </section>
                     )}
 
-                    {/* Author Signature Section */}
-                    <section className="mt-32 pt-16 border-t border-neutral-200 dark:border-white/5">
-                        <div className="max-w-3xl mx-auto">
-                            <div className="relative p-6 md:p-10 rounded-2xl md:rounded-[2.5rem] bg-card border border-neutral-200 dark:border-white/10 shadow-2xl overflow-hidden group">
-                                <div className="absolute inset-0 bg-gradient-to-br from-[#d4a373]/5 to-transparent pointer-events-none" />
-                                <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
-                                    <div className="relative shrink-0">
-                                        <div className="relative h-28 w-28 overflow-hidden rounded-3xl border-2 border-[#d4a373]/20 shadow-xl group-hover:scale-105 transition-transform duration-500">
-                                            <img src={`${import.meta.env.BASE_URL}Abhishek_Profile.png`} alt="Abhishek Mane" className="h-full w-full object-cover" />
-                                        </div>
-                                        <div className="absolute -bottom-2 -right-2 p-2 rounded-xl bg-[#d4a373] text-white shadow-lg">
-                                            <Trophy className="w-4 h-4" />
-                                        </div>
-                                    </div>
-                                    <div className="text-center md:text-left">
-                                        <span className="block font-mono text-[10px] uppercase tracking-[0.3em] text-[#d4a373] mb-3">Written By</span>
-                                        <h3 className="text-2xl font-bold text-foreground mb-3">Abhishek Mane</h3>
-                                        <p className="text-muted-foreground leading-relaxed font-light">
-                                            Full Stack Developer & AI/ML Engineer dedicated to architecting intelligent, high-performance systems and crafting intuitive digital experiences that bridge technology and human needs.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                </div>
+                    <div className="border-t border-neutral-200 py-14 text-center dark:border-white/10 md:py-20">
+                        <Link
+                            to="/projects"
+                            className="inline-flex items-center gap-3 rounded-full bg-[#d4a373] px-9 py-4 font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-white no-underline shadow-xl shadow-[#d4a373]/10 transition-all hover:-translate-y-0.5 hover:bg-[#c49363] active:scale-95"
+                        >
+                            <ArrowLeft className="h-4 w-4" /> All case studies
+                        </Link>
+                    </div>
+                </main>
             </div>
         </>
     )

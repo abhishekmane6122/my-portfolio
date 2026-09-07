@@ -1,28 +1,32 @@
-import { ProjectDetailed } from '@/types/schema'
+import { ProjectCaseStudy } from '@/types/schema'
 
-// Import individual project JSON files
-// NOTE: 02_equity_analytics_platform.json is intentionally excluded (private/confidential)
-import project1 from './projects_json/01_aegis_platform.json'
-import project3 from './projects_json/03_quantus_med.json'
-import project4 from './projects_json/04_bse_rag_processor.json'
-import project5 from './projects_json/05_doc_capture.json'
-import project6 from './projects_json/06_omniqa_agent.json'
-import project7 from './projects_json/07_rbi_pipeline_portfolio.json'
+// Every JSON file in projects_json is a case study. Dropping a new file in is
+// all that's needed - there is no import list to maintain.
+const modules = import.meta.glob<{ default: ProjectCaseStudy }>(
+    './projects_json/*.json',
+    { eager: true },
+)
 
-// Export the array of detailed projects
-export const detailedProjects: ProjectDetailed[] = [
-    project1 as ProjectDetailed,
-    project3 as ProjectDetailed,
-    project4 as ProjectDetailed,
-    project5 as ProjectDetailed,
-    project6 as ProjectDetailed,
-    project7 as ProjectDetailed
-];
+export const caseStudies: ProjectCaseStudy[] = Object.entries(modules)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([, m]) => m.default as ProjectCaseStudy)
+    .sort((a, b) => {
+        // Featured first; file-name order is preserved within each group.
+        if (a.featured !== b.featured) return a.featured ? -1 : 1
+        return 0
+    })
 
-export function getProjectBySlug(slug: string): ProjectDetailed | undefined {
-    return detailedProjects.find(project => project.slug === slug)
+/** Kept as the legacy export name so existing imports keep working. */
+export const detailedProjects = caseStudies
+
+export function getProjectBySlug(slug: string): ProjectCaseStudy | undefined {
+    return caseStudies.find(project => project.slug === slug)
 }
 
 export function getAllProjectSlugs(): string[] {
-    return detailedProjects.map(project => project.slug)
+    return caseStudies.map(project => project.slug)
+}
+
+export function getProjectCategories(): string[] {
+    return Array.from(new Set(caseStudies.map(p => p.category))).sort()
 }

@@ -553,6 +553,7 @@ export function PortfolioTemplate({
 
   const navItems = [
     { name: "Home", color: "#3b82f6", anchor: "home" },
+    { name: "Services", path: "/services", isExternal: true, color: "#06b6d4" },
     { name: "Work", color: "#d4a373", anchor: "projects" },
     { name: "Skills", color: "#10b981", anchor: "skills" },
     { name: "Experience", color: "#a855f7", anchor: "experience" },
@@ -1657,7 +1658,51 @@ export function PortfolioTemplate({
             </div>
           </div>
 
-          <div className="mt-20 pt-8 border-t border-neutral-200 dark:border-white/5 text-center text-xs text-neutral-600 flex flex-col items-center gap-4">
+          {/* Direct contact block - plain text so it survives copy/paste into an ATS or email */}
+          <div className="mt-16 pt-10 border-t border-neutral-200 dark:border-white/5">
+            <div className="mx-auto max-w-2xl rounded-3xl border border-[#d4a373]/20 dark:border-white/10 bg-neutral-50 dark:bg-[#0e0e0e] p-8 md:p-10">
+              <span className="mb-6 block text-center font-mono text-[10px] font-medium uppercase tracking-[0.3em] text-[#8a5827] dark:text-[#d4a373]">
+                Direct Contact
+              </span>
+
+              <div className="mb-6 text-center">
+                <div className="font-serif text-2xl font-light text-neutral-900 dark:text-white">Abhishek Mane</div>
+                <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.2em] text-neutral-600 dark:text-neutral-400">
+                  AI / ML Engineer · Full Stack
+                </div>
+              </div>
+
+              <dl className="grid gap-x-8 gap-y-4 sm:grid-cols-2">
+                {[
+                  { label: 'Email', value: 'abhishek.mane.work@gmail.com', href: 'mailto:abhishek.mane.work@gmail.com' },
+                  { label: 'Phone', value: '+91-7020870063', href: 'tel:+917020870063' },
+                  { label: 'LinkedIn', value: 'in/abhishek-mane-aiml', href: 'https://www.linkedin.com/in/abhishek-mane-aiml' },
+                  { label: 'GitHub', value: 'abhishekmane6122', href: 'https://github.com/abhishekmane6122' },
+                  { label: 'Portfolio', value: 'abhishekmane6122.github.io/my-portfolio', href: 'https://abhishekmane6122.github.io/my-portfolio/' },
+                ].map((item) => (
+                  <div key={item.label} className="min-w-0">
+                    <dt className="mb-1 font-mono text-[9px] uppercase tracking-[0.2em] text-neutral-500 dark:text-neutral-400">
+                      {item.label}
+                    </dt>
+                    <dd className="min-w-0">
+                      <a
+                        href={item.href}
+                        target={item.href.startsWith('http') ? '_blank' : undefined}
+                        rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                        // Wraps rather than truncates - a contact detail that is
+                        // cut off with an ellipsis cannot be read off the screen.
+                        className="block break-words text-sm text-neutral-800 no-underline transition-colors hover:text-[#8a5827] dark:text-neutral-200 dark:hover:text-[#d4a373]"
+                      >
+                        {item.value}
+                      </a>
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          </div>
+
+          <div className="mt-16 pt-8 border-t border-neutral-200 dark:border-white/5 text-center text-xs text-neutral-600 flex flex-col items-center gap-4">
             <div className="dark:text-neutral-400">© {new Date().getFullYear()} {fullName}. All rights reserved.</div>
             <div className="flex flex-col items-center gap-2">
               <span className="font-mono text-[10px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400">Live Engagement</span>

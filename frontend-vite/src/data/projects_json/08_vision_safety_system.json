@@ -1,0 +1,262 @@
+{
+    "id": "industrial-safety-vision",
+    "slug": "industrial-safety-vision-system",
+    "title": "Industrial Safety Vision System",
+    "tagline": "A computer-vision platform that analyses facility footage for PPE violations, restricted-zone intrusion, fire and smoke, falls, machine downtime and crowding — running entirely locally on CPU or GPU with evidence snapshots and an analytics dashboard.",
+    "category": "Computer Vision",
+    "domain": "Industrial Safety · EHS Compliance",
+    "year": "2026",
+    "role": "AI Engineer — detection architecture, zone modelling, violation logic, full stack",
+    "duration": "Self-initiated build",
+    "team": [
+        "Solo build — architecture through working platform"
+    ],
+    "featured": false,
+    "art": "/projects/art-vision-ai.svg",
+    "accent": "#D9C05F",
+    "headline": "17+ configurable violation detectors built on a shared detection backbone — running free and fully local, with an architecture that accepts live camera feeds without a rewrite.",
+    "highlights": [
+        "One detection pass feeds every detector, rather than one model per violation type",
+        "Temporal confirmation over consecutive frames to suppress single-frame false alarms",
+        "Editable polygon zones so restricted areas are configuration, not code",
+        "Runs on CPU or GPU from a single config switch; models auto-download, no cloud account",
+        "Evidence snapshots and annotated video so every alert can be verified by a human"
+    ],
+    "context": "Industrial facilities, plants and high-risk operational sites carry a permanent tension between safety obligations and the practical limits of human supervision. A control room may have dozens or hundreds of camera feeds and a handful of people watching them. Vigilance decrement is well documented: attention degrades within minutes, and the incidents that matter are rare enough that watching for them is exactly the task humans do worst.",
+    "problem": "### Why this is a systems problem, not a model problem\n\n**Detection is the easy part.** Off-the-shelf object detectors already find people, helmets, vehicles and equipment. Getting from \"there is a person and no helmet in this frame\" to \"this is a reportable PPE violation\" is where the real work is.\n\n**Single-frame decisions produce unusable alerting.** A person momentarily turning away, a helmet occluded for three frames, a detector wobbling at its confidence threshold — any of these fire an alert. A system that cries wolf gets muted within a day, and a muted safety system is worse than none because it creates false assurance.\n\n**Violations are spatial and contextual.** \"Restricted zone intrusion\" is meaningless without knowing where the zone is, and zones differ per site and change as work moves. Hard-coding them makes the system undeployable anywhere else.\n\n**Running a model per violation type does not scale.** Seventeen detectors each running their own inference pass would be seventeen times the compute for largely the same underlying detections.\n\n**Cost and connectivity constrain deployment.** Sites that most need monitoring often have the least reliable connectivity, and per-camera cloud inference pricing makes wide deployment unaffordable.",
+    "approach": "The architectural decision was to **separate detection from interpretation**. One detection pass per frame produces the primitives — people, PPE items, vehicles, equipment, smoke — and every violation detector is then a rule operating over those primitives plus zone geometry and time. Adding a violation type becomes a rule, not a model.\n\nThe second decision was **temporal confirmation as a first-class concept**. No violation is raised from a single frame. A candidate must persist across a configurable number of consecutive frames before becoming an event. This single mechanism removed the overwhelming majority of false positives and is the difference between a demo and something an operator would leave switched on.\n\nThe third was to make **zones data**. Restricted areas, machine regions and counting areas are editable polygons stored as configuration, so deploying to a new site is a drawing task rather than a code change.\n\nAnd deliberately: everything runs locally, on CPU or GPU, with no cloud account required — because the sites that need this most are the ones least able to depend on connectivity or per-frame pricing.",
+    "solution": "Uploaded footage is decoded frame by frame and passed through a single detection pass producing all object primitives. Those detections flow into a violation engine where each detector is a rule combining object classes, zone geometry and temporal persistence.\n\nCandidate violations are held until they persist across the configured frame threshold, at which point they become confirmed events. Each event captures an evidence snapshot with the triggering detections drawn on it, plus its timestamp, zone and detector, and writes to a local database.\n\nThe frontend presents the annotated video, the evidence gallery, an editable zone canvas, alert configuration and analytics over detected events. Every detector can be individually enabled or disabled in configuration, so a site runs only what is relevant to it.",
+    "systemDesign": {
+        "overview": "A decoupled pipeline: decode → detect → track → interpret → confirm → record → present. Detection runs once per frame and is shared by every violation rule, and the ingestion boundary is deliberately abstracted so a live camera source can replace uploaded video without touching anything downstream.",
+        "components": [
+            {
+                "name": "Video ingestion",
+                "responsibility": "Decodes uploaded video or a single image into a frame stream behind an interface designed to accept live camera feeds later",
+                "tech": "OpenCV · frame source abstraction"
+            },
+            {
+                "name": "Detection backbone",
+                "responsibility": "Runs one inference pass per frame producing all object primitives consumed by every downstream detector",
+                "tech": "YOLOv8 · CPU or CUDA"
+            },
+            {
+                "name": "Tracker",
+                "responsibility": "Maintains object identity across frames so a violation follows a person rather than a per-frame box",
+                "tech": "Multi-object tracking"
+            },
+            {
+                "name": "Zone model",
+                "responsibility": "Stores editable polygon regions — restricted areas, machine zones, counting areas — as configuration rather than code",
+                "tech": "Polygon geometry · point-in-polygon tests"
+            },
+            {
+                "name": "Violation rule engine",
+                "responsibility": "Evaluates each enabled detector as a rule over detections, zone membership and object state",
+                "tech": "Composable rule definitions"
+            },
+            {
+                "name": "Temporal confirmer",
+                "responsibility": "Requires a candidate violation to persist across consecutive frames before it becomes a reportable event",
+                "tech": "Per-track persistence windows"
+            },
+            {
+                "name": "Evidence recorder",
+                "responsibility": "Captures annotated snapshots and event metadata so every alert can be verified by a human",
+                "tech": "Annotated frame capture · local database"
+            },
+            {
+                "name": "Dashboard",
+                "responsibility": "Presents annotated video, evidence gallery, zone editor, alert configuration and event analytics",
+                "tech": "React · TypeScript"
+            }
+        ],
+        "dataFlow": [
+            {
+                "stage": "1 · Ingest",
+                "detail": "Video or a still image is decoded into frames through an abstraction that a live camera source can satisfy later."
+            },
+            {
+                "stage": "2 · Detect",
+                "detail": "A single inference pass per frame produces every object primitive — people, PPE items, vehicles, equipment, smoke."
+            },
+            {
+                "stage": "3 · Track",
+                "detail": "Detections are associated across frames so state belongs to an identity rather than to a box."
+            },
+            {
+                "stage": "4 · Locate",
+                "detail": "Each tracked object is tested against the configured zone polygons to establish spatial context."
+            },
+            {
+                "stage": "5 · Interpret",
+                "detail": "Every enabled violation rule evaluates against the detections, zone membership and object state for that frame."
+            },
+            {
+                "stage": "6 · Confirm",
+                "detail": "Candidates must persist across the configured number of consecutive frames before being promoted to a reportable event."
+            },
+            {
+                "stage": "7 · Record & present",
+                "detail": "Confirmed events capture an annotated evidence snapshot and metadata, then surface in the dashboard and analytics."
+            }
+        ]
+    },
+    "aiEngineering": {
+        "summary": "A shared-backbone vision architecture where the model does detection and the system does judgement. The engineering value is in what sits around the detector — tracking, zone geometry, temporal confirmation — because that is what converts noisy per-frame inference into alerts an operator will trust.",
+        "models": [
+            {
+                "name": "YOLOv8 (object detection)",
+                "role": "Single shared detection pass per frame",
+                "why": "Real-time detection quality with weights that auto-download and run on CPU or CUDA from one config switch. Running one detector for all violation types rather than a model per type keeps compute roughly constant as detectors are added — the property that makes 17+ detectors feasible at all."
+            },
+            {
+                "name": "Multi-object tracker",
+                "role": "Identity across frames",
+                "why": "Temporal confirmation is impossible without stable identity — you cannot say a violation persisted for N frames if you cannot tell it is the same person. Tracking is what makes the false-positive suppression strategy work."
+            }
+        ],
+        "retrieval": "Not a retrieval system. The analogous concern is evidence lookup: confirmed events are indexed by detector type, zone and timestamp so an EHS reviewer can retrieve all violations of a class in an area over a period, with the annotated snapshot attached for verification.",
+        "evaluation": "The measure that mattered was false alarms per hour of footage, not raw detection accuracy — a detector at high mAP that fires ten spurious alerts an hour will be switched off. Detectors were tuned against recorded footage with known incidents, checking both that real violations were caught and how many candidates the temporal window correctly suppressed. Tuning the persistence threshold was the single highest-leverage adjustment, and it was tuned per detector because a fall and a missing helmet have very different natural durations.",
+        "guardrails": "No event is raised from a single frame, and every confirmed event carries an annotated evidence snapshot so a human verifies rather than trusting the system blindly. Detectors are individually toggleable, so a site enables only what it is prepared to act on. The system is positioned explicitly as an attention aid for supervisors, not an automated enforcement mechanism — the output is a flagged clip for review, not a citation."
+    },
+    "infrastructure": {
+        "hosting": "Fully local — runs on a single machine on CPU or GPU with a local database, no cloud account and no external service dependency.",
+        "rationale": "The sites that most need this monitoring are often the ones with the least reliable connectivity, and per-camera cloud inference pricing makes wide deployment unaffordable before it makes it useful. Running locally means footage never leaves the facility — which matters because continuous video of a workplace is sensitive personal data — and it makes the cost of adding another camera the cost of compute rather than a per-frame charge. Zero-setup local storage keeps the deployment burden low enough for a plant IT team to run it without a platform engineer.",
+        "dataResidency": "Complete. Video, detections, evidence snapshots and event records remain on the local machine; nothing is transmitted off-site."
+    },
+    "decisions": [
+        {
+            "issue": "One model per violation type, or a shared detection backbone",
+            "choice": "A single detection pass feeding rule-based violation detectors",
+            "rationale": "Most violation types depend on the same underlying primitives — where people are, what PPE is present, where vehicles and equipment sit. Running separate inference per type multiplies compute for no additional information, and makes adding a detector expensive rather than trivial.",
+            "tradeoff": "Violation types are limited to what the shared detector's classes can express; a genuinely novel target class needs the backbone extended or a specialised model added."
+        },
+        {
+            "issue": "Alert on detection, or require temporal persistence",
+            "choice": "Candidates must persist across consecutive frames before becoming events, tuned per detector",
+            "rationale": "Single-frame alerting produces a stream of false positives from occlusion, motion blur and threshold wobble. An operator mutes such a system within a day, and a muted safety system creates false assurance — worse than no system.",
+            "tradeoff": "Adds latency equal to the confirmation window and can miss genuinely instantaneous events, which is why the window is per-detector rather than global."
+        },
+        {
+            "issue": "Hard-coded regions or editable zones",
+            "choice": "Polygon zones stored as editable configuration with a drawing UI",
+            "rationale": "Zone-dependent violations are meaningless without site-specific geometry, and layouts change as work moves. Hard-coding would make every deployment a code change and every layout change a release.",
+            "tradeoff": "Requires an initial setup step per site — a drawing task rather than an engineering one, which is the point."
+        },
+        {
+            "issue": "Cloud inference or fully local",
+            "choice": "Fully local, CPU or GPU, no cloud account required",
+            "rationale": "Connectivity is unreliable exactly where monitoring matters most, per-camera cloud pricing blocks wide deployment, and continuous workplace video is sensitive data that is safer never leaving the site.",
+            "tradeoff": "Detection quality is bounded by local hardware, and each site operates its own deployment rather than a central service."
+        },
+        {
+            "issue": "Uploaded video or live camera ingestion for the first build",
+            "choice": "Uploaded video, behind an ingestion abstraction that live feeds can satisfy",
+            "rationale": "Recorded footage made the detection and violation logic testable against known incidents repeatedly — impossible with a live feed. Abstracting the frame source meant this scoping decision did not become an architectural one.",
+            "tradeoff": "The live path is designed but not exercised, so real-time backpressure and reconnection behaviour remain to be proven."
+        }
+    ],
+    "challenges": [
+        {
+            "title": "Alert fatigue would have killed the system",
+            "description": "Early per-frame alerting produced a constant stream of violations from partial occlusion, motion blur and detector confidence wobbling at its threshold. A helmet hidden for a few frames as someone turned registered as a PPE violation. Any operator would have muted it immediately.",
+            "solution": "I introduced temporal confirmation over tracked identities: a candidate must persist across a configurable number of consecutive frames before becoming an event, with the window tuned per detector because a fall and a missing helmet have very different natural durations. This suppressed the overwhelming majority of false positives and was the change that made the system credible."
+        },
+        {
+            "title": "Seventeen detectors without seventeen inference passes",
+            "description": "The straightforward implementation — a model per violation type — would have multiplied compute per frame and made every additional detector a proportional cost, which is incompatible with running on modest local hardware.",
+            "solution": "I separated detection from interpretation. One pass produces all object primitives; each violation detector is a rule over those primitives, zone membership and tracked state. Compute stays roughly flat as detectors are added, and a new violation type is a rule definition rather than a training exercise."
+        },
+        {
+            "title": "Spatial violations that differ at every site",
+            "description": "Restricted-zone intrusion, machine-area occupancy and crowding all depend on geometry unique to a facility, and that geometry changes as work moves. Encoding it in the application would make the system single-site software.",
+            "solution": "Zones are editable polygons stored as configuration, drawn through a canvas in the dashboard, with membership resolved by point-in-polygon tests against tracked objects. Deploying to a new site or adapting to a layout change became a drawing task with no release involved."
+        },
+        {
+            "title": "Making every alert verifiable",
+            "description": "A safety event that an operator cannot quickly confirm is an interruption rather than information, and an unverifiable automated safety claim is a liability in its own right.",
+            "solution": "Every confirmed event captures an annotated snapshot with the triggering detections drawn on it, alongside timestamp, zone and detector, and the dashboard presents these as a reviewable evidence gallery. The system's role is explicitly to direct human attention, not to adjudicate."
+        }
+    ],
+    "techStack": [
+        {
+            "category": "Computer Vision",
+            "technologies": [
+                "YOLOv8",
+                "OpenCV",
+                "Multi-object tracking",
+                "Polygon zone geometry",
+                "Temporal confirmation windows",
+                "Annotated evidence capture"
+            ]
+        },
+        {
+            "category": "Backend",
+            "technologies": [
+                "Python",
+                "FastAPI",
+                "Configurable detector registry",
+                "Local database",
+                "CPU / CUDA switchable inference"
+            ]
+        },
+        {
+            "category": "Frontend",
+            "technologies": [
+                "React",
+                "TypeScript",
+                "Zone editing canvas",
+                "Evidence gallery",
+                "Event analytics"
+            ]
+        },
+        {
+            "category": "Deployment",
+            "technologies": [
+                "Docker Compose",
+                "Auto-downloading model weights",
+                "Zero-setup local storage",
+                "Live-feed-ready ingestion abstraction"
+            ]
+        }
+    ],
+    "diagrams": [
+        {
+            "title": "Detection and interpretation are separate",
+            "caption": "One inference pass; every detector is a rule over the same primitives.",
+            "chart": "---\ntitle: \"Shared Backbone Vision Pipeline\"\n---\nflowchart TD\n    A[\"Video or image source\"] --> B[\"Frame decode\"]\n    B --> C[\"Single detection pass<br/>people, PPE, vehicles, equipment, smoke\"]\n    C --> D[\"Multi-object tracking<br/>identity across frames\"]\n    D --> E[\"Zone membership test\"]\n\n    E --> F[\"Violation rule engine\"]\n    F --> G1[\"PPE compliance\"]\n    F --> G2[\"Restricted zone intrusion\"]\n    F --> G3[\"Fire and smoke\"]\n    F --> G4[\"Fall detection\"]\n    F --> G5[\"Machine downtime\"]\n    F --> G6[\"Crowding / density\"]\n\n    G1 --> H{\"Persists across N frames\"}\n    G2 --> H\n    G3 --> H\n    G4 --> H\n    G5 --> H\n    G6 --> H\n    H -->|No| I[\"Discard candidate\"]\n    H -->|Yes| J[\"Confirmed event\"]\n    J --> K[\"Annotated evidence snapshot\"]\n    K --> L[(\"Local event store\")]\n    L --> M[\"Dashboard and analytics\"]\n\n    classDef input fill:#E8F0FE,stroke:#5B7FA6,stroke-width:1px,color:#1F2933\n    classDef process fill:#EDF4E9,stroke:#7A9A6B,stroke-width:1px,color:#1F2933\n    classDef store fill:#F3F0F8,stroke:#8880AE,stroke-width:1px,color:#1F2933\n    classDef decision fill:#FDF6E7,stroke:#C9A85C,stroke-width:1px,color:#1F2933\n    classDef risk fill:#FBEDED,stroke:#C08383,stroke-width:1px,color:#1F2933\n    classDef output fill:#E7F2F1,stroke:#6F9BA3,stroke-width:1px,color:#1F2933\n\n    class A input\n    class B,C,D,E,F,G1,G2,G3,G4,G5,G6,K process\n    class H decision\n    class I risk\n    class L store\n    class J,M output"
+        },
+        {
+            "title": "Why temporal confirmation matters",
+            "caption": "The mechanism that turned an unusable alert stream into something an operator would leave running.",
+            "chart": "---\ntitle: \"Suppressing Single-Frame False Positives\"\n---\nsequenceDiagram\n    participant F as Frame stream\n    participant D as Detector\n    participant T as Tracker\n    participant C as Confirmer\n    participant E as Event store\n\n    F->>D: Frame n\n    D->>T: Person, no helmet detected\n    T->>C: Candidate opened for track id\n    F->>D: Frame n+1\n    D->>T: Helmet visible again (was occluded)\n    T->>C: Candidate broken\n    C->>C: Discard - never alerted\n\n    F->>D: Frames n+5 to n+5+N\n    D->>T: Person, no helmet, sustained\n    T->>C: Candidate persists past threshold\n    C->>E: Confirmed event + evidence snapshot\n"
+        }
+    ],
+    "results": [
+        {
+            "metric": "Violation detectors",
+            "value": "17+",
+            "description": "All served by one shared detection pass, each individually toggleable per site."
+        },
+        {
+            "metric": "False alarms",
+            "value": "Suppressed by design",
+            "description": "Temporal confirmation over tracked identities removed the bulk of single-frame false positives."
+        },
+        {
+            "metric": "Compute per added detector",
+            "value": "Near zero",
+            "description": "New violation types are rules over existing primitives rather than additional inference passes."
+        },
+        {
+            "metric": "Deployment cost",
+            "value": "Free and local",
+            "description": "CPU or GPU on one machine, auto-downloading weights, no cloud account or per-frame pricing."
+        },
+        {
+            "metric": "Site portability",
+            "value": "Drawing, not code",
+            "description": "Editable polygon zones make a new facility a configuration task."
+        }
+    ]
+}
