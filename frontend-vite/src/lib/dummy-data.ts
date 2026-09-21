@@ -6,37 +6,40 @@ export const dummyPortfolio: Partial<Portfolio> = {
     title: "AI Engineer @ CognitBotz | Building Scalable, Enterprise-Grade AI Innovations",
     tagline:
         "AI/ML Engineer building production-grade AI systems at enterprise scale — currently deployed at a Leading Renewable Energy Firm.",
-    bio: "AI/ML Engineer building production-grade AI systems at enterprise scale — currently deployed at a Leading Renewable Energy Firm. I've shipped multi-agent platforms, RAG pipelines, and full-stack AI applications that saved 250+ FTE hours/quarter for a Fortune 50 Conglomerate. Performance Awardee (Dec 2025). My stack: LangChain, LangGraph, Azure OpenAI, FastAPI, React, pgvector. Open to AI/ML Engineer roles.",
+    bio: "AI/ML Engineer building production-grade AI systems at enterprise scale — currently deployed at a Leading Renewable Energy Firm. I've shipped multi-agent platforms, RAG pipelines, and full-stack AI applications that saved 250+ FTE hours/quarter for a Fortune 50 Conglomerate. Performance Awardee (Dec 2025). AI Engineer specializing in RAG systems, multi-agent orchestration, and production LLMOps. Experienced in large language models, retrieval architectures, FastAPI microservices, and enterprise cloud deployments across Azure. Open to AI/ML Engineer roles.",
     skills: [
+        "Large Language Models (OpenAI, Azure OpenAI, Llama, Claude, Gemini)",
+        "Fine-Tuning & Integration",
+        "LangChain",
+        "LangGraph",
+        "AI Orchestration",
+        "Multi-Agent Architectures",
+        "Prompt Engineering",
+        "Retrieval-Augmented Generation (RAG)",
+        "Semantic Search",
+        "Azure AI Search",
+        "Weaviate",
+        "FAISS",
+        "pgvector",
+        "ChromaDB",
         "Python",
-        "PyTorch",
-        "TensorFlow",
-        "NLP",
-        "LLMs",
-        "BERT",
-        "GPT",
-        "spaCy",
-        "Transformers",
-        "HuggingFace",
         "FastAPI",
         "Flask",
-        "AWS",
-        "Azure",
-        "GCP",
-        "SQL",
-        "LangChain",
-        "Phidata",
-        "Scikit-learn",
-        "Machine Learning",
-        "Deep Learning",
-        "RAG",
-        "Ethical AI",
-        "Git",
-        "Docker"
+        "REST APIs & Microservices",
+        "PostgreSQL",
+        "SQLite",
+        "Async Programming",
+        "MLOps & Quality Tuning",
+        "Docker",
+        "Kubernetes",
+        "Azure Cloud Platform",
+        "CI/CD",
+        "Git & GitLab"
     ],
     socialLinks: {
         github: "https://github.com/abhishekmane-ai",
         linkedin: "https://www.linkedin.com/in/abhishek-mane-aiml/",
+        topmate: "https://topmate.io/abhishekmane/",
         email: "abhishek.mane.work@gmail.com",
         resume: "#",
     },
@@ -48,7 +51,7 @@ export const dummyPortfolio: Partial<Portfolio> = {
             position: "Artificial Intelligence Engineer",
             duration: "Sep 2025 – Present · Full-time | Ahmedabad, Gujarat, India",
             description:
-                "Designed and developed three full-stack enterprise platforms for a large-scale conglomerate, owning end-to-end architecture, backend engineering, AI integration, and cloud infrastructure.\n\n▸ Architected modular full-stack web applications using React and Python with independently deployable modules behind a unified UI\n▸ Built scheduled data ingestion pipelines that scrape, parse, and normalize data from multiple external portals and stock exchange APIs into a structured cloud database\n▸ Designed an ETL pipeline running on a scheduled VM to extract, validate, transform, and load daily data into Azure PostgreSQL\n▸ Built a backend computation engine to derive financial indicators — moving averages, volatility metrics, delivery ratios, and relative performance indices — from raw market data\n▸ Designed an automated document generation engine using structured templates, reducing manual report authoring to near zero\n▸ Designed a multi-agent Text-to-SQL system where a routing agent classifies intent and delegates to either a deterministic query handler or GPT-powered dynamic SQL generation agent\n▸ Engineered prompt templates with schema context injection to guide the LLM toward producing accurate, SAP HANA-compatible SQL\n▸ Built a query validation layer to sanitize LLM output, prevent SQL injection, and enforce read-only execution against SAP HANA\n▸ Integrated LLM-powered RAG chatbot enabling natural language querying over ingested documents\n▸ Implemented conversation memory to maintain query context across multi-turn interactions\n▸ Architected role-scoped data access with self-service approval workflows and Azure AD SSO with RBAC across all platforms\n▸ Secured all secrets via Azure Key Vault, enforced TLS in transit and AES-256 encryption at rest",
+                "Designed and developed three full-stack enterprise platforms for Adani Group, owning end-to-end architecture, backend engineering, AI integration, and cloud infrastructure.\n\n▸ Architected modular full-stack web applications using React and Python with independently deployable modules behind a unified UI\n▸ Built scheduled data ingestion pipelines that scrape, parse, and normalize data from multiple external portals and stock exchange APIs into a structured cloud database\n▸ Designed an ETL pipeline running on a scheduled VM to extract, validate, transform, and load daily data into Azure PostgreSQL\n▸ Built a backend computation engine to derive financial indicators — moving averages, volatility metrics, delivery ratios, and relative performance indices — from raw market data\n▸ Designed an automated document generation engine using structured templates, reducing manual report authoring to near zero\n▸ Designed a multi-agent Text-to-SQL system where a routing agent classifies intent and delegates to either a deterministic query handler or GPT-powered dynamic SQL generation agent\n▸ Engineered prompt templates with schema context injection to guide the LLM toward producing accurate, SAP HANA-compatible SQL\n▸ Built a query validation layer to sanitize LLM output, prevent SQL injection, and enforce read-only execution against SAP HANA\n▸ Integrated LLM-powered RAG chatbot enabling natural language querying over ingested documents\n▸ Implemented conversation memory to maintain query context across multi-turn interactions\n▸ Built custom AI Observability and Evaluation Platform with RAGAS and DeepEval to benchmark context precision, answer faithfulness, and hallucination rates; engineered an autonomous L1 AI Support agent analyzing log streams for real-time root-cause analysis and quick-fix recommendations\n▸ Architected role-scoped data access with self-service approval workflows and Azure AD SSO with RBAC across all platforms\n▸ Secured all secrets via Azure Key Vault, enforced TLS in transit and AES-256 encryption at rest\n▸ Directly engaged in stakeholder management with Adani Group leadership — conducting project progress updates, requirements gathering sessions, and sprint reviews to ensure delivery alignment with business objectives",
         },
         {
             id: "2",
@@ -169,6 +172,69 @@ export const dummyPortfolio: Partial<Portfolio> = {
 
     Agent1 --> RAG["RAG Pipeline"]
     RAG --> LLM["Groq LLM"]`
+        },
+        {
+            id: "sentinel-model-governance",
+            slug: "ai-model-governance-platform",
+            title: "Ward — Zero-Trust AI Model Security Gateway",
+            description:
+                "Zero-trust on-ramp for open-source AI weights in regulated enterprises: static opcode disassembly for PyTorch/Pickle malware, license verification, hardware sizing, and CycloneDX AIBOM generation.",
+            tags: ["AI Security", "Python", "FastAPI", "React", "Pickle Security", "EU AI Act"],
+            live: "#",
+            github: "https://github.com/abhishekmane-ai",
+            featured: true,
+            mermaidDiagram: `graph TD
+    A[Model Weights Archive] --> B[Magic-Byte Format Sniffer]
+    B --> C[Streaming SHA-256 Hashing]
+    C --> D[Static Opcode Disassembler]
+    D --> E{Malicious Gadgets Detected?}
+    E -->|Yes| F[Block & Quarantine]
+    E -->|No| G[License & Jaccard Dedupe]
+    G --> H[Hardware Sizing & AIBOM]
+    H --> I[3-Stage Human Consensus Gate]
+    I --> J[(Air-Gapped Registry)]`
+        },
+        {
+            id: "naipunya-insurance-voice-ai",
+            slug: "naipunya-insurance-voice-ai",
+            title: "Naipunya — Real-Time Voice AI Advisory System",
+            description:
+                "Production-grade, voice-first multi-agent AI for Indian insurance advisory, featuring speculative parallel execution, dynamic Google AI search RAG, and sub-second dual cloud/edge inference.",
+            tags: ["Voice AI & Speech", "FastAPI", "Groq LPU", "Ollama", "Faster-Whisper", "Web Audio"],
+            live: "#",
+            github: "https://github.com/abhishekmane-ai",
+            featured: true,
+            mermaidDiagram: `graph TD
+    UserVoice((User Voice)) --> VAD[Client RMS Silence Detector]
+    VAD --> STT[Whisper STT]
+    STT --> Orch[Orchestrator Agent]
+    Orch --> Reasoning[Dual LLM Engine]
+    Orch --> WebRAG[Google AI Mode Search]
+    Reasoning --> Tools[Deterministic Math Tools]
+    Tools --> Synth[Synthesizer]
+    WebRAG --> Synth
+    Synth --> TTS[Kokoro / Edge-TTS]
+    TTS --> VoiceOut((Audio Playback))`
+        },
+        {
+            id: "perkai-benefits-discovery-engine",
+            slug: "perkai-benefits-discovery-engine",
+            title: "PerkAI — Autonomous Capital Discovery & Stacking Engine",
+            description:
+                "Autonomous multi-agent platform discovering $180k–$340k in startup credits and non-dilutive government subsidies in <18s via an algorithmic Grounding Guard and combinatorial stacking optimizer.",
+            tags: ["Agentic Systems", "FastAPI", "React", "PostgreSQL", "NVIDIA NIM", "SSE"],
+            live: "#",
+            github: "https://github.com/abhishekmane-ai",
+            featured: true,
+            mermaidDiagram: `graph TD
+    Domain[Company Domain] --> Crawler[Intake & SPA Crawler]
+    Crawler --> Planner[Query Planner Agent]
+    Planner --> Scraper[Source Snapshot Store]
+    Scraper --> Extractor[Structured Extraction]
+    Extractor --> Guard[Algorithmic Grounding Guard]
+    Guard --> Matcher[Hybrid Deterministic/Vector Matcher]
+    Matcher --> Stacker[Combinatorial Stacking Optimizer]
+    Stacker --> Stream[Real-time SSE Stream]`
         },
         {
             id: "text-insights",

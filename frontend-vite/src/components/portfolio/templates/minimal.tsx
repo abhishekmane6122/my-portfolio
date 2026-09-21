@@ -40,6 +40,8 @@ import {
   Moon,
   ArrowUp,
   ArrowDown,
+  Calendar,
+  MessageCircle,
 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import type { Portfolio, BlogData } from "@/types/schema";
@@ -53,6 +55,37 @@ import ResumeDownload from "@/components/resume/ResumeDownload";
 import SkillsMatrix from "@/components/skills/SkillsMatrix";
 import TestimonialCarousel from "@/components/testimonials/TestimonialCarousel";
 import FlowDiagram from "@/components/ui/FlowDiagram";
+import { CONTACT_INFO } from "@/data/services-data";
+
+const TopmateIcon = ({ className = "h-5 w-5" }: { className?: string }) => (
+  <svg viewBox="0 0 95 97" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <path d="M47 97C71.8528 97 92 76.8528 92 52C92 27.1472 71.8528 7 47 7C22.1472 7 2 27.1472 2 52C2 76.8528 22.1472 97 47 97Z" fill="#111"/>
+    <path d="M81 46C81 68.1629 63.0214 86 40.9999 86C18.9787 86 1 68.1629 1 46C1 23.8374 18.9787 6 40.9999 6C63.0214 6 81 23.8374 81 46Z" fill="#E44332" stroke="#111" strokeWidth="2"/>
+    <path d="M59.3151 58.9226C56.5022 62.8991 52.4785 65.8591 47.8448 67.3603C43.2111 68.8616 38.2161 68.8237 33.6057 67.2523C28.9953 65.6808 25.017 62.6601 22.2648 58.6413C19.5127 54.6226 18.1343 49.8213 18.3357 44.9546C18.5371 40.088 20.3073 35.417 23.3821 31.6393C26.4569 27.8617 30.6712 25.18 35.3956 23.9948C40.12 22.8096 45.1011 23.1844 49.5949 25.0634C54.0888 26.9424 57.8542 30.2246 60.329 34.4199L40.8878 45.8878L59.3151 58.9226Z" fill="white"/>
+  </svg>
+);
+
+const LinkedinIcon = ({ className = "h-5 w-5" }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <rect width="24" height="24" rx="4.5" fill="#0A66C2" />
+    <path
+      fill="#FFFFFF"
+      d="M7.12 19V9.56H4V19h3.12zM5.56 8.27c1.08 0 1.75-.72 1.75-1.62-.02-.92-.67-1.62-1.73-1.62s-1.75.7-1.75 1.62c0 .9.67 1.62 1.71 1.62h.02zm4.36 10.73h3.12v-5.27c0-.28.02-.56.1-.77.23-.56.75-1.15 1.62-1.15 1.14 0 1.6.87 1.6 2.14V19h3.12v-5.46c0-2.92-1.56-4.28-3.64-4.28-1.7 0-2.46.95-2.88 1.61h.02v-1.39h-3.12c.04.88 0 9.52 0 9.52z"
+    />
+  </svg>
+);
+
+const GithubIcon = ({ className = "h-5 w-5" }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <rect width="24" height="24" rx="5" className="fill-[#181717] dark:fill-[#24292e]" />
+    <path
+      fill="#FFFFFF"
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M12 4.5C7.86 4.5 4.5 7.86 4.5 12c0 3.31 2.15 6.12 5.13 7.11.38.07.51-.16.51-.36 0-.18-.01-.77-.01-1.4-2.09.45-2.53-.5-2.69-.96-.09-.23-.48-.96-.82-1.15-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.23 1.88.88 2.34.67.07-.52.28-.88.51-1.08-1.78-.2-3.65-.89-3.65-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.03 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .2.14.44.52.36 2.97-.99 5.12-3.8 5.12-7.11 0-4.14-3.36-7.5-7.5-7.5z"
+    />
+  </svg>
+);
 
 const TimelineScrollAnimation = ({
   containerRef,
@@ -553,8 +586,7 @@ export function PortfolioTemplate({
 
   const navItems = [
     { name: "Home", color: "#3b82f6", anchor: "home" },
-    { name: "Services", path: "/services", isExternal: true, color: "#06b6d4" },
-    { name: "Work", color: "#d4a373", anchor: "projects" },
+    { name: "Services", path: "/services", isExternal: true, color: "#10b981", isSpecial: true },
     { name: "Skills", color: "#10b981", anchor: "skills" },
     { name: "Experience", color: "#a855f7", anchor: "experience" },
     { name: "Projects", path: "/projects", isExternal: true, color: "#f59e0b" },
@@ -602,7 +634,7 @@ export function PortfolioTemplate({
       <nav className={cn(
         "fixed top-0 left-0 right-0 z-50 w-full pt-3 pb-3 transition-all duration-300",
         isScrolled
-          ? "bg-background/90 dark:bg-black/90 backdrop-blur-xl shadow-lg border-b border-white/10"
+          ? "bg-background/90 dark:bg-black/90 backdrop-blur-xl shadow-lg border-b border-neutral-200 dark:border-white/10"
           : "bg-transparent"
       )}>
         <div className="mx-auto flex max-w-[95%] w-full items-center justify-between px-4 md:px-8">
@@ -634,19 +666,40 @@ export function PortfolioTemplate({
           </div>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-6 lg:gap-10">
-            <div className="flex gap-6 lg:gap-10">
-              {navItems.map((item: any) => (
-                item.isExternal ? (
+          <div className="hidden md:flex items-center gap-6 lg:gap-8">
+            <div className="flex items-center gap-5 lg:gap-8">
+              {navItems.map((item: any) => {
+                if (item.isSpecial) {
+                  return (
+                    <RouterLink
+                      key={item.name}
+                      to={item.path}
+                      onMouseEnter={() => setHoveredNav(item.name)}
+                      onMouseLeave={() => setHoveredNav(null)}
+                      className="group relative inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 hover:border-emerald-500/60 shadow-[0_0_12px_rgba(16,185,129,0.18)] hover:shadow-[0_0_16px_rgba(16,185,129,0.3)] transition-all duration-200 hover:scale-105"
+                    >
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                      </span>
+                      <span>{item.name}</span>
+                    </RouterLink>
+                  );
+                }
+
+                return item.isExternal ? (
                   <RouterLink
                     key={item.name}
                     to={item.path}
                     onMouseEnter={() => setHoveredNav(item.name)}
                     onMouseLeave={() => setHoveredNav(null)}
-                    className="text-sm font-light tracking-wide text-neutral-500 dark:text-neutral-400 transition-all duration-300 hover:text-black dark:hover:text-white relative top-[2px]"
+                    className="relative text-sm font-medium tracking-normal text-neutral-800 dark:text-neutral-100 transition-colors duration-200 hover:text-black dark:hover:text-white py-1"
                     style={{ color: hoveredNav === item.name || activeNav === item.name ? item.color : undefined }}
                   >
                     {item.name}
+                    {(hoveredNav === item.name || (activeNav === item.name && !hoveredNav)) && (
+                      <motion.div layoutId="nav-underline" className="absolute -bottom-1 left-0 right-0 h-[2px] rounded-full" style={{ backgroundColor: item.color }} />
+                    )}
                   </RouterLink>
                 ) : (
                   <button
@@ -654,16 +707,16 @@ export function PortfolioTemplate({
                     onClick={() => { setActiveNav(item.name); scrollToSection(item.anchor); }}
                     onMouseEnter={() => setHoveredNav(item.name)}
                     onMouseLeave={() => setHoveredNav(null)}
-                    className="text-sm font-light tracking-wide text-neutral-500 dark:text-neutral-400 transition-all duration-300 hover:text-black dark:hover:text-white relative top-[2px] bg-transparent border-none cursor-pointer"
+                    className="relative text-sm font-medium tracking-normal text-neutral-800 dark:text-neutral-100 transition-colors duration-200 hover:text-black dark:hover:text-white py-1 bg-transparent border-none cursor-pointer"
                     style={{ color: hoveredNav === item.name || activeNav === item.name ? item.color : undefined }}
                   >
                     {item.name}
                     {(hoveredNav === item.name || (activeNav === item.name && !hoveredNav)) && (
-                      <motion.div layoutId="nav-underline" className="absolute -bottom-2 left-0 right-0 h-px" style={{ backgroundColor: item.color }} />
+                      <motion.div layoutId="nav-underline" className="absolute -bottom-1 left-0 right-0 h-[2px] rounded-full" style={{ backgroundColor: item.color }} />
                     )}
                   </button>
-                )
-              ))}
+                );
+              })}
             </div>
             <ResumeDownload variant="button" showLabel={true} />
             {mounted && <FloatingThemeToggle />}
@@ -693,14 +746,35 @@ export function PortfolioTemplate({
             animate={{ opacity: 1, y: 0 }}
             className="md:hidden bg-background/95 dark:bg-black/95 backdrop-blur-xl border-t border-neutral-200 dark:border-white/10 px-6 py-4 flex flex-col gap-3"
           >
-            {navItems.map((item: any) => (
-              item.isExternal ? (
+            {navItems.map((item: any) => {
+              if (item.isSpecial) {
+                return (
+                  <RouterLink
+                    key={item.name}
+                    to={item.path}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="inline-flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-semibold text-sm shadow-sm"
+                  >
+                    <span className="flex items-center gap-2">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                      </span>
+                      Services
+                    </span>
+                    <span className="text-[10px] uppercase font-mono tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold">
+                      Available
+                    </span>
+                  </RouterLink>
+                );
+              }
+
+              return item.isExternal ? (
                 <RouterLink
                   key={item.name}
                   to={item.path}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-base font-light py-2 text-neutral-600 dark:text-neutral-300"
-                  style={{ color: undefined }}
+                  className="text-base font-medium py-2 text-neutral-800 dark:text-neutral-100 hover:text-black dark:hover:text-white transition-colors"
                 >
                   {item.name}
                 </RouterLink>
@@ -708,12 +782,12 @@ export function PortfolioTemplate({
                 <button
                   key={item.name}
                   onClick={() => { setActiveNav(item.name); scrollToSection(item.anchor); }}
-                  className="text-base font-light py-2 text-neutral-600 dark:text-neutral-300 text-left bg-transparent border-none cursor-pointer"
+                  className="text-base font-medium py-2 text-neutral-800 dark:text-neutral-100 hover:text-black dark:hover:text-white text-left bg-transparent border-none cursor-pointer transition-colors"
                 >
                   {item.name}
                 </button>
-              )
-            ))}
+              );
+            })}
             <div className="pt-2">
               <ResumeDownload variant="button" showLabel={true} />
             </div>
@@ -826,8 +900,13 @@ export function PortfolioTemplate({
                   const highlights = [
                     "production-grade AI systems",
                     "multi-agent platforms",
+                    "RAG pipelines",
                     "full-stack AI applications",
-                    "Enterprise Client. Performance Awardee"
+                    "RAG systems",
+                    "multi-agent orchestration",
+                    "production LLMOps",
+                    "multi-agent architectures",
+                    "Adani Group"
                   ];
                   
                   // Use a unique marker to prevent nested replacements
@@ -888,12 +967,63 @@ export function PortfolioTemplate({
           >
             {Object.entries(socialLinks).map(([key, value]) => {
               if (!value) return null;
+              if (key.includes("topmate")) {
+                return (
+                  <a
+                    key={key}
+                    href={value}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group relative flex h-12 w-12 items-center justify-center rounded-full bg-white dark:bg-[#111] border border-neutral-300 dark:border-white/10 hover:border-[#E44332] transition-all hover:-translate-y-1 shadow-md"
+                  >
+                    <TopmateIcon className="h-6 w-6" />
+                    {/* Tooltip */}
+                    <span className="absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md border border-neutral-200 dark:border-white/10 bg-white dark:bg-neutral-900 px-2 py-1 text-xs text-neutral-900 dark:text-white opacity-0 shadow-xl transition-all duration-300 group-hover:opacity-100">
+                      Topmate (Book 1:1)
+                    </span>
+                  </a>
+                );
+              }
+
+              if (key.includes("linkedin")) {
+                return (
+                  <a
+                    key={key}
+                    href={value}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group relative flex h-12 w-12 items-center justify-center rounded-full bg-white dark:bg-[#111] border border-neutral-300 dark:border-white/10 hover:border-[#0A66C2] transition-all hover:-translate-y-1 shadow-md"
+                  >
+                    <LinkedinIcon className="h-6 w-6" />
+                    {/* Tooltip */}
+                    <span className="absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md border border-neutral-200 dark:border-white/10 bg-white dark:bg-neutral-900 px-2 py-1 text-xs text-neutral-900 dark:text-white opacity-0 shadow-xl transition-all duration-300 group-hover:opacity-100">
+                      LinkedIn
+                    </span>
+                  </a>
+                );
+              }
+
+              if (key.includes("github")) {
+                return (
+                  <a
+                    key={key}
+                    href={value}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group relative flex h-12 w-12 items-center justify-center rounded-full bg-white dark:bg-[#111] border border-neutral-300 dark:border-white/10 hover:border-black dark:hover:border-white transition-all hover:-translate-y-1 shadow-md"
+                  >
+                    <GithubIcon className="h-6 w-6" />
+                    {/* Tooltip */}
+                    <span className="absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md border border-neutral-200 dark:border-white/10 bg-white dark:bg-neutral-900 px-2 py-1 text-xs text-neutral-900 dark:text-white opacity-0 shadow-xl transition-all duration-300 group-hover:opacity-100">
+                      GitHub
+                    </span>
+                  </a>
+                );
+              }
+
               let Icon = Globe;
-              if (key.includes("github")) Icon = Github;
-              if (key.includes("linkedin")) Icon = Linkedin;
               if (key.includes("twitter")) Icon = Twitter;
               if (key.includes("email")) Icon = Mail;
-              if (key.includes("resume")) Icon = FileText;
 
               return (
                 <a
@@ -1129,90 +1259,6 @@ export function PortfolioTemplate({
         </div>
       </section>
 
-      {/* Projects Section */}
-      <section id="projects" className="py-16 md:py-24 bg-background/50 dark:bg-[#080808] transition-colors duration-300">
-        <div className="mx-auto max-w-6xl w-full px-6 md:px-10">
-          <div className="mb-16 text-center">
-            <span className="mb-4 block font-mono text-xs font-medium uppercase tracking-wider text-[#d4a373]">
-              Selected Work
-            </span>
-            <h2 className="font-sans text-4xl font-light text-neutral-900 dark:text-white md:text-5xl">
-              Featured Projects
-            </h2>
-          </div>
-
-          <div className="grid gap-8 md:grid-cols-2 lg:gap-12">
-            {projects.map((project, index) => (
-              <motion.div
-                key={project.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="group flex flex-col overflow-hidden rounded-2xl border border-neutral-300 dark:border-white/10 bg-card dark:bg-[#0e0e0e] hover:border-[#d4a373] dark:hover:border-[#d4a373]/50 transition-all duration-300 shadow-lg hover:shadow-xl"
-              >
-                {/* Image Area */}
-                <div className="relative aspect-[16/10] w-full overflow-hidden bg-neutral-200 dark:bg-[#0a0a0a]">
-                  {project.image ? (
-                    <img
-                      src={project.image}
-                      alt={project.title}
-                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                  ) : project.flowDiagram ? (
-                    <div className="relative aspect-[16/10] flex items-center justify-center bg-black/40 overflow-hidden group-hover:bg-black/60 transition-all duration-500">
-                      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 pointer-events-none" />
-                      <div className="scale-[0.4] md:scale-[0.3] origin-center opacity-80 group-hover:opacity-100 transition-opacity w-full h-full">
-                        <FlowDiagram
-                          nodes={project.flowDiagram.nodes}
-                          edges={project.flowDiagram.edges}
-                          height="100%"
-                          title={project.title}
-                        />
-                      </div>
-                    </div>
-                  ) : (
-                    <CoolProjectPlaceholder />
-                  )}
-
-                  {/* No hover overlay buttons - removed Live Demo and Code buttons */}
-                </div>
-
-                {/* Info */}
-                <div className="flex flex-1 flex-col p-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-2xl font-medium text-neutral-900 dark:text-white">
-                      {project.title}
-                    </h3>
-                    {project.slug && (
-                      <RouterLink
-                        to={`/projects/${project.slug}`}
-                        className="text-xs font-mono uppercase tracking-wider text-[#d4a373] hover:underline"
-                      >
-                        Details
-                      </RouterLink>
-                    )}
-                  </div>
-                  <p className="mb-6 line-clamp-3 text-sm leading-relaxed text-neutral-700 dark:text-neutral-300 font-light">
-                    {project.description}
-                  </p>
-
-                  <div className="mt-auto flex flex-wrap gap-2">
-                    {project.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-[10px] font-mono uppercase tracking-wider text-[#d4a373] bg-[#d4a373]/10 border border-[#d4a373]/20 px-2 py-1 rounded"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* LinkedIn Posts Section */}
       {linkedinPosts && linkedinPosts.length > 0 && (
@@ -1606,36 +1652,85 @@ export function PortfolioTemplate({
                 <p className="text-lg md:text-xl text-neutral-600 dark:text-neutral-400 font-light leading-relaxed">
                   I'm currently specializing in Generative AI and Agentic Workflows. Reach out for collaborations or deep technical discussions.
                 </p>
-                <div className="pt-6 flex flex-wrap justify-center gap-6">
+                <div className="pt-4 flex justify-center">
                   <a
-                    href="mailto:abhishek.mane.work@gmail.com"
-                    className="inline-flex items-center gap-4 px-10 py-5 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-black text-lg font-bold hover:scale-105 transition-all shadow-xl"
+                    href={`mailto:${socialLinks.email || "abhishek.mane.work@gmail.com"}`}
+                    className="group relative inline-flex items-center gap-3 px-7 py-3.5 rounded-full bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-900 text-sm font-semibold tracking-wide shadow-xl shadow-neutral-900/10 dark:shadow-white/5 border border-[#d4a373]/30 hover:border-[#d4a373] transition-all duration-300 hover:scale-[1.03] active:scale-[0.98]"
                   >
-                    <Mail className="h-6 w-6" /> Get in Touch
+                    <span className="flex items-center justify-center w-7 h-7 rounded-full bg-[#d4a373]/15 text-[#d4a373] transition-transform duration-300 group-hover:scale-110">
+                      <Mail className="h-3.5 w-3.5" />
+                    </span>
+                    <span>Get in Touch</span>
+                    <ArrowUpRight className="h-4 w-4 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300" />
                   </a>
                 </div>
               </div>
             </motion.div>
 
-            <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-12 w-full max-w-4xl">
-              <div className="flex flex-col items-center md:items-start space-y-6">
+            <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-10 w-full max-w-4xl">
+              <div className="flex flex-col items-center md:items-start space-y-4">
                 <span className="block text-neutral-900 dark:text-white font-medium uppercase tracking-widest text-xs">
-                  Connect on Social
+                  Connect on Social & Platforms
                 </span>
-                <div className="flex gap-4">
+                <div className="flex flex-wrap gap-3">
                   {Object.entries(socialLinks).map(([key, value]) => {
-                    if (!value || key === "email") return null;
+                    if (!value || key === "email" || key === "resume") return null;
+
+                    if (key.includes("topmate")) {
+                      return (
+                        <a
+                          key={key}
+                          href={value}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title="Topmate - Book 1:1 Call"
+                          className="flex h-12 w-12 items-center justify-center rounded-2xl border border-neutral-300 dark:border-white/10 bg-white dark:bg-[#111] hover:scale-110 hover:border-[#E44332] transition-all shadow-sm group"
+                        >
+                          <TopmateIcon className="h-6 w-6" />
+                        </a>
+                      );
+                    }
+
+                    if (key.includes("linkedin")) {
+                      return (
+                        <a
+                          key={key}
+                          href={value}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title="LinkedIn Profile"
+                          className="flex h-12 w-12 items-center justify-center rounded-2xl border border-neutral-300 dark:border-white/10 bg-white dark:bg-[#111] hover:scale-110 hover:border-[#0A66C2] transition-all shadow-sm group"
+                        >
+                          <LinkedinIcon className="h-6 w-6" />
+                        </a>
+                      );
+                    }
+
+                    if (key.includes("github")) {
+                      return (
+                        <a
+                          key={key}
+                          href={value}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title="GitHub Profile"
+                          className="flex h-12 w-12 items-center justify-center rounded-2xl border border-neutral-300 dark:border-white/10 bg-white dark:bg-[#111] hover:scale-110 hover:border-black dark:hover:border-white transition-all shadow-sm group"
+                        >
+                          <GithubIcon className="h-6 w-6" />
+                        </a>
+                      );
+                    }
+
                     let Icon = Globe;
-                    if (key.includes("github")) Icon = Github;
-                    if (key.includes("linkedin")) Icon = Linkedin;
                     if (key.includes("twitter")) Icon = Twitter;
+
                     return (
                       <a
                         key={key}
                         href={value}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[#d4a373]/10 dark:border-white/10 bg-white dark:bg-[#111] text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white hover:border-[#d4a373] transition-all shadow-sm"
+                        className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[#d4a373]/10 dark:border-white/10 bg-white dark:bg-[#111] text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white hover:border-[#d4a373] transition-all shadow-sm hover:scale-105"
                       >
                         <Icon className="h-5 w-5" />
                       </a>
@@ -1644,16 +1739,39 @@ export function PortfolioTemplate({
                 </div>
               </div>
 
-              <div className="flex flex-col items-center md:items-end space-y-6">
+              <div className="flex flex-col items-center md:items-end space-y-4">
                 <span className="block text-neutral-900 dark:text-white font-medium uppercase tracking-widest text-xs text-center md:text-right">
-                  Collaborations
+                  Instant Booking & Chat
                 </span>
-                <a
-                  href={`mailto:${socialLinks.email}`}
-                  className="inline-flex items-center gap-3 px-6 py-3 rounded-2xl border border-[#d4a373]/20 dark:border-white/10 bg-neutral-900 dark:bg-white/5 text-white dark:text-white hover:bg-black dark:hover:bg-white/10 transition-all font-medium"
-                >
-                  <Mail className="h-4 w-4 text-[#d4a373]" /> Book a Technical Call
-                </a>
+                <div className="flex flex-wrap gap-2.5 justify-center md:justify-end">
+                  <a
+                    href="https://topmate.io/abhishekmane/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-neutral-300 dark:border-white/15 bg-white dark:bg-[#111] text-neutral-900 dark:text-white hover:bg-neutral-100 dark:hover:bg-white/10 transition-all text-xs font-semibold shadow-sm hover:scale-105"
+                  >
+                    <TopmateIcon className="h-4 w-4" />
+                    <span>Topmate 1:1</span>
+                  </a>
+                  <a
+                    href={CONTACT_INFO.calComUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-neutral-300 dark:border-white/15 bg-white dark:bg-[#111] text-neutral-900 dark:text-white hover:bg-neutral-100 dark:hover:bg-white/10 transition-all text-xs font-semibold shadow-sm hover:scale-105"
+                  >
+                    <Calendar className="h-4 w-4 text-[#8a5827] dark:text-[#d4a373]" />
+                    <span>Cal.com</span>
+                  </a>
+                  <a
+                    href={CONTACT_INFO.getWhatsAppUrl()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white transition-all text-xs font-semibold shadow-sm hover:scale-105"
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                    <span>WhatsApp</span>
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -1677,7 +1795,8 @@ export function PortfolioTemplate({
                   { label: 'Email', value: 'abhishek.mane.work@gmail.com', href: 'mailto:abhishek.mane.work@gmail.com' },
                   { label: 'Phone', value: '+91-7020870063', href: 'tel:+917020870063' },
                   { label: 'LinkedIn', value: 'in/abhishek-mane-aiml', href: 'https://www.linkedin.com/in/abhishek-mane-aiml' },
-                  { label: 'GitHub', value: 'abhishekmane6122', href: 'https://github.com/abhishekmane6122' },
+                  { label: 'GitHub', value: 'abhishekmane-ai', href: 'https://github.com/abhishekmane-ai' },
+                  { label: 'Location', value: 'India · Open to Remote & Relocation', href: undefined },
                   { label: 'Portfolio', value: 'abhishekmane6122.github.io/my-portfolio', href: 'https://abhishekmane6122.github.io/my-portfolio/' },
                 ].map((item) => (
                   <div key={item.label} className="min-w-0">
@@ -1685,16 +1804,20 @@ export function PortfolioTemplate({
                       {item.label}
                     </dt>
                     <dd className="min-w-0">
-                      <a
-                        href={item.href}
-                        target={item.href.startsWith('http') ? '_blank' : undefined}
-                        rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                        // Wraps rather than truncates - a contact detail that is
-                        // cut off with an ellipsis cannot be read off the screen.
-                        className="block break-words text-sm text-neutral-800 no-underline transition-colors hover:text-[#8a5827] dark:text-neutral-200 dark:hover:text-[#d4a373]"
-                      >
-                        {item.value}
-                      </a>
+                      {item.href ? (
+                        <a
+                          href={item.href}
+                          target={item.href.startsWith('http') ? '_blank' : undefined}
+                          rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                          className="block break-words text-sm text-neutral-800 no-underline transition-colors hover:text-[#8a5827] dark:text-neutral-200 dark:hover:text-[#d4a373]"
+                        >
+                          {item.value}
+                        </a>
+                      ) : (
+                        <span className="block break-words text-sm text-neutral-800 dark:text-neutral-200">
+                          {item.value}
+                        </span>
+                      )}
                     </dd>
                   </div>
                 ))}
@@ -1757,20 +1880,29 @@ export function PortfolioTemplate({
                 {bio}
               </p>
 
-              <div className="flex gap-4">
+              <div className="flex flex-wrap justify-center gap-3">
                 {socialLinks.linkedin && (
-                  <a href={socialLinks.linkedin} target="_blank" className="flex h-14 w-14 items-center justify-center rounded-2xl bg-neutral-100 dark:bg-white/5 hover:bg-neutral-200 dark:hover:bg-white/10 transition-colors shadow-md">
-                    <Linkedin className="h-6 w-6 text-neutral-700 dark:text-white" />
+                  <a href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer" title="LinkedIn" className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white dark:bg-[#111] border border-neutral-300 dark:border-white/15 hover:border-[#0A66C2] transition-all hover:scale-105 shadow-md">
+                    <LinkedinIcon className="h-6 w-6" />
                   </a>
                 )}
                 {socialLinks.github && (
-                  <a href={socialLinks.github} target="_blank" className="flex h-14 w-14 items-center justify-center rounded-2xl bg-neutral-100 dark:bg-white/5 hover:bg-neutral-200 dark:hover:bg-white/10 transition-colors shadow-md">
-                    <Github className="h-6 w-6 text-neutral-700 dark:text-white" />
+                  <a href={socialLinks.github} target="_blank" rel="noopener noreferrer" title="GitHub" className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white dark:bg-[#111] border border-neutral-300 dark:border-white/15 hover:border-black dark:hover:border-white transition-all hover:scale-105 shadow-md">
+                    <GithubIcon className="h-6 w-6" />
                   </a>
                 )}
+                <a href="https://topmate.io/abhishekmane/" target="_blank" rel="noopener noreferrer" title="Topmate 1:1 Booking" className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white dark:bg-[#111] border border-neutral-300 dark:border-white/15 hover:border-[#E44332] transition-all hover:scale-105 shadow-md group">
+                  <TopmateIcon className="h-5 w-5" />
+                </a>
+                <a href={CONTACT_INFO.getWhatsAppUrl()} target="_blank" rel="noopener noreferrer" title="Quick WhatsApp" className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white transition-all hover:scale-105 shadow-md">
+                  <MessageCircle className="h-5 w-5" />
+                </a>
+                <a href={CONTACT_INFO.calComUrl} target="_blank" rel="noopener noreferrer" title="Cal.com Meeting" className="flex h-12 w-12 items-center justify-center rounded-2xl bg-neutral-100 dark:bg-white/5 hover:bg-neutral-200 dark:hover:bg-white/10 transition-all hover:scale-105 shadow-md">
+                  <Calendar className="h-5 w-5 text-[#8a5827] dark:text-[#d4a373]" />
+                </a>
                 {socialLinks.email && (
-                  <a href={`mailto:${socialLinks.email}`} className="flex h-14 w-14 items-center justify-center rounded-2xl bg-neutral-100 dark:bg-white/5 hover:bg-neutral-200 dark:hover:bg-white/10 transition-colors shadow-md">
-                    <Mail className="h-6 w-6 text-neutral-700 dark:text-white" />
+                  <a href={`mailto:${socialLinks.email}`} title="Email" className="flex h-12 w-12 items-center justify-center rounded-2xl bg-neutral-100 dark:bg-white/5 hover:bg-neutral-200 dark:hover:bg-white/10 transition-all hover:scale-105 shadow-md">
+                    <Mail className="h-5 w-5 text-neutral-700 dark:text-white" />
                   </a>
                 )}
               </div>

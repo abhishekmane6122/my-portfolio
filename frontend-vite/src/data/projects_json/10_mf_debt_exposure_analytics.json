@@ -3,10 +3,10 @@
     "slug": "mutual-fund-debt-exposure-analytics",
     "title": "Mutual Fund Debt Exposure Analytics",
     "tagline": "A treasury-grade analytics platform that replaces a 29,000-row monthly exposure spreadsheet with a governed data model, a deterministic derived-field engine, and a constrained self-service formula builder.",
-    "category": "Treasury Analytics",
+    "category": "Backend for AI & High-Throughput Data",
     "domain": "Debt Capital Markets · Treasury",
     "year": "2026",
-    "role": "Full Stack Engineer — data modelling, backend architecture, normalization engine, SSO, deployment",
+    "role": "Backend Engineer for AI Applications — AST-based safe formula builder, normalization pipeline, enterprise SSO",
     "duration": "Sprint-based delivery into production",
     "team": [
         "Solo build — architecture through production"

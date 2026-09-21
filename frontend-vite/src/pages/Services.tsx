@@ -21,6 +21,10 @@ import {
   ArrowRight,
   Send,
   MessageSquare,
+  MessageCircle,
+  ShieldCheck,
+  Code2,
+  Calendar,
   Zap,
 } from 'lucide-react'
 import FloatingThemeToggle from '@/components/ui/FloatingThemeToggle'
@@ -31,6 +35,7 @@ import {
   workingProcess,
   clientFaqs,
   ServiceItem,
+  CONTACT_INFO,
 } from '@/data/services-data'
 import toast from 'react-hot-toast'
 
@@ -52,13 +57,13 @@ const formatBudgetInput = (val: string, currency: 'USD' | 'INR'): string => {
 
 export default function Services() {
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'dev' | 'ai' | 'analytics' | 'education'>('all')
-  const [currencyMode, setCurrencyMode] = useState<CurrencyMode>('both')
+  const [currencyMode, setCurrencyMode] = useState<CurrencyMode>('inr')
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0)
   const [inquiryModalOpen, setInquiryModalOpen] = useState(false)
   const [selectedServiceForInquiry, setSelectedServiceForInquiry] = useState<string>('Full-Stack Development')
 
   // Inquiry form states with simple typed number budget & currency selection
-  const [inquiryCurrency, setInquiryCurrency] = useState<'USD' | 'INR'>('USD')
+  const [inquiryCurrency, setInquiryCurrency] = useState<'USD' | 'INR'>('INR')
   const [inquiryBudget, setInquiryBudget] = useState<string>('')
   const [inquiryForm, setInquiryForm] = useState({
     name: '',
@@ -68,7 +73,7 @@ export default function Services() {
   })
 
   // Bottom inline form states
-  const [bottomCurrency, setBottomCurrency] = useState<'USD' | 'INR'>('USD')
+  const [bottomCurrency, setBottomCurrency] = useState<'USD' | 'INR'>('INR')
   const [bottomBudget, setBottomBudget] = useState<string>('')
   const [bottomService, setBottomService] = useState<string>('Full-Stack Development')
   const [bottomForm, setBottomForm] = useState({
@@ -189,27 +194,43 @@ ${name}`
 
   const renderServicePrice = (service: ServiceItem) => {
     if (service.priceUsd === 'Custom / Cohort') {
-      return <span className="font-mono text-xs font-semibold">Custom / Cohort</span>
-    }
-
-    if (currencyMode === 'usd') {
-      return <span className="font-mono text-xs font-semibold">{service.priceUsd}</span>
+      return (
+        <div className="flex items-center gap-1.5 font-mono text-xs">
+          <span className="font-semibold text-neutral-900 dark:text-white">Custom / Cohort</span>
+          <span className="text-neutral-400 dark:text-neutral-600">•</span>
+          <span className="text-[11px] font-medium text-[#8a5827] dark:text-[#d4a373]">Flexible Scope</span>
+        </div>
+      )
     }
 
     if (currencyMode === 'inr') {
-      return <span className="font-mono text-xs font-semibold">{service.priceInr}</span>
+      return (
+        <div className="flex items-center gap-1.5 font-mono text-xs">
+          <span className="font-semibold text-neutral-900 dark:text-white">{service.priceInr}</span>
+          <span className="text-neutral-400 dark:text-neutral-600">•</span>
+          <span className="text-[11px] font-medium text-[#8a5827] dark:text-[#d4a373]">Negotiable</span>
+        </div>
+      )
     }
 
-    // Default: Both currencies
+    if (currencyMode === 'usd') {
+      return (
+        <div className="flex items-center gap-1.5 font-mono text-xs">
+          <span className="font-semibold text-neutral-900 dark:text-white">{service.priceUsd}</span>
+          <span className="text-neutral-400 dark:text-neutral-600">•</span>
+          <span className="text-[11px] font-medium text-[#8a5827] dark:text-[#d4a373]">Negotiable</span>
+        </div>
+      )
+    }
+
+    // Default / Both: INR first, then USD, then Negotiable
     return (
-      <div className="flex flex-wrap items-center gap-1 sm:gap-1.5">
-        <span className="font-mono text-xs font-semibold text-neutral-900 dark:text-white whitespace-nowrap">
-          {service.priceUsd}
-        </span>
-        <span className="text-neutral-400 dark:text-neutral-600 text-xs">•</span>
-        <span className="font-mono text-[11px] font-medium text-[#8a5827] dark:text-[#d4a373] whitespace-nowrap">
-          {service.priceInr}
-        </span>
+      <div className="flex items-center gap-1.5 font-mono text-xs flex-wrap">
+        <span className="font-semibold text-neutral-900 dark:text-white">{service.priceInr}</span>
+        <span className="text-neutral-400 dark:text-neutral-600">•</span>
+        <span className="text-neutral-500 dark:text-neutral-400 text-[11px]">{service.priceUsd}</span>
+        <span className="text-neutral-400 dark:text-neutral-600">•</span>
+        <span className="text-[11px] font-medium text-[#8a5827] dark:text-[#d4a373]">Negotiable</span>
       </div>
     )
   }
@@ -259,13 +280,17 @@ ${name}`
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
               <Link
                 to="/"
-                className="inline-flex items-center gap-1 text-xs font-mono font-medium uppercase tracking-widest text-neutral-500 hover:text-foreground transition-colors flex-shrink-0"
+                className="inline-flex items-center gap-1 text-xs font-mono font-semibold uppercase tracking-widest text-neutral-800 dark:text-neutral-200 hover:text-foreground transition-colors flex-shrink-0"
               >
                 <Home className="w-3.5 h-3.5" />
                 <span className="hidden xs:inline">Home</span>
               </Link>
               <span className="text-neutral-300 dark:text-neutral-700">/</span>
-              <span className="text-xs font-mono font-medium uppercase tracking-widest text-[#8a5827] dark:text-[#d4a373] truncate">
+              <span className="text-xs font-mono font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 truncate flex items-center gap-1.5">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
                 Services
               </span>
             </div>
@@ -274,13 +299,13 @@ ${name}`
             <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
               <Link
                 to="/projects"
-                className="hidden md:inline-block text-xs font-mono uppercase tracking-widest text-neutral-500 hover:text-foreground transition-colors"
+                className="hidden md:inline-block text-xs font-mono font-medium uppercase tracking-widest text-neutral-700 dark:text-neutral-200 hover:text-black dark:hover:text-white transition-colors"
               >
                 Projects
               </Link>
               <Link
                 to="/blog"
-                className="hidden md:inline-block text-xs font-mono uppercase tracking-widest text-neutral-500 hover:text-foreground transition-colors"
+                className="hidden md:inline-block text-xs font-mono font-medium uppercase tracking-widest text-neutral-700 dark:text-neutral-200 hover:text-black dark:hover:text-white transition-colors"
               >
                 Blog
               </Link>
@@ -381,22 +406,34 @@ ${name}`
               </button>
 
               <a
+                href={CONTACT_INFO.getWhatsAppUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto px-5 py-3.5 rounded-xl font-medium text-sm bg-emerald-600 hover:bg-emerald-700 text-white transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 group cursor-pointer"
+              >
+                <MessageCircle className="w-4 h-4" />
+                <span>Quick WhatsApp</span>
+              </a>
+
+              <a
+                href={CONTACT_INFO.calComUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto px-5 py-3.5 rounded-xl font-medium text-sm bg-white dark:bg-white/10 text-neutral-900 dark:text-white border border-neutral-300 dark:border-white/15 hover:bg-neutral-100 dark:hover:bg-white/15 transition-all flex items-center justify-center gap-2 shadow-sm"
+              >
+                <Calendar className="w-4 h-4 text-[#8a5827] dark:text-[#d4a373]" />
+                <span>Book 15-Min Call</span>
+              </a>
+
+              <a
                 href="https://www.intelligentagentworks.com/course"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full sm:w-auto px-6 py-3.5 rounded-xl font-medium text-sm bg-white dark:bg-white/10 text-neutral-900 dark:text-white border border-neutral-300 dark:border-white/15 hover:bg-neutral-100 dark:hover:bg-white/15 transition-all flex items-center justify-center gap-2 shadow-sm"
+                className="w-full sm:w-auto px-6 py-3.5 rounded-xl font-medium text-sm bg-transparent text-neutral-700 dark:text-neutral-300 hover:text-foreground transition-all flex items-center justify-center gap-2"
               >
                 <GraduationCap className="w-4 h-4 text-[#8a5827] dark:text-[#d4a373]" />
                 <span>Course Prospectus</span>
                 <ExternalLink className="w-3.5 h-3.5 opacity-60" />
-              </a>
-
-              <a
-                href="mailto:abhishek.mane.work@gmail.com"
-                className="w-full sm:w-auto px-6 py-3.5 rounded-xl font-medium text-sm bg-transparent text-neutral-600 dark:text-neutral-400 hover:text-foreground transition-colors flex items-center justify-center gap-2 truncate"
-              >
-                <Mail className="w-4 h-4 flex-shrink-0" />
-                <span className="truncate">Email Me</span>
               </a>
             </motion.div>
 
@@ -509,13 +546,22 @@ ${name}`
                   Currency:
                 </span>
                 <button
+                  onClick={() => setCurrencyMode('inr')}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-mono font-medium transition-all cursor-pointer whitespace-nowrap ${currencyMode === 'inr'
+                      ? 'bg-white dark:bg-white/20 text-foreground shadow-xs'
+                      : 'text-neutral-500 hover:text-foreground'
+                    }`}
+                >
+                  INR (₹)
+                </button>
+                <button
                   onClick={() => setCurrencyMode('both')}
                   className={`px-2.5 py-1 rounded-lg text-xs font-mono font-medium transition-all cursor-pointer whitespace-nowrap ${currencyMode === 'both'
                       ? 'bg-white dark:bg-white/20 text-foreground shadow-xs'
                       : 'text-neutral-500 hover:text-foreground'
                     }`}
                 >
-                  Both ($ / ₹)
+                  Both (₹ / $)
                 </button>
                 <button
                   onClick={() => setCurrencyMode('usd')}
@@ -525,15 +571,6 @@ ${name}`
                     }`}
                 >
                   USD ($)
-                </button>
-                <button
-                  onClick={() => setCurrencyMode('inr')}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-mono font-medium transition-all cursor-pointer whitespace-nowrap ${currencyMode === 'inr'
-                      ? 'bg-white dark:bg-white/20 text-foreground shadow-xs'
-                      : 'text-neutral-500 hover:text-foreground'
-                    }`}
-                >
-                  INR (₹)
                 </button>
               </div>
 
@@ -575,19 +612,26 @@ ${name}`
                   className="group relative rounded-2xl bg-card border border-neutral-200 dark:border-white/10 hover:border-[#d4a373]/50 dark:hover:border-[#d4a373]/50 transition-all duration-300 flex flex-col justify-between overflow-hidden shadow-xs hover:shadow-md"
                 >
                   <div className="p-5 sm:p-6 md:p-7 flex-1 flex flex-col">
-                    {/* Header line: Symbol + Badge + Dual Price */}
-                    <div className="flex flex-wrap items-start justify-between gap-2 mb-3 sm:mb-4">
-                      <div className="flex items-center gap-2">
+                    {/* Header: Category Badge + Popular Tag */}
+                    <div className="flex items-center justify-between gap-2 mb-3">
+                      <div className="flex items-center gap-2 min-w-0">
                         <span className="text-xl font-mono text-[#8a5827] dark:text-[#d4a373]">{service.symbol}</span>
                         {service.badge && (
-                          <span className="px-2 py-0.5 rounded text-[9px] font-mono uppercase tracking-wider font-semibold bg-neutral-100 dark:bg-white/10 text-neutral-700 dark:text-neutral-300">
+                          <span className="px-2 py-0.5 rounded text-[9px] font-mono uppercase tracking-wider font-semibold bg-neutral-100 dark:bg-white/10 text-neutral-700 dark:text-neutral-300 truncate">
                             {service.badge}
                           </span>
                         )}
                       </div>
+                      {service.popular && (
+                        <span className="px-2 py-0.5 rounded-full text-[9px] font-mono uppercase tracking-wider font-semibold bg-[#d4a373]/15 text-[#8a5827] dark:text-[#d4a373] border border-[#d4a373]/30 whitespace-nowrap">
+                          Popular
+                        </span>
+                      )}
+                    </div>
 
-                      {/* Price Pill */}
-                      <div className="px-2.5 py-1 rounded-lg bg-neutral-100 dark:bg-white/10 border border-neutral-200 dark:border-white/15">
+                    {/* Dedicated Price Pill Row - Always left-aligned & consistent */}
+                    <div className="mb-4">
+                      <div className="inline-flex items-center px-2.5 py-1 rounded-lg bg-neutral-100 dark:bg-white/10 border border-neutral-200 dark:border-white/15">
                         {renderServicePrice(service)}
                       </div>
                     </div>
@@ -607,13 +651,19 @@ ${name}`
                     </p>
 
                     {/* Features Checklist */}
-                    <div className="mt-auto space-y-2 pt-4 border-t border-neutral-100 dark:border-white/10">
-                      {service.features.map((feat, idx) => (
-                        <div key={idx} className="flex items-start gap-2 text-xs text-neutral-700 dark:text-neutral-300">
-                          <Check className="w-3.5 h-3.5 text-emerald-500 mt-0.5 flex-shrink-0" />
-                          <span className="leading-tight">{feat}</span>
-                        </div>
-                      ))}
+                    <div className="mt-auto space-y-2.5 pt-4 border-t border-neutral-100 dark:border-white/10">
+                      {service.features.map((feat, idx) => {
+                        const [title, detail] = feat.includes(' — ') ? feat.split(' — ') : [feat, '']
+                        return (
+                          <div key={idx} className="flex items-start gap-2 text-xs text-neutral-700 dark:text-neutral-300">
+                            <Check className="w-3.5 h-3.5 text-emerald-500 mt-0.5 flex-shrink-0" />
+                            <span className="leading-snug">
+                              <span className="font-medium text-neutral-900 dark:text-neutral-100">{title}</span>
+                              {detail && <span className="text-neutral-500 dark:text-neutral-400"> — {detail}</span>}
+                            </span>
+                          </div>
+                        )
+                      })}
                     </div>
                   </div>
 
@@ -637,6 +687,59 @@ ${name}`
                 </motion.div>
               ))}
             </AnimatePresence>
+          </div>
+        </section>
+
+        {/* Trust & De-risking Guarantees Strip */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 pb-12 sm:pb-16 w-full">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-5 sm:p-7 rounded-2xl bg-neutral-100/70 dark:bg-white/[0.03] border border-neutral-200 dark:border-white/10">
+            <div className="flex items-start gap-3">
+              <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 mt-0.5 flex-shrink-0">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-sm font-semibold text-foreground mb-1">14 Days Free Support</h4>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed font-light">
+                  Post-launch bug fixes, deployment adjustments, and config tweaks included with every delivery.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <div className="p-2 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0">
+                <Code2 className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-sm font-semibold text-foreground mb-1">100% Code & IP Ownership</h4>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed font-light">
+                  Complete intellectual property rights, clean Git repository, Docker containers, and docs handed over.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <div className="p-2 rounded-xl bg-[#d4a373]/15 text-[#8a5827] dark:text-[#d4a373] mt-0.5 flex-shrink-0">
+                <Users className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-sm font-semibold text-foreground mb-1">Direct Engineer Access</h4>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed font-light">
+                  No account managers or agency overhead markups. You communicate directly with the engineer.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <div className="p-2 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 mt-0.5 flex-shrink-0">
+                <Check className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-sm font-semibold text-foreground mb-1">Milestone-Based Billing</h4>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed font-light">
+                  Transparent milestone payments. Pay safely as features are tested and approved on live staging.
+                </p>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -899,14 +1002,34 @@ ${name}`
               </form>
             </div>
 
-            {/* Social Links & Direct Email */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-center">
+            {/* Social Links & Direct Email / WhatsApp / Cal.com */}
+            <div className="flex flex-wrap items-center justify-center gap-3 text-center">
               <a
-                href="mailto:abhishek.mane.work@gmail.com"
+                href={CONTACT_INFO.getWhatsAppUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white transition-colors flex items-center gap-2 text-xs font-mono shadow-sm"
+              >
+                <MessageCircle className="w-4 h-4" />
+                <span>WhatsApp: +91 7020870063</span>
+              </a>
+
+              <a
+                href={CONTACT_INFO.calComUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-5 py-2.5 rounded-xl bg-card border border-neutral-300 dark:border-white/15 text-foreground hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors flex items-center gap-2 text-xs font-mono shadow-sm"
+              >
+                <Calendar className="w-4 h-4 text-[#8a5827] dark:text-[#d4a373]" />
+                <span>Book 15-Min Call (Cal.com)</span>
+              </a>
+
+              <a
+                href={`mailto:${CONTACT_INFO.email}`}
                 className="px-5 py-2.5 rounded-xl bg-card border border-neutral-300 dark:border-white/15 text-foreground hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors flex items-center gap-2 text-xs font-mono shadow-sm"
               >
                 <Mail className="w-4 h-4 text-[#8a5827] dark:text-[#d4a373]" />
-                <span>abhishek.mane.work@gmail.com</span>
+                <span>{CONTACT_INFO.email}</span>
               </a>
 
               <div className="flex items-center gap-3 text-neutral-500 dark:text-neutral-400">
@@ -973,9 +1096,45 @@ ${name}`
 
                 {/* Scrollable Form Body */}
                 <div className="px-5 sm:px-7 py-4 overflow-y-auto flex-1 overscroll-contain">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-4">
+                    <a
+                      href={CONTACT_INFO.getWhatsAppUrl(selectedServiceForInquiry)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/25 hover:bg-emerald-500/15 transition-all flex items-center justify-between gap-2 group cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2">
+                        <MessageCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                        <span className="text-xs font-medium text-emerald-800 dark:text-emerald-300">
+                          WhatsApp Chat
+                        </span>
+                      </div>
+                      <span className="text-xs font-mono font-semibold text-emerald-600 dark:text-emerald-400 group-hover:translate-x-0.5 transition-transform">
+                        Instant →
+                      </span>
+                    </a>
+
+                    <a
+                      href={CONTACT_INFO.calComUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-3 rounded-xl bg-[#d4a373]/10 border border-[#d4a373]/25 hover:bg-[#d4a373]/15 transition-all flex items-center justify-between gap-2 group cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-[#8a5827] dark:text-[#d4a373] flex-shrink-0" />
+                        <span className="text-xs font-medium text-neutral-800 dark:text-neutral-200">
+                          15-Min Intro Call
+                        </span>
+                      </div>
+                      <span className="text-xs font-mono font-semibold text-[#8a5827] dark:text-[#d4a373] group-hover:translate-x-0.5 transition-transform">
+                        Cal.com →
+                      </span>
+                    </a>
+                  </div>
+
                   <p className="text-xs text-neutral-500 dark:text-neutral-400 font-light mb-4">
-                    Fill in a quick brief below. Submitting will prepare your email draft directly to{' '}
-                    <span className="text-foreground font-mono font-medium">abhishek.mane.work@gmail.com</span> with your specified budget and details.
+                    Or send a brief via email to{' '}
+                    <span className="text-foreground font-mono font-medium">abhishek.mane.work@gmail.com</span>:
                   </p>
 
                   <form id="modal-inquiry-form" onSubmit={handleInquirySubmit} className="space-y-4">

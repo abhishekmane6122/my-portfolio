@@ -3,10 +3,10 @@
     "slug": "securities-regulator-intelligence-pipeline",
     "title": "Securities Regulator Intelligence Pipeline",
     "tagline": "A production RAG and summarization pipeline for securities-regulator circulars, built on multi-backend LLM orchestration, OCR recovery for scanned filings, and an LLM-as-judge quality gate.",
-    "category": "Regulatory AI",
+    "category": "RAG & Document Intelligence",
     "domain": "Capital Markets · Compliance",
     "year": "2026",
-    "role": "AI Engineer — pipeline architecture, LLM orchestration, evaluation harness, observability, deployment",
+    "role": "RAG Engineer & LLM Evaluator — OCR recovery, hybrid retrieval, LLM-as-a-judge quality harness",
     "duration": "Production delivery with ongoing daily operation",
     "team": [
         "Solo build — architecture through production"

@@ -3,10 +3,10 @@
     "slug": "industrial-safety-vision-system",
     "title": "Industrial Safety Vision System",
     "tagline": "A computer-vision platform that analyses facility footage for PPE violations, restricted-zone intrusion, fire and smoke, falls, machine downtime and crowding — running entirely locally on CPU or GPU with evidence snapshots and an analytics dashboard.",
-    "category": "Computer Vision",
+    "category": "Computer Vision & Edge ML",
     "domain": "Industrial Safety · EHS Compliance",
     "year": "2026",
-    "role": "AI Engineer — detection architecture, zone modelling, violation logic, full stack",
+    "role": "AI/ML Computer Vision Engineer — multi-task detection backbone, spatial zone modeling, edge CPU/GPU optimization",
     "duration": "Self-initiated build",
     "team": [
         "Solo build — architecture through working platform"

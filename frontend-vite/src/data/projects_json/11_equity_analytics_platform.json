@@ -3,10 +3,10 @@
     "slug": "equity-market-analytics-platform",
     "title": "Equity Market Analytics Platform",
     "tagline": "A dual-source market analytics platform that treats daily exchange files as the audited record and a commercial data feed as enrichment, keeping the two reconcilable rather than blended.",
-    "category": "Market Analytics",
+    "category": "Backend for AI & High-Throughput Data",
     "domain": "Capital Markets · Equity Research",
     "year": "2026",
-    "role": "Full Stack Engineer — data architecture, ingestion, reconciliation design, dashboard",
+    "role": "Backend Engineer for AI Applications — time-series reconciliation, symbol change tracking, idempotent ingestion",
     "duration": "Phased delivery",
     "team": [
         "Solo build — architecture through production"

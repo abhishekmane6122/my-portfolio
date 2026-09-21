@@ -1,36 +1,35 @@
 {
   "fullName": "Abhishek Mane",
   "title": "AI Engineer @ CognitBotz | Building Scalable, Enterprise-Grade AI Innovations",
-  "tagline": "Building real-world AI solutions with a focus on Ethical AI, LLM fine-tuning, and scalable cloud deployments.",
-  "bio": "I’m an AI Engineer harnessing the power of Python, ML, Deep Learning, and NLP to address real-world challenges. Experienced in LLM fine-tuning, building and integrating APIs, and making AI accessible and reliable. I am a strong advocate for ethical AI, striving to mitigate bias and foster fairness. Skilled in deploying scalable solutions with AWS and Azure.",
+  "tagline": "AI Engineer specializing in Large Language Models, Multi-Agent Systems, and Production AI Architectures.",
+  "bio": "I’m an AI Engineer specializing in RAG systems, multi-agent orchestration, and production LLMOps. Experienced in large language models, retrieval architectures, FastAPI microservices, and enterprise cloud deployments across Azure and AWS.",
+  "coreStack": {
+    "AI / LLMs": "Large Language Models (OpenAI, Azure OpenAI, Llama, Claude, Gemini), Fine-Tuning & Integration, LangChain, LangGraph, AI Orchestration, Multi-Agent Architectures, Prompt Engineering",
+    "RAG & Search": "Retrieval-Augmented Generation (RAG), Semantic Search, Azure AI Search, Weaviate, FAISS, pgvector (Azure PostgreSQL), ChromaDB",
+    "Backend & APIs": "Python, FastAPI, Flask, REST APIs & Microservices for AI Applications, PostgreSQL, SQLite, Async Programming",
+    "MLOps & Cloud": "MLOps (Model Deployment, Monitoring, Evaluation & Quality Tuning), Containerization (Docker, Kubernetes), Azure Cloud Platform, CI/CD, Git, GitLab"
+  },
   "skills": [
-    "Python",
-    "SQL",
-    "Azure",
-    "Databricks",
-    "Gen AI",
-    "RAG",
-    "LLMs",
-    "LangChain",
-    "LangGraph",
-    "n8n",
-    "Microsoft Agent Framework",
-    "LMOPS",
-    "MLOPS",
-    "Multi Agent Systems",
-    "A2A (Anything to Action)",
-    "PyTorch",
-    "TensorFlow",
-    "NLP",
-    "BERT",
-    "GPT",
-    "FastAPI",
-    "Jupyter Notebook",
-    "Git",
-    "Docker"
+    "Large Language Models (OpenAI, Azure OpenAI, Llama, Claude, Gemini)",
+    "Fine-Tuning & Integration",
+    "LangChain & LangGraph",
+    "Multi-Agent Architectures & AI Orchestration",
+    "Prompt Engineering",
+    "RAG & Semantic Search",
+    "Azure AI Search & Weaviate",
+    "FAISS, pgvector & ChromaDB",
+    "Python, FastAPI & Flask",
+    "REST APIs & AI Microservices",
+    "PostgreSQL & SQLite",
+    "Async Programming",
+    "MLOps & Quality Tuning",
+    "Docker & Kubernetes",
+    "Azure Cloud Platform & CI/CD",
+    "Git & GitLab"
   ],
   "socialLinks": {
-    "github": "https://github.com/abhishekmane-ai",
+    "portfolio": "https://abhishekmane6122.github.io/my-portfolio/",
+    "github": "https://github.com/abhishekmane6122",
     "linkedin": "https://www.linkedin.com/in/abhishek-mane-aiml/",
     "email": "abhishek.mane.work@gmail.com",
     "resume": "#"
@@ -90,59 +89,81 @@
   ],
   "projects": [
     {
-      "id": "1",
-      "title": "SmartBot",
-      "description": "Designed and deployed a conversational AI model using BERT to enable seamless, bias-aware customer interactions.",
+      "id": "sentinel-model-governance",
+      "title": "Ward — Zero-Trust AI Model Security & Static Opcode Ingestion Gateway",
+      "description": "Zero-trust on-ramp for open-source AI weights in regulated enterprises with static opcode disassembly, license allowlists, Jaccard bigram deduplication, and CycloneDX AIBOM export.",
       "tags": [
-        "BERT",
-        "NLP",
+        "AI Security & MLOps",
         "Python",
-        "Ethical AI"
-      ],
-      "live": "#",
-      "github": "https://github.com/abhishekmane-ai",
-      "featured": true
-    },
-    {
-      "id": "2",
-      "title": "AI4Health",
-      "description": "Built diagnostic ML tools on cloud platforms (AWS/Azure) to accelerate healthcare insights delivery.",
-      "tags": [
-        "ML",
-        "Cloud",
-        "AWS",
-        "Azure",
-        "Healthcare"
-      ],
-      "live": "#",
-      "github": "https://github.com/abhishekmane-ai",
-      "featured": true
-    },
-    {
-      "id": "3",
-      "title": "Text Insights API",
-      "description": "Created robust, plug-and-play APIs for NLP workflows and business analytics using FastAPI.",
-      "tags": [
         "FastAPI",
-        "NLP",
-        "API",
-        "Business Analytics"
+        "React",
+        "Pickle Security",
+        "EU AI Act"
       ],
       "live": "#",
       "github": "https://github.com/abhishekmane-ai",
       "featured": true
     },
     {
-      "id": "4",
-      "title": "MLflow Wine Quality Prediction",
-      "description": "Regression model with ElasticNet and complete experiment tracking using MLflow.",
+      "id": "naipunya-insurance-voice-ai",
+      "title": "Naipunya — Low-Latency Voice AI & Multi-Agent Actuarial Advisory System",
+      "description": "Voice-first multi-agent conversational AI for Indian insurance advisory with speculative parallel execution, dynamic Google AI search RAG, progressive slot filling, and sub-second dual cloud/edge inference.",
       "tags": [
-        "MLflow",
-        "Scikit-learn",
-        "Python"
+        "Voice AI & Speech",
+        "FastAPI",
+        "Groq LPU",
+        "Ollama",
+        "Faster-Whisper",
+        "Web Audio"
       ],
       "live": "#",
-      "github": "https://github.com/abhishekmane-ai/wine-quality-prediction",
+      "github": "https://github.com/abhishekmane-ai",
+      "featured": true
+    },
+    {
+      "id": "perkai-benefits-discovery-engine",
+      "title": "PerkAI — Autonomous Multi-Agent Capital Discovery & Combinatorial Stacking Engine",
+      "description": "Autonomous multi-agent discovery platform unlocking $180k–$340k in startup credits and non-dilutive subsidies with an algorithmic Grounding Guard, combinatorial stacking optimizer, and distributed AI gateway.",
+      "tags": [
+        "Agentic Systems & GenAI",
+        "FastAPI",
+        "React",
+        "PostgreSQL",
+        "NVIDIA NIM",
+        "SSE"
+      ],
+      "live": "#",
+      "github": "https://github.com/abhishekmane-ai",
+      "featured": true
+    },
+    {
+      "id": "aegis-platform",
+      "title": "Aegis — Regulatory Compliance Intelligence Suite",
+      "description": "Production-grade multi-module platform automating BSE/SEBI/RBI monitoring, director disclosure management, insider trading surveillance across 3.9M+ investor records, and board meeting minutes generation.",
+      "tags": [
+        "Multi-Agent Systems",
+        "Azure OpenAI",
+        "FastAPI",
+        "pgvector",
+        "React"
+      ],
+      "live": "#",
+      "github": "https://github.com/abhishekmane-ai",
+      "featured": true
+    },
+    {
+      "id": "equity-pulse",
+      "title": "Equity Pulse — Enterprise Equity Analytics Platform",
+      "description": "End-to-end equity analytics platform tracking enterprise business units with automated ETL from BSE/NSE, real-time dashboards, candlestick charts, and shareholding pattern tracking across 3.9M+ investor records.",
+      "tags": [
+        "Equity Analytics",
+        "FastAPI",
+        "React",
+        "PostgreSQL",
+        "ETL"
+      ],
+      "live": "#",
+      "github": "https://github.com/abhishekmane-ai",
       "featured": true
     }
   ]

@@ -3,10 +3,10 @@
     "slug": "exchange-filing-intelligence-platform",
     "title": "Exchange Filing Intelligence Platform",
     "tagline": "A document-AI platform that monitors stock-exchange corporate filings for a watchlist of entities, classifies and summarises them, and delivers a charted daily digest to market-facing teams.",
-    "category": "Document AI",
+    "category": "RAG & Document Intelligence",
     "domain": "Capital Markets · Corporate Disclosure",
     "year": "2026",
-    "role": "AI Engineer — ingestion, extraction, RAG design, reporting automation, deployment",
+    "role": "Backend Engineer for AI Applications — asynchronous filing ingestion, document classification, automated digest engine",
     "duration": "Production delivery with daily operation",
     "team": [
         "Solo build — architecture through production"

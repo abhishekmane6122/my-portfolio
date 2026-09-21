@@ -17,6 +17,20 @@ export interface ServiceItem {
   color: string
 }
 
+export const CONTACT_INFO = {
+  email: 'abhishek.mane.work@gmail.com',
+  phone: '+91 7020870063',
+  whatsappNumber: '917020870063',
+  calComUrl: import.meta.env.VITE_CAL_COM_URL || 'https://cal.com/abhishek-mane-tflycv',
+  topmateUrl: 'https://topmate.io/abhishekmane/',
+  getWhatsAppUrl: (serviceName?: string) => {
+    const text = serviceName
+      ? `Hi Abhishek, I saw your portfolio and want to discuss a project for "${serviceName}". Can we discuss scope & availability?`
+      : `Hi Abhishek, I found your portfolio and would like to discuss a freelance project with you. When is a good time to connect?`
+    return `https://wa.me/917020870063?text=${encodeURIComponent(text)}`
+  },
+}
+
 export interface TechGroup {
   label: string
   badgeClass: string
@@ -78,12 +92,11 @@ export const servicesData: ServiceItem[] = [
     description:
       'End-to-end product development — React/Next.js frontend, Node.js or Python backend, PostgreSQL database, REST API, and deployment. I own the full stack from concept to launch.',
     features: [
-      'Web applications, dashboards & SaaS platforms',
-      'TypeScript / Modern React frontend architectures',
-      'Database integration (PostgreSQL, Supabase, MySQL)',
-      'Auth, roles & multi-tenant third-party integrations',
-      'CI/CD pipeline + Docker containerization included',
-      '>80% test coverage standard — no runtime surprises',
+      'Responsive Web Apps & SaaS — React, Next.js & TypeScript',
+      'Database & Schema Design — PostgreSQL, Supabase & MySQL',
+      'Secure Auth & Integrations — RBAC, OAuth & multi-tenant APIs',
+      'DevOps & Deployments — Docker containers & automated CI/CD',
+      'Quality & Reliability — >80% test coverage with zero runtime surprises',
     ],
     ctaText: 'Discuss a Project →',
     ctaType: 'contact',
@@ -102,12 +115,11 @@ export const servicesData: ServiceItem[] = [
     description:
       'Integrating AI capabilities into existing or new applications — LLM APIs (OpenAI, Anthropic, Gemini, DeepSeek), AI assistants, intelligent automation, document processing and custom AI workflows.',
     features: [
-      'RAG pipeline design & document intelligence (PDFs, docs, tables)',
-      'LLM API integration (OpenAI, Claude, Gemini, DeepSeek)',
-      'Prompt engineering, evaluation workflows & structured output',
-      'Autonomous agentic loops & multi-agent routing',
-      'Vector search & semantic retrieval (pgvector, Chroma)',
-      'Deterministic fallback & guardrails against hallucinations',
+      'Production RAG Pipelines — Intelligent doc search (PDFs, docs, tables)',
+      'LLM API Integrations — OpenAI, Claude, Gemini & DeepSeek',
+      'Agentic Workflows — Autonomous multi-agent loops & dynamic routing',
+      'Vector Search & Embeddings — Fast retrieval with pgvector & Chroma',
+      'Guardrails & Fallbacks — Deterministic output & anti-hallucination checks',
     ],
     ctaText: 'Explore AI Options →',
     ctaType: 'contact',
@@ -125,12 +137,11 @@ export const servicesData: ServiceItem[] = [
     description:
       'Scalable, well-documented REST APIs. Whether you need a backend from scratch, a refactor, or third-party integrations — I build systems that handle real traffic and are easy to maintain.',
     features: [
-      'REST APIs with comprehensive OpenAPI / Swagger docs',
-      'Robust authentication, RBAC & API security',
-      'PostgreSQL, MySQL & Supabase schema design',
-      'Third-party integrations, CRM webhooks & payment processing',
-      'Performance optimization, indexing & query tuning',
-      'Event-driven architectures & asynchronous background tasks',
+      'High-Throughput REST APIs — Documented OpenAPI / Swagger specs',
+      'Security & Authentication — JWT, OAuth2, RBAC & rate limiting',
+      'Database Performance — Query optimization, indexing & caching',
+      'Third-Party Services — Payment gateways, CRM webhooks & events',
+      'Asynchronous Architecture — Background workers, queues & task runners',
     ],
     ctaText: 'Talk Backend →',
     ctaType: 'contact',
@@ -148,12 +159,11 @@ export const servicesData: ServiceItem[] = [
     description:
       'Custom ML model development, prediction/classification systems, recommendation engines, data preprocessing, rigorous model evaluation, and production inference deployment.',
     features: [
-      'Supervised & unsupervised ML model development',
-      'Prediction, forecasting & classification systems',
-      'Recommendation engines & ranking algorithms',
-      'Feature engineering, data cleaning & preprocessing pipelines',
-      'Model evaluation (ROC/AUC, precision, recall, F1) & drift monitoring',
-      'Deployment via FastAPI / TorchServe with optimized latency',
+      'Custom Model Development — Supervised & unsupervised ML architectures',
+      'Predictive Systems — Forecasting, classification & ranking algorithms',
+      'Feature Engineering — Automated data cleaning & preprocessing pipelines',
+      'Rigorous Evaluation — ROC/AUC, precision-recall & drift monitoring',
+      'Production Deployment — FastAPI & TorchServe with low-latency inference',
     ],
     ctaText: 'Inquire About Models →',
     ctaType: 'contact',
@@ -171,12 +181,11 @@ export const servicesData: ServiceItem[] = [
     description:
       'Data cleaning, exploratory analysis, visualization, interactive KPI dashboards, automated reporting, and actionable business insights that drive strategic decisions.',
     features: [
-      'Data cleaning, transformation & automated ETL pipelines',
-      'Interactive executive dashboards (React, Chart.js, Recharts)',
-      'KPI tracking, revenue metrics & retention analytics',
-      'Custom scheduled reports & automated alerts',
-      'SQL data warehousing & query optimization',
-      'Actionable business recommendations & visualization decks',
+      'Automated ETL Pipelines — Data ingestion, cleaning & transformation',
+      'Interactive Dashboards — Real-time analytics with React & Recharts',
+      'Business KPI Tracking — Revenue, user retention & conversion metrics',
+      'SQL Data Warehousing — High-performance querying & aggregation',
+      'Strategic Reporting — Scheduled automated alerts & executive summaries',
     ],
     ctaText: 'Build a Dashboard →',
     ctaType: 'contact',
@@ -194,12 +203,11 @@ export const servicesData: ServiceItem[] = [
     description:
       'I review your existing codebase, identify bottlenecks, bad patterns, and security issues — then provide hands-on bug fixing, feature development, database updates, and speed optimization.',
     features: [
-      'Core Web Vitals & Lighthouse performance audit',
-      'Database query analysis & N+1 bottleneck elimination',
-      'Security review (auth, input validation, vulnerability fixes)',
-      'Bug fixing & routine dependency upgrades',
-      'Feature development & API integration on legacy codebases',
-      'Prioritized refactoring roadmap with immediate quick wins',
+      'Performance Audit — Core Web Vitals & Lighthouse speed optimization',
+      'Database Diagnostics — Slow query elimination & N+1 resolution',
+      'Security Hardening — Auth audit, input validation & vulnerability fixes',
+      'Legacy Modernization — Bug fixing, dependency updates & API refactoring',
+      'Actionable Roadmap — Prioritized technical debt reduction plan',
     ],
     ctaText: 'Request an Audit →',
     ctaType: 'contact',
@@ -218,12 +226,11 @@ export const servicesData: ServiceItem[] = [
     description:
       'Comprehensive hands-on training for engineers, tech leads, and product teams. Practical curriculum covering autonomous agent design, multi-agent frameworks, production RAG, and LLM orchestration.',
     features: [
-      'Official Course Prospectus: "AI Engineering for Everyone"',
-      'Multi-agent systems with LangChain, LangGraph & Agno',
-      'Production RAG: chunking, hybrid retrieval, late interaction',
-      'Hands-on coding labs, evaluation benchmarks & cost control',
-      'Customized corporate syllabus for engineering teams',
-      'Lifetime access to code examples and architecture templates',
+      'Official Curriculum — Comprehensive "AI Engineering for Everyone"',
+      'Multi-Agent Frameworks — Hands-on with LangChain, LangGraph & Agno',
+      'Production RAG Mastery — Chunking, hybrid retrieval & reranking',
+      'Interactive Labs — Live coding exercises, benchmarks & cost control',
+      'Tailored Cohorts — Custom corporate syllabus & permanent codebase access',
     ],
     ctaText: 'View Course Prospectus ↗',
     ctaType: 'external',
@@ -242,12 +249,11 @@ export const servicesData: ServiceItem[] = [
     description:
       '1-on-1 intensive mock interviews and tailored coaching for AI/ML, Full Stack, and Backend engineering roles. Actionable feedback based on real hiring bars across top global tech companies.',
     features: [
-      'AI & Full Stack live coding challenges under real constraints',
-      'System design & architecture deep-dives with trade-off analysis',
-      'Resume & GitHub portfolio review through recruiter eyes',
-      'Evaluation rubric across code quality, scalability & communication',
-      'Clear, actionable feedback & personalized practice problem sets',
-      'Targeted preparation for tech lead and senior engineer bars',
+      'Live Coding Simulations — Real-time Full Stack & AI problem sets',
+      'System Design Deep-Dives — Scalability, trade-offs & architecture rubrics',
+      'Portfolio & Resume Audit — Recruiter-focused review of GitHub & projects',
+      'Hiring Bar Feedback — Actionable scoring on communication & code quality',
+      'Targeted Prep Roadmaps — Tailored for Senior Engineer & Tech Lead roles',
     ],
     ctaText: 'Book Interview Prep →',
     ctaType: 'contact',

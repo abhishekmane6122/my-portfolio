@@ -3,10 +3,10 @@
     "slug": "shareholding-intelligence-platform",
     "title": "Shareholding Intelligence Platform",
     "tagline": "A multi-tenant Investor Relations analytics portal that turns raw weekly depository registries into board-ready institutional-ownership intelligence across seven listed business units.",
-    "category": "Investor Analytics",
+    "category": "Backend for AI & High-Throughput Data",
     "domain": "Capital Markets · Investor Relations",
     "year": "2026",
-    "role": "Full Stack & AI Engineer — architecture, backend, data pipeline, RAG assistant, deployment",
+    "role": "Backend Engineer for AI Applications & Full Stack — high-concurrency pipeline, multi-tenant RBAC, natural-language query assistant",
     "duration": "Multi-sprint delivery, extended into ongoing production ownership",
     "team": [
         "Solo build — architecture through production"

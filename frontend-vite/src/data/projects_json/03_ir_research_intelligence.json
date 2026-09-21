@@ -3,10 +3,10 @@
     "slug": "ir-meeting-and-research-intelligence",
     "title": "IR Meeting & Research Intelligence Platform",
     "tagline": "A unified Investor Relations console combining meeting and contact management with a multi-agent RAG pipeline that extracts structured financial estimates from sell-side broker research and answers role-tailored questions with citations.",
-    "category": "Multi-Agent RAG",
+    "category": "RAG & Document Intelligence",
     "domain": "Capital Markets · Equity Research",
     "year": "2026",
-    "role": "Lead Developer & AI Engineer — architecture, extraction pipeline, RAG design, SSO, E2E testing",
+    "role": "RAG Engineer & AI Architect — multi-table PDF parsing, anti-hallucination verification, persona-tailored retrieval",
     "duration": "Two sprints to production",
     "team": [
         "Solo build — architecture through production"

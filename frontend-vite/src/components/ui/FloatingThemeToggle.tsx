@@ -3,7 +3,11 @@ import { Sun, Moon } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const FloatingThemeToggle: React.FC = () => {
+interface FloatingThemeToggleProps {
+    className?: string;
+}
+
+const FloatingThemeToggle: React.FC<FloatingThemeToggleProps> = ({ className = '' }) => {
     const { theme, setTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
 
@@ -21,10 +25,10 @@ const FloatingThemeToggle: React.FC = () => {
         <motion.button
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={toggleTheme}
-            className="z-10 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-neutral-100 dark:bg-white/10 backdrop-blur-xl border border-neutral-200 dark:border-white/10 shadow-lg transition-colors hover:bg-neutral-200 dark:hover:bg-white/20"
+            className={`z-10 flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-white/80 dark:bg-[#181818] backdrop-blur-xl border border-neutral-200 dark:border-white/15 shadow-sm transition-colors hover:bg-neutral-100 dark:hover:bg-[#222] ${className}`}
             aria-label="Toggle Theme"
         >
             <AnimatePresence mode="wait">

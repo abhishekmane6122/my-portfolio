@@ -44,10 +44,15 @@ export default function Navigation() {
 
                     <div className="flex items-center gap-1" role="menubar">
                         {navLinks.map((link) => {
-                            const className = `px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-2 text-sm ${isActive(link.to)
-                                ? 'bg-accent-blue text-white shadow-md'
-                                : 'text-gray-600 dark:text-text-secondary hover:text-gray-900 dark:hover:text-text-primary hover:bg-gray-100 dark:hover:bg-bg-secondary'
-                                }`;
+                            const isServices = link.label === 'Services';
+                            const active = isActive(link.to);
+                            const className = `px-3 py-1.5 rounded-lg font-semibold transition-all flex items-center gap-2 text-sm ${
+                                isServices
+                                    ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20 hover:border-emerald-500/60 shadow-sm'
+                                    : active
+                                    ? 'bg-accent-blue text-white shadow-md'
+                                    : 'text-neutral-800 dark:text-neutral-100 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-bg-secondary'
+                            }`;
 
                             if (link.isExternal) {
                                 return (

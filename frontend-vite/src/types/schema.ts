@@ -204,6 +204,7 @@ export interface SocialLinksData {
     website?: string;
     email?: string;
     resume?: string;
+    topmate?: string;
 }
 
 // Skills Matrix

@@ -3,10 +3,10 @@
     "slug": "rpa-failure-and-knowledge-copilot",
     "title": "RPA Failure & Knowledge Copilot",
     "tagline": "An AI layer over a large bot estate that turns silent automation failures into diagnosed root causes, and unread process design documents into a conversational knowledge assistant for new developers.",
-    "category": "Automation Intelligence",
+    "category": "RAG & Document Intelligence",
     "domain": "Enterprise Automation · RPA",
     "year": "2026",
-    "role": "AI Engineer — RAG architecture, document structure modelling, failure analysis design",
+    "role": "RAG Engineer & AI Application Developer — hierarchical document chunking, telemetry log retrieval, root-cause diagnosis",
     "duration": "Two weeks to working platform",
     "team": [
         "Solo build — architecture through demo"

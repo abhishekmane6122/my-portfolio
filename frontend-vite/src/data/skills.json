@@ -1,195 +1,428 @@
 {
     "stats": {
-        "expertSkills": 15,
-        "yearsExperience": "2+",
-        "totalTechs": 28
+        "expertSkills": 26,
+        "yearsExperience": "2",
+        "totalTechs": 30
     },
     "skills": [
         {
-            "id": "python",
-            "name": "Python",
-            "category": "backend",
+            "id": "llms-finetuning",
+            "name": "Large Language Models & Fine-Tuning",
+            "category": "ai-ml",
             "proficiency": "expert",
-            "yearsOfExperience": 2.1,
-            "icon": "/icons/python.svg",
-            "description": "Architecting scalable AI backends, ETL pipelines, and enterprise automation with Python 3.11+",
+            "yearsOfExperience": 1.8,
+            "icon": "/icons/genai.svg",
+            "description": "Deploying, evaluating, and fine-tuning frontier & open LLMs (Azure OpenAI, Claude 3.5, Llama 3, Gemini) for enterprise domain workflows",
             "projects": [
-                "bse-rag-project",
-                "aegis-platform",
-                "equity-pulse",
-                "doc-capture"
+                "sebi-regulatory-rag-pipeline",
+                "naipunya-insurance-voice-ai",
+                "perkai-benefits-discovery-engine",
+                "sentinel-model-governance"
             ]
         },
         {
-            "id": "langchain",
-            "name": "LangChain",
+            "id": "langchain-langgraph",
+            "name": "LangChain & LangGraph Orchestration",
             "category": "ai-ml",
             "proficiency": "expert",
             "yearsOfExperience": 1.6,
             "icon": "/icons/langchain.svg",
-            "description": "Orchestrating complex LLM chains, memory management, and tool integration for production-grade AI systems",
+            "description": "Orchestrating stateful cyclical agent graphs, multi-step tool calling, memory management, and human-in-the-loop approval gates",
             "projects": [
-                "aegis-platform",
-                "quantus-med",
-                "omniqa-agent"
-            ]
-        },
-        {
-            "id": "langgraph",
-            "name": "LangGraph",
-            "category": "ai-ml",
-            "proficiency": "expert",
-            "yearsOfExperience": 1.6,
-            "icon": "/icons/langgraph.svg",
-            "description": "Building stateful, multi-agent workflows and resilient autonomous systems with cyclical logic",
-            "projects": [
-                "aegis-platform",
-                "multi-agent-sql-system"
+                "ir-research-intelligence-platform",
+                "naipunya-insurance-voice-ai",
+                "autonomous-test-engineering",
+                "rpa-intelligence-copilot"
             ]
         },
         {
             "id": "rag-systems",
-            "name": "RAG Systems",
+            "name": "Production RAG & Hybrid Retrieval",
             "category": "ai-ml",
             "proficiency": "expert",
             "yearsOfExperience": 1.6,
-            "icon": "/icons/ai.svg",
-            "description": "Designing high-precision retrieval-augmented generation pipelines using OpenAI, Llama-3, and Phi-3 models",
+            "icon": "/icons/genai.svg",
+            "description": "Dense/sparse hybrid search, Reciprocal Rank Fusion (RRF), Cross-Encoder reranking, and chunking optimization over complex filings",
             "projects": [
-                "bse-rag-project",
-                "aegis-platform",
-                "regulatory-rag-pipeline"
+                "sebi-regulatory-rag-pipeline",
+                "ir-research-intelligence-platform",
+                "exchange-filing-intelligence",
+                "perkai-benefits-discovery-engine"
             ]
         },
         {
             "id": "multi-agent",
-            "name": "Multi-Agent Architectures",
+            "name": "Multi-Agent Architectures & Delegation",
             "category": "ai-ml",
             "proficiency": "expert",
-            "yearsOfExperience": 1.4,
-            "icon": "/icons/agents.svg",
-            "description": "Designing autonomous systems with intent routing, deterministic query handling, and dynamic agent delegation",
+            "yearsOfExperience": 1.5,
+            "icon": "/icons/genai.svg",
+            "description": "Hierarchical agent networks with deterministic query routing, dynamic subagent delegation, intent classification, and schema sanitization",
             "projects": [
-                "aegis-platform",
-                "omniqa-agent"
+                "ir-research-intelligence-platform",
+                "naipunya-insurance-voice-ai",
+                "perkai-benefits-discovery-engine",
+                "autonomous-test-engineering"
             ]
         },
         {
-            "id": "fastapi",
-            "name": "FastAPI",
-            "category": "backend",
+            "id": "vector-search",
+            "name": "Vector Databases & High-Dimensional Search",
+            "category": "ai-ml",
             "proficiency": "expert",
-            "yearsOfExperience": 1.3,
-            "icon": "/icons/fastapi.svg",
-            "description": "Developing high-performance, asynchronous RESTful APIs with Pydantic validation and automatic documentation",
+            "yearsOfExperience": 1.5,
+            "icon": "/icons/sql.svg",
+            "description": "Partitioning, indexing, and querying vector spaces across Azure AI Search, Weaviate, FAISS, pgvector (HNSW), and ChromaDB",
             "projects": [
-                "aegis-platform",
-                "equity-pulse",
-                "doc-capture",
-                "quantus-med"
-            ]
-        },
-        {
-            "id": "postgresql",
-            "name": "PostgreSQL & Vector Search",
-            "category": "backend",
-            "proficiency": "expert",
-            "yearsOfExperience": 1.0,
-            "icon": "/icons/postgresql.svg",
-            "description": "Designing high-concurrency relational schemas and optimizing vector search with pgvector and FAISS",
-            "projects": [
-                "equity-pulse",
-                "aegis-platform",
-                "bse-rag-project"
-            ]
-        },
-        {
-            "id": "azure",
-            "name": "Azure Cloud",
-            "category": "devops",
-            "proficiency": "expert",
-            "yearsOfExperience": 1.0,
-            "icon": "/icons/azure.svg",
-            "description": "Managing enterprise AI infrastructure, Azure OpenAI, AD SSO, and VM scheduling for high-availability apps",
-            "projects": [
-                "aegis-platform",
-                "equity-pulse"
-            ]
-        },
-        {
-            "id": "docker",
-            "name": "Docker",
-            "category": "devops",
-            "proficiency": "expert",
-            "yearsOfExperience": 1.6,
-            "icon": "/icons/docker.svg",
-            "description": "Containerizing AI workloads for consistent delivery across production, staging, and development environments",
-            "projects": [
-                "aegis-platform",
-                "equity-pulse",
-                "doc-capture"
+                "sebi-regulatory-rag-pipeline",
+                "shareholding-intelligence-platform",
+                "naipunya-insurance-voice-ai",
+                "perkai-benefits-discovery-engine"
             ]
         },
         {
             "id": "ai-observability",
-            "name": "AI Agent Observability",
+            "name": "AI Observability & RAG Evaluation",
             "category": "ai-ml",
             "proficiency": "expert",
-            "yearsOfExperience": 1.0,
-            "icon": "/icons/monitor.svg",
-            "description": "Building custom monitoring platforms for agent health, execution logs, and latency tracking",
+            "yearsOfExperience": 1.2,
+            "icon": "/icons/mlops.svg",
+            "description": "Continuous telemetry benchmarking via RAGAS & DeepEval for faithfulness, context precision, token cost tracking, and automated L1 RCA triage",
             "projects": [
-                "aegis-platform"
+                "sebi-regulatory-rag-pipeline",
+                "rpa-intelligence-copilot"
+            ]
+        },
+        {
+            "id": "slm-local-inference",
+            "name": "Small Language Models & Air-Gapped SLMs",
+            "category": "ai-ml",
+            "proficiency": "expert",
+            "yearsOfExperience": 1.4,
+            "icon": "/icons/genai.svg",
+            "description": "Air-gapped on-premise SLM deployment (Phi-3-mini, Mistral 7B) using Ollama, llama.cpp, and quantized GGUF for strict regulatory data privacy",
+            "projects": [
+                "central-bank-circular-pipeline",
+                "sebi-regulatory-rag-pipeline"
+            ]
+        },
+        {
+            "id": "voice-ai",
+            "name": "Voice AI & Speech Processing",
+            "category": "ai-ml",
+            "proficiency": "expert",
+            "yearsOfExperience": 1.2,
+            "icon": "/icons/genai.svg",
+            "description": "Low-latency conversational voice pipelines with Faster-Whisper, Kokoro TTS, Groq LPU inference, and Web Audio streaming",
+            "projects": [
+                "naipunya-insurance-voice-ai"
+            ]
+        },
+        {
+            "id": "ai-safety",
+            "name": "AI Safety & Model Security",
+            "category": "ai-ml",
+            "proficiency": "expert",
+            "yearsOfExperience": 1.2,
+            "icon": "/icons/genai.svg",
+            "description": "Zero-trust model inspection: pickle bytecode static opcode disassembly, prompt injection defenses, and CycloneDX AIBOM export",
+            "projects": [
+                "sentinel-model-governance"
+            ]
+        },
+        {
+            "id": "prompt-engineering",
+            "name": "Prompt & Context Engineering",
+            "category": "ai-ml",
+            "proficiency": "expert",
+            "yearsOfExperience": 1.6,
+            "icon": "/icons/genai.svg",
+            "description": "Few-shot dynamic exemplar retrieval, schema injection for SAP HANA SQL generation, and strict Pydantic structured output validation",
+            "projects": [
+                "shareholding-intelligence-platform",
+                "ir-research-intelligence-platform",
+                "naipunya-insurance-voice-ai"
+            ]
+        },
+        {
+            "id": "doc-intelligence",
+            "name": "Document Intelligence & Multimodal Extraction",
+            "category": "ai-ml",
+            "proficiency": "expert",
+            "yearsOfExperience": 1.4,
+            "icon": "/icons/genai.svg",
+            "description": "Extracting tabular data and text from unstructured regulatory circulars and PDFs using PyMuPDF, Camelot, and Multimodal Vision LLMs",
+            "projects": [
+                "sebi-regulatory-rag-pipeline",
+                "central-bank-circular-pipeline",
+                "exchange-filing-intelligence"
+            ]
+        },
+        {
+            "id": "edge-vision",
+            "name": "Computer Vision & Multi-Violation Detection",
+            "category": "ai-ml",
+            "proficiency": "expert",
+            "yearsOfExperience": 1.3,
+            "icon": "/icons/genai.svg",
+            "description": "Real-time edge computer vision using YOLOv8/YOLOv11, OpenCV, RTSP video streaming, and ByteTrack for multi-violation industrial safety",
+            "projects": [
+                "industrial-safety-vision"
+            ]
+        },
+        {
+            "id": "python",
+            "name": "Python & Async Programming",
+            "category": "backend",
+            "proficiency": "expert",
+            "yearsOfExperience": 2.0,
+            "icon": "/icons/python.svg",
+            "description": "Architecting asynchronous event loops (AsyncIO), background worker queues, and automated multi-source ingestion with Python 3.11+",
+            "projects": [
+                "shareholding-intelligence-platform",
+                "sebi-regulatory-rag-pipeline",
+                "equity-analytics-platform",
+                "sentinel-model-governance",
+                "naipunya-insurance-voice-ai"
+            ]
+        },
+        {
+            "id": "fastapi",
+            "name": "FastAPI & AI Microservices",
+            "category": "backend",
+            "proficiency": "expert",
+            "yearsOfExperience": 1.5,
+            "icon": "/icons/python.svg",
+            "description": "Developing ultra-low-latency asynchronous RESTful APIs, SSE streaming endpoints, and strict Pydantic validation layers for AI workloads",
+            "projects": [
+                "shareholding-intelligence-platform",
+                "sebi-regulatory-rag-pipeline",
+                "equity-analytics-platform",
+                "sentinel-model-governance",
+                "naipunya-insurance-voice-ai"
+            ]
+        },
+        {
+            "id": "postgresql",
+            "name": "PostgreSQL & pgvector",
+            "category": "backend",
+            "proficiency": "expert",
+            "yearsOfExperience": 1.5,
+            "icon": "/icons/sql.svg",
+            "description": "Designing high-concurrency relational schemas, transactional integrity, and indexing vector embeddings with pgvector (HNSW/IVFFlat)",
+            "projects": [
+                "shareholding-intelligence-platform",
+                "equity-analytics-platform",
+                "sebi-regulatory-rag-pipeline",
+                "perkai-benefits-discovery-engine"
+            ]
+        },
+        {
+            "id": "financial-computation",
+            "name": "Deterministic Financial Analytics",
+            "category": "backend",
+            "proficiency": "expert",
+            "yearsOfExperience": 1.6,
+            "icon": "/icons/python.svg",
+            "description": "High-performance vectorized computation (pandas, NumPy) for modified duration, portfolio yields, credit rating concentration, and stock analytics",
+            "projects": [
+                "mutual-fund-debt-exposure-analytics",
+                "equity-analytics-platform",
+                "shareholding-intelligence-platform"
+            ]
+        },
+        {
+            "id": "etl-pipelines",
+            "name": "Automated ETL & Time-Series Reconciliation",
+            "category": "backend",
+            "proficiency": "expert",
+            "yearsOfExperience": 1.5,
+            "icon": "/icons/sql.svg",
+            "description": "Scheduled ingestion pipelines extracting, validating, and reconciling daily stock exchange data from BSE/NSE into cloud PostgreSQL",
+            "projects": [
+                "equity-analytics-platform",
+                "shareholding-intelligence-platform",
+                "exchange-filing-intelligence"
+            ]
+        },
+        {
+            "id": "redis-caching",
+            "name": "Semantic Caching & Distributed State",
+            "category": "backend",
+            "proficiency": "intermediate",
+            "yearsOfExperience": 1.4,
+            "icon": "/icons/sql.svg",
+            "description": "Semantic caching with Redis to eliminate redundant LLM inference calls, session state management for multi-turn chats, and task queues",
+            "projects": [
+                "naipunya-insurance-voice-ai",
+                "rpa-intelligence-copilot",
+                "exchange-filing-intelligence"
+            ]
+        },
+        {
+            "id": "mlops",
+            "name": "MLOps & Quality Tuning",
+            "category": "devops",
+            "proficiency": "expert",
+            "yearsOfExperience": 1.4,
+            "icon": "/icons/mlops.svg",
+            "description": "Continuous model evaluation, drift tracking, latency benchmarking, automated regression guardrails, and model registry governance",
+            "projects": [
+                "sebi-regulatory-rag-pipeline",
+                "sentinel-model-governance"
+            ]
+        },
+        {
+            "id": "azure",
+            "name": "Azure Cloud Platform",
+            "category": "devops",
+            "proficiency": "expert",
+            "yearsOfExperience": 1.2,
+            "icon": "/icons/mlops.svg",
+            "description": "Managing enterprise cloud infrastructure, Azure OpenAI, Azure PostgreSQL, scheduled VMs, Key Vault, and secure networking",
+            "projects": [
+                "shareholding-intelligence-platform",
+                "equity-analytics-platform",
+                "sebi-regulatory-rag-pipeline"
+            ]
+        },
+        {
+            "id": "docker",
+            "name": "Docker & Containerization",
+            "category": "devops",
+            "proficiency": "expert",
+            "yearsOfExperience": 1.5,
+            "icon": "/icons/mlops.svg",
+            "description": "Containerizing AI workloads, multi-stage Docker builds, and container orchestration for consistent production and staging parity",
+            "projects": [
+                "shareholding-intelligence-platform",
+                "equity-analytics-platform",
+                "sebi-regulatory-rag-pipeline",
+                "sentinel-model-governance"
             ]
         },
         {
             "id": "security",
-            "name": "Enterprise Security",
+            "name": "Enterprise Security & RBAC",
             "category": "devops",
             "proficiency": "expert",
-            "yearsOfExperience": 1.0,
-            "icon": "/icons/security.svg",
-            "description": "Implementing RBAC, TLS in-transit, AES-256 at-rest, and Azure Key Vault secret management",
+            "yearsOfExperience": 1.2,
+            "icon": "/icons/mlops.svg",
+            "description": "Enforcing Azure AD SSO, role-scoped data access (RBAC), secret rotation via Key Vault, and TLS/AES-256 data-in-transit encryption",
             "projects": [
-                "aegis-platform",
-                "equity-pulse"
+                "shareholding-intelligence-platform",
+                "equity-analytics-platform",
+                "sentinel-model-governance"
+            ]
+        },
+        {
+            "id": "linux-administration",
+            "name": "Linux Systems & Server Administration",
+            "category": "devops",
+            "proficiency": "expert",
+            "yearsOfExperience": 1.8,
+            "icon": "/icons/mlops.svg",
+            "description": "Ubuntu/Debian server environments, systemd daemon services, shell scripting, cron jobs, and air-gapped on-premise security isolation",
+            "projects": [
+                "central-bank-circular-pipeline",
+                "equity-analytics-platform",
+                "shareholding-intelligence-platform"
             ]
         },
         {
             "id": "react",
-            "name": "React",
+            "name": "React & TypeScript",
             "category": "frontend",
             "proficiency": "intermediate",
-            "yearsOfExperience": 3,
-            "icon": "/icons/react.svg",
-            "description": "Building modern, performant web applications with React 18+, hooks, and context",
+            "yearsOfExperience": 2.0,
+            "icon": "/icons/genai.svg",
+            "description": "Building high-responsiveness enterprise web cockpits, interactive analytics dashboards, and real-time AI user interfaces",
             "projects": [
-                "aegis-platform",
-                "equity-pulse",
-                "quantus-med"
+                "shareholding-intelligence-platform",
+                "equity-analytics-platform",
+                "perkai-benefits-discovery-engine"
+            ]
+        },
+        {
+            "id": "tailwind",
+            "name": "Tailwind CSS & Design Systems",
+            "category": "frontend",
+            "proficiency": "intermediate",
+            "yearsOfExperience": 1.8,
+            "icon": "/icons/genai.svg",
+            "description": "Designing accessible dark-mode UI systems, micro-interactions, responsive grids, and high-contrast operational displays",
+            "projects": [
+                "shareholding-intelligence-platform",
+                "equity-analytics-platform",
+                "perkai-benefits-discovery-engine"
+            ]
+        },
+        {
+            "id": "data-visualization",
+            "name": "Data Visualization & Analytics Dashboards",
+            "category": "frontend",
+            "proficiency": "intermediate",
+            "yearsOfExperience": 1.7,
+            "icon": "/icons/genai.svg",
+            "description": "Interactive financial candlestick charts, depository ownership treemaps, and real-time telemetry gauges using Recharts and Chart.js",
+            "projects": [
+                "shareholding-intelligence-platform",
+                "equity-analytics-platform",
+                "mutual-fund-debt-exposure-analytics"
+            ]
+        },
+        {
+            "id": "streamlit",
+            "name": "Streamlit AI Cockpits",
+            "category": "frontend",
+            "proficiency": "expert",
+            "yearsOfExperience": 1.8,
+            "icon": "/icons/python.svg",
+            "description": "Rapidly prototyping analytical cockpits, RAG verification sandboxes, and interactive human-in-the-loop evaluation portals",
+            "projects": [
+                "rpa-intelligence-copilot",
+                "sebi-regulatory-rag-pipeline"
             ]
         },
         {
             "id": "playwright",
-            "name": "Playwright",
+            "name": "Playwright Browser Automation",
             "category": "tools",
             "proficiency": "expert",
-            "yearsOfExperience": 1.6,
-            "icon": "/icons/playwright.svg",
-            "description": "Advanced browser automation for large-scale regulatory scraping and automated test generation",
+            "yearsOfExperience": 1.5,
+            "icon": "/icons/python.svg",
+            "description": "Headless Chromium automation for continuous regulatory scraping, automated DOM parsing, and end-to-end regression testing",
             "projects": [
-                "bse-rag-project",
-                "omniqa-agent"
+                "sebi-regulatory-rag-pipeline",
+                "exchange-filing-intelligence"
             ]
         },
         {
             "id": "git",
-            "name": "Git & GitLab",
+            "name": "CI/CD, Git & GitLab",
             "category": "tools",
             "proficiency": "expert",
-            "yearsOfExperience": 4,
-            "icon": "/icons/git.svg",
-            "description": "Version control and collaborative development within enterprise GitLab environments"
+            "yearsOfExperience": 2.0,
+            "icon": "/icons/mlops.svg",
+            "description": "Branching strategies, automated CI/CD pipeline triggers, container builds, and enterprise GitLab workflows",
+            "projects": [
+                "shareholding-intelligence-platform",
+                "equity-analytics-platform",
+                "sebi-regulatory-rag-pipeline"
+            ]
+        },
+        {
+            "id": "agentic-testing",
+            "name": "Agentic Test Generation & Harnesses",
+            "category": "tools",
+            "proficiency": "expert",
+            "yearsOfExperience": 1.2,
+            "icon": "/icons/python.svg",
+            "description": "Multi-agent AST requirement decomposition, automated Pytest test suite generation, and deterministic verification harnesses",
+            "projects": [
+                "autonomous-test-engineering",
+                "sentinel-model-governance"
+            ]
         }
     ],
     "categories": [

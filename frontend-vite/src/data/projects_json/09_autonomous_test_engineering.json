@@ -3,10 +3,10 @@
     "slug": "autonomous-test-engineering-agent",
     "title": "Autonomous Test Engineering Agent",
     "tagline": "An agentic system that reads a web application, derives the requirements it appears to implement, and generates structured user stories, test plans and executable test cases — turning QA authoring from writing into reviewing.",
-    "category": "Agentic AI",
+    "category": "Agentic Systems & Generative AI",
     "domain": "Quality Engineering · Developer Tooling",
     "year": "2026",
-    "role": "AI Engineer — agent design, decomposition strategy, output contracts, frontend",
+    "role": "Generative AI Engineer — agentic decomposition, AST-guided prompt chaining, structured test generation",
     "duration": "Self-initiated build",
     "team": [
         "Solo build — architecture through working product"

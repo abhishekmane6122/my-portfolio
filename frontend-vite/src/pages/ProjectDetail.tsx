@@ -1,7 +1,7 @@
 import { useParams, Link, Navigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Home, Calendar, User, Layers, ArrowRight } from 'lucide-react'
+import { ArrowLeft, Home, Calendar, User, Layers, ArrowRight, Cpu } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { getProjectBySlug, caseStudies } from '@/data/projects-detailed'
@@ -25,7 +25,7 @@ function SectionHeading({ eyebrow, title, lead }: { eyebrow: string; title: stri
                 {eyebrow}
             </span>
             <h2 className="font-serif text-2xl font-light tracking-tight text-foreground md:text-3xl">{title}</h2>
-            {lead && <p className="mt-3 max-w-2xl text-base leading-relaxed text-neutral-700 dark:text-neutral-300">{lead}</p>}
+            {lead && <p className="mt-3 max-w-3xl text-base leading-relaxed text-neutral-700 dark:text-neutral-300">{lead}</p>}
         </div>
     )
 }
@@ -34,27 +34,27 @@ export default function ProjectDetail() {
     const { slug } = useParams<{ slug: string }>()
     const project = slug ? getProjectBySlug(slug) : undefined
 
-    if (!project) return <Navigate to="/projects" replace />
+    if (!project) {
+        return <Navigate to="/projects" replace />
+    }
 
-    const accent = project.accent || '#d4a373'
-    const others = caseStudies.filter((p) => p.slug !== project.slug).slice(0, 2)
-    const serial = String(caseStudies.findIndex((p) => p.slug === project.slug) + 1).padStart(2, '0')
+    const index = caseStudies.findIndex((p) => p.id === project.id)
+    const serial = String(index + 1).padStart(2, '0')
+    const accent = project.accent || '#8a5827'
+    const others = caseStudies.filter((p) => p.id !== project.id).slice(0, 2)
 
     return (
         <>
             <Helmet>
-                <title>{project.title} | Abhishek Mane</title>
+                <title>{`${project.title} | Abhishek Mane`}</title>
                 <meta name="description" content={project.tagline} />
             </Helmet>
 
-            <FloatingThemeToggle />
-
-            {/* Warm off-white rather than pure white - a flat white page reads as unfinished */}
-            <div className="accent-scope min-h-screen bg-[#faf9f6] text-foreground dark:bg-background" style={{ ['--accent' as string]: accent }}>
-                {/* ---------- Hero ---------- */}
-                <header className="relative overflow-hidden border-b border-neutral-200 dark:border-white/10">
+            <div className="min-h-screen bg-background text-foreground selection:bg-[#d4a373]/30 selection:text-foreground" style={{ ['--accent' as string]: accent }}>
+                {/* ---------- Header / Hero ---------- */}
+                <header className="relative overflow-hidden border-b border-neutral-200 bg-[#faf9f6] transition-colors duration-300 dark:border-white/10 dark:bg-[#0c0c0c]">
                     <img
-                        src={`${import.meta.env.BASE_URL}${project.art.replace(/^\//, '')}`}
+                        src={project.art}
                         alt=""
                         aria-hidden="true"
                         className="absolute inset-0 h-full w-full object-cover opacity-[0.18] dark:opacity-25"
@@ -62,14 +62,17 @@ export default function ProjectDetail() {
                     <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/90 to-background" />
 
                     <div className="relative mx-auto max-w-5xl px-4 pb-14 pt-6 sm:px-6 md:pb-20 md:pt-8">
-                        <nav className="mb-10 flex flex-wrap items-center gap-4 font-mono text-[10px] uppercase tracking-widest sm:gap-6">
-                            <Link to="/projects" className="inline-flex items-center gap-2 text-[#8a5827] dark:text-[#d4a373] no-underline transition-opacity hover:opacity-70">
-                                <ArrowLeft className="h-3.5 w-3.5" /> All work
-                            </Link>
-                            <span className="text-neutral-300 dark:text-white/20">/</span>
-                            <Link to="/" className="inline-flex items-center gap-2 text-neutral-500 no-underline transition-colors hover:text-[#8a5827] dark:hover:text-[#d4a373]">
-                                <Home className="h-3.5 w-3.5" /> Home
-                            </Link>
+                        <nav className="mb-10 flex items-center justify-between font-mono text-[10px] uppercase tracking-widest">
+                            <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+                                <Link to="/projects" className="inline-flex items-center gap-2 text-[#8a5827] dark:text-[#d4a373] no-underline transition-opacity hover:opacity-70">
+                                    <ArrowLeft className="h-3.5 w-3.5" /> All work
+                                </Link>
+                                <span className="text-neutral-300 dark:text-white/20">/</span>
+                                <Link to="/" className="inline-flex items-center gap-2 text-neutral-500 no-underline transition-colors hover:text-[#8a5827] dark:hover:text-[#d4a373]">
+                                    <Home className="h-3.5 w-3.5" /> Home
+                                </Link>
+                            </div>
+                            <FloatingThemeToggle />
                         </nav>
 
                         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
@@ -112,6 +115,28 @@ export default function ProjectDetail() {
                                     </div>
                                 ))}
                             </div>
+
+                            {/* Prominent Core Technology Ribbon in Hero */}
+                            {project.techStack?.length > 0 && (
+                                <div className="mt-8 border-t border-neutral-200 pt-6 dark:border-white/10">
+                                    <div className="mb-3 flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.25em] text-[#8a5827] dark:text-[#d4a373]">
+                                        <Cpu className="h-3.5 w-3.5" /> Core Technology Architecture
+                                    </div>
+                                    <div className="flex flex-wrap gap-2">
+                                        {project.techStack
+                                            .flatMap((g) => g.technologies)
+                                            .slice(0, 10)
+                                            .map((t) => (
+                                                <span
+                                                    key={t}
+                                                    className="inline-flex items-center rounded-lg border border-neutral-300 bg-background/90 px-3 py-1 font-mono text-xs font-medium text-foreground shadow-sm backdrop-blur-sm transition-all hover:border-[#8a5827] dark:border-white/15 dark:bg-white/[0.04] dark:hover:border-[#d4a373]"
+                                                >
+                                                    {t}
+                                                </span>
+                                            ))}
+                                    </div>
+                                </div>
+                            )}
                         </motion.div>
                     </div>
                 </header>
@@ -122,7 +147,7 @@ export default function ProjectDetail() {
                         <section className="py-14 md:py-20">
                             <div className="rounded-3xl border p-8 md:p-10" style={{ borderColor: `${accent}33`, background: `${accent}0D` }}>
                                 <span className="mb-6 block font-mono text-[10px] font-medium uppercase tracking-[0.3em] text-[color:var(--accent-ink)]">
-                                    At a glance
+                                    Executive Summary & Key Engineering Impact
                                 </span>
                                 <p className="mb-8 font-serif text-xl font-light leading-snug text-foreground md:text-2xl">
                                     {project.headline}
@@ -141,28 +166,28 @@ export default function ProjectDetail() {
 
                     {/* ---------- Narrative ---------- */}
                     <section className="border-t border-neutral-200 py-14 dark:border-white/10 md:py-20">
-                        <SectionHeading eyebrow="Context" title="The setting" />
+                        <SectionHeading eyebrow="Context & Domain Constraints" title="Background & Operating Realities" />
                         <div className={proseClass}><ReactMarkdown remarkPlugins={REMARK}>{project.context}</ReactMarkdown></div>
                     </section>
 
                     <section className="border-t border-neutral-200 py-14 dark:border-white/10 md:py-20">
-                        <SectionHeading eyebrow="Problem" title="What made this hard" />
+                        <SectionHeading eyebrow="Technical Problem" title="Core Engineering Bottlenecks & Architecture Constraints" />
                         <div className={proseClass}><ReactMarkdown remarkPlugins={REMARK}>{project.problem}</ReactMarkdown></div>
                     </section>
 
                     <section className="border-t border-neutral-200 py-14 dark:border-white/10 md:py-20">
-                        <SectionHeading eyebrow="Approach" title="How I framed it" />
+                        <SectionHeading eyebrow="Architectural Strategy" title="System Invariants & Core Design Principles" />
                         <div className={proseClass}><ReactMarkdown remarkPlugins={REMARK}>{project.approach}</ReactMarkdown></div>
                     </section>
 
                     <section className="border-t border-neutral-200 py-14 dark:border-white/10 md:py-20">
-                        <SectionHeading eyebrow="Solution" title="What I built" />
+                        <SectionHeading eyebrow="System Implementation" title="Functional Architecture & Pipeline Execution" />
                         <div className={proseClass}><ReactMarkdown remarkPlugins={REMARK}>{project.solution}</ReactMarkdown></div>
                     </section>
 
                     {/* ---------- System design ---------- */}
                     <section className="border-t border-neutral-200 py-14 dark:border-white/10 md:py-20">
-                        <SectionHeading eyebrow="System design" title="How the system is put together" lead={project.systemDesign.overview} />
+                        <SectionHeading eyebrow="System Design" title="Component Decomposition & Data Flow" lead={project.systemDesign.overview} />
 
                         <div className="mb-14 overflow-hidden rounded-2xl border border-neutral-200 dark:border-white/10">
                             <div className="hidden grid-cols-12 gap-4 border-b border-neutral-200 bg-neutral-50 px-6 py-3 font-mono text-[9px] uppercase tracking-[0.2em] text-neutral-500 dark:text-neutral-400 dark:border-white/10 dark:bg-white/[0.03] md:grid">
@@ -204,8 +229,8 @@ export default function ProjectDetail() {
                     {project.aiEngineering && (
                         <section className="border-t border-neutral-200 py-14 dark:border-white/10 md:py-20">
                             <SectionHeading
-                                eyebrow="AI engineering"
-                                title="The AI system"
+                                eyebrow="AI Engineering"
+                                title="Model Selection, Retrieval Architecture & Guardrails"
                                 lead={project.aiEngineering.summary}
                             />
 
@@ -249,7 +274,7 @@ export default function ProjectDetail() {
                     {/* ---------- Infrastructure ---------- */}
                     {project.infrastructure && (
                         <section className="border-t border-neutral-200 py-14 dark:border-white/10 md:py-20">
-                            <SectionHeading eyebrow="Infrastructure" title="Where it runs, and why that mattered" />
+                            <SectionHeading eyebrow="Infrastructure Topology" title="Hardware Resource Allocation & Compute Optimization" />
                             <div className="grid gap-5 md:grid-cols-3">
                                 {[
                                     { label: 'Hosting', body: project.infrastructure.hosting },
@@ -272,7 +297,7 @@ export default function ProjectDetail() {
                     {/* ---------- Diagrams ---------- */}
                     {project.diagrams?.length > 0 && (
                         <section className="border-t border-neutral-200 py-14 dark:border-white/10 md:py-20">
-                            <SectionHeading eyebrow="Architecture" title="Diagrams" lead="Drag to pan, scroll controls to zoom, or open any diagram fullscreen." />
+                            <SectionHeading eyebrow="System Architecture" title="Interactive Architecture & Flow Diagrams" lead="Drag to pan, scroll controls to zoom, or open any diagram fullscreen." />
                             <div className="space-y-14">
                                 {project.diagrams.map((d, i) => (
                                     <figure key={i} className="m-0">
@@ -291,9 +316,9 @@ export default function ProjectDetail() {
                     {project.decisions?.length > 0 && (
                         <section className="border-t border-neutral-200 py-14 dark:border-white/10 md:py-20">
                             <SectionHeading
-                                eyebrow="Engineering decisions"
-                                title="Choices worth defending"
-                                lead="The decisions that shaped the system, why they went the way they did, and what each one cost."
+                                eyebrow="Engineering Decisions"
+                                title="Architecture Decision Records (ADRs) & Trade-offs"
+                                lead="The architectural trade-offs that shaped the system, why they were chosen over alternatives, and the operational costs accepted."
                             />
                             <div className="space-y-5">
                                 {project.decisions.map((d, i) => (
@@ -329,7 +354,7 @@ export default function ProjectDetail() {
                     {/* ---------- Challenges ---------- */}
                     {project.challenges?.length > 0 && (
                         <section className="border-t border-neutral-200 py-14 dark:border-white/10 md:py-20">
-                            <SectionHeading eyebrow="Hard parts" title="Problems that took real work" />
+                            <SectionHeading eyebrow="Production Challenges" title="Critical Failure Modes & Edge Case Engineering" />
                             <div className="space-y-4">
                                 {project.challenges.map((c, i) => (
                                     <details key={i} className="group rounded-2xl border border-neutral-200 p-6 transition-colors open:border-[var(--accent)]/40 dark:border-white/10 md:p-8">
@@ -360,16 +385,34 @@ export default function ProjectDetail() {
 
                     {/* ---------- Tech stack ---------- */}
                     <section className="border-t border-neutral-200 py-14 dark:border-white/10 md:py-20">
-                        <SectionHeading eyebrow="Stack" title="Technology" />
-                        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                        <SectionHeading
+                            eyebrow="Technology Architecture"
+                            title="Production Tech Stack & Tooling Architecture"
+                            lead="Comprehensive inventory of model architectures, serving layers, backend runtimes, and engineering tooling."
+                        />
+                        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                             {project.techStack.map((group) => (
-                                <div key={group.category}>
-                                    <h3 className="mb-4 font-mono text-[10px] uppercase tracking-[0.2em] text-[color:var(--accent-ink)]">
-                                        {group.category}
-                                    </h3>
+                                <div
+                                    key={group.category}
+                                    className="group rounded-2xl border border-neutral-200 bg-neutral-50/70 p-6 shadow-sm transition-all hover:border-[var(--accent)]/40 hover:shadow-md dark:border-white/10 dark:bg-white/[0.02]"
+                                >
+                                    <div className="mb-4 flex items-center justify-between border-b border-neutral-200/80 pb-3 dark:border-white/10">
+                                        <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-foreground">
+                                            {group.category}
+                                        </h3>
+                                        <span
+                                            className="rounded-full px-2.5 py-0.5 font-mono text-[10px] font-semibold"
+                                            style={{ background: `${accent}1A`, color: accent }}
+                                        >
+                                            {group.technologies.length} tools
+                                        </span>
+                                    </div>
                                     <div className="flex flex-wrap gap-2">
                                         {group.technologies.map((t) => (
-                                            <span key={t} className="rounded-lg border border-neutral-200 px-2.5 py-1.5 font-mono text-[10px] text-neutral-600 dark:border-white/10 dark:text-neutral-400">
+                                            <span
+                                                key={t}
+                                                className="inline-flex items-center rounded-lg border border-neutral-200 bg-card px-3 py-1.5 font-mono text-xs font-medium text-foreground shadow-sm transition-colors hover:border-[var(--accent)] hover:text-[var(--accent-ink)] dark:border-white/10 dark:bg-white/[0.04]"
+                                            >
                                                 {t}
                                             </span>
                                         ))}
@@ -382,7 +425,7 @@ export default function ProjectDetail() {
                     {/* ---------- Results ---------- */}
                     {project.results?.length > 0 && (
                         <section className="border-t border-neutral-200 py-14 dark:border-white/10 md:py-20">
-                            <SectionHeading eyebrow="Outcome" title="What changed" />
+                            <SectionHeading eyebrow="Production Impact" title="Empirical Benchmarks & Business Outcomes" />
                             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                                 {project.results.map((r) => (
                                     <div key={r.metric} className="rounded-2xl border border-neutral-200 p-6 dark:border-white/10">
@@ -398,7 +441,7 @@ export default function ProjectDetail() {
                     {/* ---------- Next ---------- */}
                     {others.length > 0 && (
                         <section className="border-t border-neutral-200 py-14 dark:border-white/10 md:py-20">
-                            <SectionHeading eyebrow="Keep reading" title="Other case studies" />
+                            <SectionHeading eyebrow="Related Work" title="Other Production Case Studies" />
                             <div className="grid gap-5 md:grid-cols-2">
                                 {others.map((p) => (
                                     <Link

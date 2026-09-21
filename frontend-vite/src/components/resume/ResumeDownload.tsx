@@ -12,17 +12,32 @@ interface ResumeDownloadProps {
 export default function ResumeDownload({ variant = 'button', showLabel = true }: ResumeDownloadProps) {
     const [showModal, setShowModal] = useState(false)
 
-    const handleDownload = () => {
+    const handleDownload = async () => {
         const fileName = 'Abhishek_Mane_Resume.pdf'
         const filePath = `${import.meta.env.BASE_URL}resume/${fileName}`
-        const link = document.createElement('a')
-        link.href = filePath
-        link.download = fileName
-        link.target = '_blank'
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-        toast.success('Resume downloaded!', { icon: '📄', duration: 3000 })
+        try {
+            const res = await fetch(filePath)
+            if (!res.ok) throw new Error('Failed to fetch resume file')
+            const blob = await res.blob()
+            const blobUrl = window.URL.createObjectURL(blob)
+            const link = document.createElement('a')
+            link.href = blobUrl
+            link.download = fileName
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+            window.URL.revokeObjectURL(blobUrl)
+            toast.success('Resume downloaded!', { icon: '📄', duration: 3000 })
+        } catch {
+            const link = document.createElement('a')
+            link.href = filePath
+            link.download = fileName
+            link.target = '_blank'
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+            toast.success('Resume downloaded!', { icon: '📄', duration: 3000 })
+        }
     }
 
     const ResumeModal = () => {
@@ -107,11 +122,13 @@ export default function ResumeDownload({ variant = 'button', showLabel = true }:
                                     <span>Ahmedabad, Gujarat, India</span>
                                 </p>
                                 <p className="text-xs text-neutral-600 dark:text-neutral-400 flex flex-wrap justify-center gap-x-2 gap-y-1 mt-1">
+                                    <a href="https://abhishekmane6122.github.io/my-portfolio/" target="_blank" rel="noopener noreferrer" className="text-[#d4a373] hover:underline font-medium">Portfolio: abhishekmane6122.github.io/my-portfolio</a>
+                                    <span className="text-neutral-400">|</span>
+                                    <a href="https://github.com/abhishekmane6122" target="_blank" rel="noopener noreferrer" className="text-[#d4a373] hover:underline">github.com/abhishekmane6122</a>
+                                    <span className="text-neutral-400">|</span>
                                     <a href="https://www.linkedin.com/in/abhishek-mane-aiml" target="_blank" rel="noopener noreferrer" className="text-[#d4a373] hover:underline">linkedin.com/in/abhishek-mane-aiml</a>
                                     <span className="text-neutral-400">|</span>
                                     <a href="https://substack.com/@abhimane" target="_blank" rel="noopener noreferrer" className="text-[#d4a373] hover:underline">substack.com/@abhimane</a>
-                                    <span className="text-neutral-400">|</span>
-                                    <a href="https://github.com/abhishekmane6122" target="_blank" rel="noopener noreferrer" className="text-[#d4a373] hover:underline">github.com/abhishekmane6122</a>
                                 </p>
                             </div>
 
@@ -130,16 +147,16 @@ export default function ResumeDownload({ variant = 'button', showLabel = true }:
                                 <RSubheading
                                     title="CognitBotz Solutions"
                                     right1="Ahmedabad, India"
-                                    subtitle="Artificial Intelligence Engineer — Client: Leading Renewable Energy Firm & Fortune 50 Conglomerate"
+                                    subtitle="Artificial Intelligence Engineer — Client: Adani Group"
                                     right2="Sep. 2025 — Present"
                                 >
                                     <RItemList items={[
-                                        { bold: "Aegis — Enterprise Compliance Platform", text: ": Designed and developed a full-stack, production-grade compliance intelligence platform for a Fortune 50 Conglomerate's Secretarial & Legal teams. Built six independently deployable modules — BSE Intelligence, RBI Compliance, SEBI Hub, Director Disclosure Management, Insider Trading Surveillance, and Minutes Preparation — behind a unified React UI. Platform saved 250+ FTE hours per quarter and is live in production." },
+                                        { bold: "Aegis — Enterprise Compliance Platform", text: ": Designed and developed a full-stack, production-grade compliance intelligence platform for Adani Group's Secretarial & Legal teams. Built six independently deployable modules — BSE Intelligence, RBI Compliance, SEBI Hub, Director Disclosure Management, Insider Trading Surveillance, and Minutes Preparation — behind a unified React UI. Platform saved 250+ FTE hours per quarter and is live in production." },
                                         { bold: "Regulatory RAG Pipeline (BSE, SEBI, RBI)", text: ": Engineered automated scraping and ingestion pipelines (using Playwright and Requests) that collect daily notifications from BSE, SEBI, and RBI portals, extract content from PDFs via PyMuPDF and OCR, and generate AI summaries using Phi-3-mini LLM. Indexed documents into ChromaDB vector store for semantic search and pushed structured data to Azure PostgreSQL. Delivered automated daily email reports via SMTP. Eliminated 6+ hours of manual daily monitoring and reduced SEBI notification noise by 71%." },
                                         { bold: "Multi-Agent NL-to-SQL System", text: ": Designed a multi-agent architecture where a routing agent classifies user intent and delegates to either a deterministic query handler or a GPT-powered dynamic SQL generation agent. Engineered prompt templates with schema context injection for SAP HANA-compatible SQL generation. Built a query validation layer to sanitize LLM output, prevent SQL injection, and enforce read-only access." },
-                                        { bold: "Equity Pulse — Market Analytics Platform", text: ": Built an end-to-end equity analytics platform for a Fortune 50 Conglomerate's finance and portfolio teams. Designed ETL pipelines on a scheduled VM to extract, validate, and load daily bhavcopy data from BSE and NSE into Azure PostgreSQL. Developed a backend computation engine to calculate moving averages, volatility metrics, delivery ratios, and relative performance indices. Built the React frontend with interactive dashboards, candlestick charts, competitor analysis, and shareholding pattern tracking across 7 enterprise business units and 3.9M+ investor records. Eliminated 4–6 hours of daily manual analyst work." },
-                                        { bold: "Platform Infrastructure & Observability", text: ": Implemented Azure AD SSO with RBAC across all platforms. Secured all secrets via Azure Key Vault, enforced TLS in transit and AES-256 encryption at rest. Built a custom AI Agent Observability Platform to monitor all deployed agents in real time — covering health checks, execution logs, latency tracking, and failure alerts. Configured Azure VM scheduling for automated pipeline execution and optimized API response times from 8 seconds to 500ms. Integrated email-based triggers and automated reporting via SMTP for daily operational summaries." },
-                                        { bold: "Cross-Functional Technical Leadership", text: ": Act as de facto technical lead across all enterprise AI projects at CognitBotz. Lead daily Scrum meetings with a 15+ member cross-functional team spanning Data Engineers, Python Developers, AI/ML Engineers, and Frontend Developers. Directly engaged in stakeholder management with enterprise leadership — conducting project progress updates, requirements gathering sessions, and sprint reviews to ensure delivery alignment with business objectives." },
+                                        { bold: "Equity Pulse — Market Analytics Platform", text: ": Built an end-to-end equity analytics platform for Adani Group's finance and portfolio teams. Designed ETL pipelines on a scheduled VM to extract, validate, and load daily bhavcopy data from BSE and NSE into Azure PostgreSQL. Developed a backend computation engine to calculate moving averages, volatility metrics, delivery ratios, and relative performance indices. Built the React frontend with interactive dashboards, candlestick charts, competitor analysis, and shareholding pattern tracking across 7 enterprise business units and 3.9M+ investor records. Eliminated 4–6 hours of daily manual analyst work." },
+                                        { bold: "Platform Infrastructure, AI Observability & RAG Evaluation", text: ": Built a custom AI Observability and Evaluation Platform monitoring production agents and RAG pipelines in real time. Integrated RAGAS and DeepEval frameworks to benchmark retrieval context precision, answer faithfulness, semantic recall, and LLM hallucination rates across document ingestion workflows. Deployed centralized telemetry dashboards displaying distributed execution traces, component downtime, token consumption, p95/p99 latency, and error spikes. Engineered an autonomous L1 AI Support Engineer agent on top of system log streams that parses error traces, performs real-time root-cause analysis (RCA), and automatically generates diagnostic quick-fix playbooks to slash incident MTTR. Enforced enterprise security via Azure AD SSO with RBAC, Key Vault, and TLS/AES-256 encryption." },
+                                        { bold: "Stakeholder Management & Delivery", text: ": Directly engaged in stakeholder management with Adani Group leadership — conducting project progress updates, requirements gathering sessions, and sprint reviews to ensure delivery alignment with business objectives." },
                                     ]} />
                                 </RSubheading>
 
@@ -182,14 +199,32 @@ export default function ResumeDownload({ variant = 'button', showLabel = true }:
                             <RSection title="Projects">
                                 {[
                                     {
-                                        name: "Aegis — Regulatory Compliance Intelligence Suite",
-                                        context: "CognitBotz, Client: Fortune 50 Conglomerate",
-                                        desc: "Production-grade multi-module platform automating BSE/SEBI/RBI monitoring, director disclosure management, insider trading surveillance across 3.9M+ investor records, and board meeting minutes generation. Saved 250+ FTE hours/quarter.",
+                                        name: "Aegis — Enterprise Compliance Intelligence Suite",
+                                        context: "CognitBotz, Client: Adani Group",
+                                        desc: "Production-grade multi-module platform automating BSE/SEBI/RBI regulatory monitoring, director disclosure management, insider trading surveillance across 3.9M+ investor records, and board meeting minutes generation. Built automated scraping with Playwright/PyMuPDF, ChromaDB semantic vector search, and daily automated SMTP reports, saving 250+ FTE hours/quarter.",
                                         stack: "React, FastAPI, Python, LangChain, LangGraph, Azure OpenAI, Cohere Embeddings, pgvector (Azure PostgreSQL), Azure Key Vault, Azure VM, Nginx, Docker, GitLab."
                                     },
                                     {
+                                        name: "Ward — Zero-Trust AI Model Security & Static Opcode Ingestion Gateway",
+                                        context: "Enterprise SecOps & MLOps Architecture",
+                                        desc: "Zero-trust security gateway for open-source AI models in regulated enterprises. Engineered C-level static bytecode disassembler (pickletools.genops) intercepting 100% of PyTorch/Pickle malware (<350ms latency) without execution, Protocol 4 STACK_GLOBAL lookback buffers, magic-byte sniffing (.pt, Safetensors, GGUF), Jaccard word-bigram shingle deduplication (0.40 threshold), Hardware Resource Sizing Advisor (FP32/FP16/INT8/INT4 VRAM across A100/H100/L40), and CycloneDX AIBOM generation for air-gapped GPU deployments (EU AI Act & NIST AI RMF).",
+                                        stack: "Python 3.13, FastAPI, React 18, TypeScript, SQLAlchemy 2.0, SQLite/PostgreSQL, Groq/OpenRouter (LLaMA-3.3-70B), Pydantic v2, Tailwind CSS."
+                                    },
+                                    {
+                                        name: "Naipunya — Low-Latency Voice AI & Multi-Agent Actuarial Advisory System",
+                                        context: "InsurTech & Speech Systems Architecture",
+                                        desc: "Voice-first conversational multi-agent system for Indian insurance advisory. Engineered client-side Web Audio API RMS silence detection (0ms network VAD delay), speculative parallel execution (asyncio.gather) running headless Selenium web RAG and LLM reasoning concurrently, progressive 7-slot state machine with sliding-window memory, dual deployment (Cloud Groq LPU vs 100% offline edge CPU via Ollama IBM Granite 2B, Faster-Whisper INT8, Kokoro-82M ONNX in <4 GB RAM), and deterministic actuarial tools (<1% hallucination rate) across English, Hindi, and Telugu.",
+                                        stack: "FastAPI, React 19, Python, Groq LPU, Llama-3.3, Qwen-2.5, Ollama (IBM Granite), Faster-Whisper, Kokoro ONNX, Edge-TTS, Web Audio API, Selenium, Langfuse."
+                                    },
+                                    {
+                                        name: "PerkAI — Autonomous Multi-Agent Capital Discovery & Combinatorial Stacking Engine",
+                                        context: "FinTech & Agentic Systems Architecture",
+                                        desc: "Autonomous multi-agent platform discovering $180k–$340k in startup credits and non-dilutive government subsidies in <18s. Engineered domain crawler with headless Chrome SPA rendering, algorithmic Grounding Guard enforcing character-window quote verification (0.0% ungrounded claims), in-process deterministic JSON rule gating (78% token reduction), constrained combinatorial stacking optimizer for mutually exclusive cloud credits, in-process 2048-dim vector math (NumPy cosine similarity on PostgreSQL float[]), and distributed AI gateway with automated failover.",
+                                        stack: "Python, FastAPI, React 19, PostgreSQL (JSONB), NVIDIA NIM (Nemotron-3 2048-dim), Groq, OpenRouter, Langfuse v3, Prometheus, Grafana, Loki, SSE."
+                                    },
+                                    {
                                         name: "Equity Pulse — Enterprise Equity Analytics Platform",
-                                        context: "CognitBotz, Client: Fortune 50 Conglomerate",
+                                        context: "CognitBotz, Client: Adani Group",
                                         desc: "End-to-end equity analytics platform tracking 5 enterprise business units with automated ETL from BSE/NSE, real-time dashboards, candlestick charts, competitor analysis, and shareholding pattern portal across 3.9M+ investor records. Eliminated 4–6 hrs of daily manual analyst work.",
                                         stack: "React, TypeScript, FastAPI, Python, Azure PostgreSQL, pgvector, Azure VM, APScheduler, Recharts, Docker, GitLab."
                                     },
@@ -224,17 +259,15 @@ export default function ResumeDownload({ variant = 'button', showLabel = true }:
                                 ))}
                             </RSection>
 
-                            {/* TECHNICAL SKILLS */}
-                            <RSection title="Technical Skills">
+                            {/* CORE STACK */}
+                            <RSection title="Core Stack">
                                 {[
-                                    { cat: "AI/ML", val: "LangChain, LangGraph, RAG Systems, Multi-Agent Architectures, Azure OpenAI, Groq LPU, Llama-3/4, Phi-3, Whisper, Cohere Embeddings, Prompt Engineering, Fine-Tuning, Open Source LLMs, VLLMs" },
-                                    { cat: "Vector Databases & Search", val: "pgvector (Azure PostgreSQL), ChromaDB, FAISS" },
-                                    { cat: "Backend", val: "Python, FastAPI, PostgreSQL, SQLite, REST APIs, Async Programming, Nginx, Docker, Playwright" },
-                                    { cat: "Frontend", val: "React, TypeScript, Tailwind CSS, Streamlit" },
-                                    { cat: "Cloud & DevOps", val: "Azure (OpenAI, AD SSO, Key Vault, PostgreSQL, VM Scheduling, AI Foundry, Microsoft Foundry), Docker, APScheduler, GitLab, Git, SMTP Automation" },
-                                    { cat: "Security & Observability", val: "RBAC, Azure Key Vault, TLS, AES-256, SQL Injection Prevention, AI Agent Observability, AI Security" },
+                                    { cat: "AI / LLMs", val: "Large Language Models (OpenAI, Azure OpenAI, Llama, Claude, Gemini), Fine-Tuning & Integration, LangChain, LangGraph, AI Orchestration, Multi-Agent Architectures, Prompt Engineering" },
+                                    { cat: "RAG & Search", val: "Retrieval-Augmented Generation (RAG), Semantic Search, Azure AI Search, Weaviate, FAISS, pgvector (Azure PostgreSQL), ChromaDB" },
+                                    { cat: "Backend & APIs", val: "Python, FastAPI, Flask, REST APIs & Microservices for AI Applications, PostgreSQL, SQLite, Async Programming" },
+                                    { cat: "MLOps & Cloud", val: "MLOps (Model Deployment, Monitoring, Evaluation & Quality Tuning), Containerization (Docker, Kubernetes), Azure Cloud Platform, CI/CD, Git, GitLab" },
                                 ].map((s, i) => (
-                                    <p key={i} className="text-xs mb-1 leading-relaxed">
+                                    <p key={i} className="text-xs mb-1.5 leading-relaxed">
                                         <span className="font-bold text-neutral-900 dark:text-white">{s.cat}: </span>
                                         <span className="text-neutral-700 dark:text-neutral-300">{s.val}</span>
                                     </p>
@@ -244,7 +277,7 @@ export default function ResumeDownload({ variant = 'button', showLabel = true }:
                             {/* AWARDS */}
                             <RSection title="Awards & Recognition">
                                 <p className="text-xs leading-relaxed text-neutral-700 dark:text-neutral-300 pl-1">
-                                    <span className="font-bold text-neutral-900 dark:text-white">Performance Award</span> (December 2025), Enterprise Client: Recognized by leadership and stakeholders for designing and delivering impactful AI-driven portals and solutions. Work was highly appreciated and received positive feedback across multiple teams at the organization.
+                                    <span className="font-bold text-neutral-900 dark:text-white">Performance Award</span> (December 2025), Adani Group: Recognized by leadership and stakeholders for designing and delivering impactful AI-driven portals and solutions. Work was highly appreciated and received positive feedback across multiple teams at the organization.
                                 </p>
                             </RSection>
 

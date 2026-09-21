@@ -3,10 +3,10 @@
     "slug": "central-bank-circular-intelligence-pipeline",
     "title": "Central Bank Circular Intelligence Pipeline",
     "tagline": "An autonomous pipeline that scrapes central-bank notifications, summarises them entirely on-premises with a local small language model, and distributes briefings — with no document content ever leaving the corporate network.",
-    "category": "Regulatory AI",
+    "category": "RAG & Document Intelligence",
     "domain": "Banking Regulation · Compliance",
     "year": "2026",
-    "role": "AI Engineer — pipeline architecture, local model serving, GPU deployment, observability",
+    "role": "LLM Systems Engineer — on-prem SLM serving, GPU memory optimization, air-gapped pipeline",
     "duration": "Two weeks to production",
     "team": [
         "Solo build — architecture through production"
