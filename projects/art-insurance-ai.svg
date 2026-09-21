@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-label="Naipunya AI — Voice AI Insurance Advisory">
+  <defs>
+    <linearGradient id="bgartinsurance" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#061A14"/><stop offset="100%" stop-color="#0E2F24"/>
+    </linearGradient>
+    <radialGradient id="glartinsurance" cx="0.8" cy="0.15" r="0.75">
+      <stop offset="0%" stop-color="#10B981" stop-opacity="0.32"/>
+      <stop offset="100%" stop-color="#10B981" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grartinsurance" width="44" height="44" patternUnits="userSpaceOnUse">
+      <path d="M44 0H0V44" fill="none" stroke="#FFFFFF" stroke-opacity="0.04" stroke-width="1"/>
+    </pattern>
+    <marker id="ar-ins" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+      <path d="M0 0 L9 4.5 L0 9 z" fill="#10B981" fill-opacity="0.6"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="675" fill="url(#bgartinsurance)"/>
+  <rect width="1200" height="675" fill="url(#grartinsurance)"/>
+  <rect width="1200" height="675" fill="url(#glartinsurance)"/>
+  <rect x="0" y="0" width="7" height="675" fill="#10B981"/>
+
+  <!-- Voice Input Node -->
+  <circle cx="160" cy="360" r="42" fill="#10B981" fill-opacity="0.18" stroke="#10B981" stroke-opacity="0.7" stroke-width="2"/>
+  <circle cx="160" cy="360" r="26" fill="#10B981" fill-opacity="0.3" stroke="#10B981" stroke-opacity="0.9" stroke-width="2"/>
+  <!-- Soundwave bars -->
+  <rect x="148" y="348" width="4" height="24" rx="2" fill="#10B981"/>
+  <rect x="154" y="340" width="4" height="40" rx="2" fill="#10B981"/>
+  <rect x="160" y="332" width="4" height="56" rx="2" fill="#10B981"/>
+  <rect x="166" y="342" width="4" height="36" rx="2" fill="#10B981"/>
+  <rect x="172" y="350" width="4" height="20" rx="2" fill="#10B981"/>
+
+  <!-- Arrow to Orchestrator -->
+  <path d="M205 360 L280 360" stroke="#10B981" stroke-opacity="0.6" stroke-width="2" marker-end="url(#ar-ins)"/>
+
+  <!-- Orchestrator Box -->
+  <rect x="290" y="295" width="130" height="130" rx="14" fill="#10B981" fill-opacity="0.12" stroke="#10B981" stroke-opacity="0.75" stroke-width="2.5"/>
+  <text x="355" y="352" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12" fill="#10B981" text-anchor="middle" font-weight="bold">ORCHESTRATOR</text>
+  <text x="355" y="372" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10" fill="#A7F3D0" text-anchor="middle">Intent Dispatcher</text>
+
+  <!-- Speculative Parallel Branches -->
+  <!-- Top: Dynamic Web RAG -->
+  <path d="M420 335 C 470 335, 480 270, 530 270" stroke="#10B981" stroke-opacity="0.55" stroke-width="2" fill="none" marker-end="url(#ar-ins)"/>
+  <rect x="540" y="225" width="180" height="90" rx="10" fill="#10B981" fill-opacity="0.15" stroke="#10B981" stroke-opacity="0.6" stroke-width="2"/>
+  <text x="630" y="260" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12" fill="#10B981" text-anchor="middle" font-weight="bold">DYNAMIC WEB RAG</text>
+  <text x="630" y="280" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10" fill="#A7F3D0" text-anchor="middle">Google AI Headless + Cache</text>
+
+  <!-- Bottom: Dual LLM Reasoning -->
+  <path d="M420 385 C 470 385, 480 445, 530 445" stroke="#10B981" stroke-opacity="0.55" stroke-width="2" fill="none" marker-end="url(#ar-ins)"/>
+  <rect x="540" y="400" width="180" height="90" rx="10" fill="#10B981" fill-opacity="0.15" stroke="#10B981" stroke-opacity="0.6" stroke-width="2"/>
+  <text x="630" y="435" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12" fill="#10B981" text-anchor="middle" font-weight="bold">DUAL REASONING</text>
+  <text x="630" y="455" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10" fill="#A7F3D0" text-anchor="middle">Cloud Groq / Edge Ollama</text>
+
+  <!-- Convergence to Synthesizer -->
+  <path d="M720 270 C 770 270, 780 335, 830 335" stroke="#10B981" stroke-opacity="0.55" stroke-width="2" fill="none" marker-end="url(#ar-ins)"/>
+  <path d="M720 445 C 770 445, 780 385, 830 385" stroke="#10B981" stroke-opacity="0.55" stroke-width="2" fill="none" marker-end="url(#ar-ins)"/>
+
+  <!-- Synthesizer & Speech Out -->
+  <rect x="840" y="305" width="150" height="110" rx="12" fill="#10B981" fill-opacity="0.22" stroke="#10B981" stroke-opacity="0.85" stroke-width="2.5"/>
+  <text x="915" y="352" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12" fill="#FFFFFF" text-anchor="middle" font-weight="bold">SYNTHESIZER</text>
+  <text x="915" y="372" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10" fill="#A7F3D0" text-anchor="middle">Dual Voice (Kokoro/Edge)</text>
+
+  <!-- Output Audio Wave -->
+  <path d="M990 360 L1045 360" stroke="#10B981" stroke-opacity="0.6" stroke-width="2" marker-end="url(#ar-ins)"/>
+  <circle cx="1080" cy="360" r="28" fill="#10B981" fill-opacity="0.2" stroke="#10B981" stroke-opacity="0.75" stroke-width="2"/>
+  <path d="M1070 348 C 1084 354, 1084 366, 1070 372" stroke="#10B981" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M1076 342 C 1094 352, 1094 368, 1076 378" stroke="#10B981" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-opacity="0.7"/>
+
+  <!-- Typography -->
+  <text x="90" y="115" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="18" fill="#10B981" letter-spacing="6">CONVERSATIONAL VOICE AI</text>
+  <text x="90" y="175" font-family="Georgia,serif" font-size="48" fill="#FFFFFF">Voice AI Insurance Advisory &amp; Multi-Agent System</text>
+</svg>

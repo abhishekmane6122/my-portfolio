@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-label="PerkAI — Benefits &amp; Subsidy Discovery Engine">
+  <defs>
+    <linearGradient id="bgartperkai" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0A0E2A"/><stop offset="100%" stop-color="#141846"/>
+    </linearGradient>
+    <radialGradient id="glartperkai" cx="0.85" cy="0.15" r="0.75">
+      <stop offset="0%" stop-color="#6366F1" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#6366F1" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grartperkai" width="44" height="44" patternUnits="userSpaceOnUse">
+      <path d="M44 0H0V44" fill="none" stroke="#FFFFFF" stroke-opacity="0.04" stroke-width="1"/>
+    </pattern>
+    <marker id="ar-perk" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+      <path d="M0 0 L9 4.5 L0 9 z" fill="#6366F1" fill-opacity="0.6"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="675" fill="url(#bgartperkai)"/>
+  <rect width="1200" height="675" fill="url(#grartperkai)"/>
+  <rect width="1200" height="675" fill="url(#glartperkai)"/>
+  <rect x="0" y="0" width="7" height="675" fill="#6366F1"/>
+
+  <!-- Pipeline Stage 1: Domain Crawl -->
+  <rect x="110" y="300" width="115" height="120" rx="12" fill="#6366F1" fill-opacity="0.14" stroke="#6366F1" stroke-opacity="0.6" stroke-width="2"/>
+  <circle cx="167" cy="345" r="22" fill="#6366F1" fill-opacity="0.25" stroke="#6366F1" stroke-width="1.5"/>
+  <path d="M152 345 H182 M167 330 V360" stroke="#818CF8" stroke-width="2" stroke-linecap="round"/>
+  <text x="167" y="395" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10" fill="#C7D2FE" text-anchor="middle" font-weight="bold">DOMAIN CRAWL</text>
+
+  <path d="M225 360 L275 360" stroke="#6366F1" stroke-opacity="0.6" stroke-width="2" marker-end="url(#ar-perk)"/>
+
+  <!-- Pipeline Stage 2: Grounding Guard -->
+  <rect x="285" y="275" width="155" height="170" rx="14" fill="#6366F1" fill-opacity="0.18" stroke="#6366F1" stroke-opacity="0.8" stroke-width="2.5"/>
+  <path d="M362 310 l25 10 v35 c0 20 -25 35 -25 35 s-25 -15 -25 -35 v-35 z" fill="#6366F1" fill-opacity="0.3" stroke="#818CF8" stroke-width="2"/>
+  <path d="M352 350 l7 7 l15 -15" stroke="#FFFFFF" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="362" y="410" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11" fill="#FFFFFF" text-anchor="middle" font-weight="bold">GROUNDING GUARD</text>
+  <text x="362" y="428" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9" fill="#A5B4FC" text-anchor="middle">Verbatim Quote Match</text>
+
+  <path d="M440 360 L495 360" stroke="#6366F1" stroke-opacity="0.6" stroke-width="2" marker-end="url(#ar-perk)"/>
+
+  <!-- Pipeline Stage 3: Multi-Provider AI Gateway -->
+  <rect x="505" y="290" width="165" height="140" rx="12" fill="#6366F1" fill-opacity="0.14" stroke="#6366F1" stroke-opacity="0.65" stroke-width="2"/>
+  <rect x="525" y="315" width="125" height="24" rx="6" fill="#6366F1" fill-opacity="0.25" stroke="#818CF8" stroke-width="1"/>
+  <text x="587" y="331" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9" fill="#E0E7FF" text-anchor="middle">Groq (Llama 3.3)</text>
+  <rect x="525" y="348" width="125" height="24" rx="6" fill="#6366F1" fill-opacity="0.25" stroke="#818CF8" stroke-width="1"/>
+  <text x="587" y="364" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9" fill="#E0E7FF" text-anchor="middle">NVIDIA NIM (Nemotron)</text>
+  <rect x="525" y="381" width="125" height="24" rx="6" fill="#6366F1" fill-opacity="0.25" stroke="#818CF8" stroke-width="1"/>
+  <text x="587" y="397" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9" fill="#E0E7FF" text-anchor="middle">OpenRouter Fallback</text>
+
+  <path d="M670 360 L725 360" stroke="#6366F1" stroke-opacity="0.6" stroke-width="2" marker-end="url(#ar-perk)"/>
+
+  <!-- Pipeline Stage 4: Stacking & Optimization -->
+  <rect x="735" y="280" width="160" height="160" rx="14" fill="#6366F1" fill-opacity="0.2" stroke="#6366F1" stroke-opacity="0.8" stroke-width="2.5"/>
+  <rect x="760" y="315" width="50" height="50" rx="6" fill="#6366F1" fill-opacity="0.4" stroke="#A5B4FC" stroke-width="1.5"/>
+  <text x="785" y="345" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12" fill="#FFFFFF" text-anchor="middle" font-weight="bold">$100k</text>
+  <rect x="820" y="315" width="50" height="50" rx="6" fill="#6366F1" fill-opacity="0.4" stroke="#A5B4FC" stroke-width="1.5"/>
+  <text x="845" y="345" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12" fill="#FFFFFF" text-anchor="middle" font-weight="bold">$150k</text>
+  <text x="815" y="405" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10" fill="#FFFFFF" text-anchor="middle" font-weight="bold">STACKING OPTIMIZER</text>
+  <text x="815" y="423" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9" fill="#A5B4FC" text-anchor="middle">Combinatorial Gating</text>
+
+  <path d="M895 360 L950 360" stroke="#6366F1" stroke-opacity="0.6" stroke-width="2" marker-end="url(#ar-perk)"/>
+
+  <!-- Pipeline Stage 5: Unlocked Capital Value -->
+  <rect x="960" y="295" width="145" height="130" rx="14" fill="#6366F1" fill-opacity="0.25" stroke="#6366F1" stroke-opacity="0.9" stroke-width="2"/>
+  <text x="1032" y="345" font-family="Georgia,serif" font-size="24" fill="#FFFFFF" text-anchor="middle" font-weight="bold">$340k+</text>
+  <text x="1032" y="370" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10" fill="#A5B4FC" text-anchor="middle">Capital Unlocked</text>
+  <text x="1032" y="392" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9" fill="#818CF8" text-anchor="middle">&lt; 18s Turnaround</text>
+
+  <!-- Typography -->
+  <text x="90" y="115" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="18" fill="#818CF8" letter-spacing="6">AUTONOMOUS AGENTIC AI</text>
+  <text x="90" y="175" font-family="Georgia,serif" font-size="48" fill="#FFFFFF">Benefits, Credits &amp; Subsidy Discovery Engine</text>
+</svg>
