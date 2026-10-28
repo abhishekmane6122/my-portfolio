@@ -589,6 +589,7 @@ export function PortfolioTemplate({
     { name: "Services", path: "/services", isExternal: true, color: "#10b981", isSpecial: true },
     { name: "Skills", color: "#10b981", anchor: "skills" },
     { name: "Experience", color: "#a855f7", anchor: "experience" },
+    { name: "Resume", color: "#d4a373", anchor: "resume" },
     { name: "Projects", path: "/projects", isExternal: true, color: "#f59e0b" },
     { name: "Blog", path: "/blog", isExternal: true, color: "#f97316" },
     { name: "Contact", color: "#ec4899", anchor: "contact" },
@@ -1077,10 +1078,10 @@ export function PortfolioTemplate({
               <div className="space-y-4">
                 <div>
                   <h3 className="text-xl md:text-2xl font-medium text-neutral-900 dark:text-white mb-2 leading-tight">
-                    Performance of the Month Award
+                    Performance of the Year Award — GreenRatna Initiative
                   </h3>
                   <div className="flex flex-wrap items-center gap-3 text-[#d4a373] font-mono text-sm">
-                    <span className="px-3 py-1 rounded-full bg-[#d4a373]/10 border border-[#d4a373]/20">December 2025</span>
+                    <span className="px-3 py-1 rounded-full bg-[#d4a373]/10 border border-[#d4a373]/20">2025–2026</span>
                     <span className="px-3 py-1 rounded-full bg-[#d4a373]/10 border border-[#d4a373]/20">Recognized</span>
                     <span>•</span>
                     <span className="uppercase tracking-wider">Industry Excellence</span>
@@ -1088,18 +1089,18 @@ export function PortfolioTemplate({
                 </div>
 
                 <p className="text-xl text-neutral-600 dark:text-neutral-400 font-light leading-relaxed italic text-balance">
-                  "Honored to share that I’ve received this recognition for designing and delivering AI-driven solutions for a Leading Renewable Energy Firm, appreciated by the Executive Chairman and leadership across the organization."
+                  "Conferred by the Chief Digital Officer (CDO, AGEL) and recognized across the GreenRatna initiative for high-impact production delivery of enterprise AI compliance and capital markets platforms; appreciated by Group Chairman Shri Gautam Adani."
                 </p>
 
                 <div className="flex flex-wrap items-center gap-6 pt-4">
                   <div className="flex flex-col">
                     <span className="text-xs text-neutral-500 uppercase tracking-widest mb-1">Organization</span>
-                    <span className="text-neutral-900 dark:text-white font-medium">Leading Renewable Energy Firm</span>
+                    <span className="text-neutral-900 dark:text-white font-medium">Adani Green Energy Limited (Adani Group)</span>
                   </div>
                   <div className="h-8 w-px bg-neutral-200 dark:bg-white/10 hidden sm:block" />
                   <div className="flex flex-col">
                     <span className="text-xs text-neutral-500 uppercase tracking-widest mb-1">Role</span>
-                    <span className="text-neutral-900 dark:text-white font-medium">AI Engineer</span>
+                    <span className="text-neutral-900 dark:text-white font-medium">Forward-Deployed AI Engineer</span>
                   </div>
                 </div>
 
@@ -1443,6 +1444,24 @@ export function PortfolioTemplate({
           </div>
         </section>
       )}
+
+      {/* Resume Section */}
+      <section id="resume" className="py-20 md:py-28 bg-neutral-50/70 dark:bg-[#070707] transition-colors duration-300 relative border-y border-neutral-200/60 dark:border-white/5">
+        <div className="mx-auto max-w-6xl w-full px-6 md:px-10">
+          <div className="flex flex-col items-center text-center mb-12">
+            <span className="mb-3 block font-mono text-sm font-medium uppercase tracking-[0.4em] text-[#d4a373]">
+              Curriculum Vitae
+            </span>
+            <h2 className="font-sans text-3xl md:text-5xl font-light text-neutral-900 dark:text-white">
+              Resume &amp; Credentials
+            </h2>
+            <p className="mt-3 text-sm md:text-base text-neutral-600 dark:text-neutral-400 max-w-2xl font-light">
+              2+ years of production experience architecting enterprise LLM platforms, multi-agent workflows, and regulatory RAG pipelines for large listed conglomerates.
+            </p>
+          </div>
+          <ResumeDownload variant="card" />
+        </div>
+      </section>
 
       {/* Positions of Responsibility Section */}
       {positionsOfResponsibility.length > 0 && (

@@ -1,0 +1,227 @@
+%-------------------------------------------------------------------------------
+% Abhishek Mane - Curriculum Vitae / Resume
+% Target: Forward Deployed AI Engineer (FDE) / Applied AI Engineer / AI Platform Engineer
+% Compile with pdflatex / xelatex / lualatex (e.g. on Overleaf)
+%-------------------------------------------------------------------------------
+
+\documentclass[a4paper,10pt]{article}
+
+\usepackage{iftex}
+
+\ifPDFTeX
+  \usepackage[utf8]{inputenc}
+  \usepackage[T1]{fontenc}
+  \usepackage{charter}
+\else
+  \usepackage{fontspec}
+  \setmainfont{Cambria}[
+    BoldFont = * Bold,
+    ItalicFont = * Italic,
+    BoldItalicFont = * Bold Italic
+  ]
+\fi
+
+\usepackage[margin=0.48in,top=0.42in,bottom=0.42in]{geometry}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{fontawesome5}
+\usepackage{titlesec}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{microtype}
+\usepackage{xcolor}
+
+% Document settings
+\pagestyle{empty}
+\raggedbottom
+\setlength{\tabcolsep}{0in}
+
+% Colors
+\definecolor{primary}{RGB}{0, 0, 0}
+\definecolor{textdark}{RGB}{20, 20, 20}
+\definecolor{textgray}{RGB}{70, 70, 70}
+\definecolor{projecttitle}{RGB}{14, 53, 107}
+
+% Hyperlink styling
+\hypersetup{
+    colorlinks=true,
+    linkcolor=primary,
+    urlcolor=primary,
+    pdftitle={Abhishek Mane - Resume},
+    pdfauthor={Abhishek Mane}
+}
+
+% Section formatting: Small caps with bottom rule
+\titleformat{\section}
+  {\scshape\large\bfseries\color{primary}\raggedright}
+  {}
+  {0em}
+  {}
+  [{\titlerule[0.75pt]}]
+\titlespacing*{\section}{0pt}{5pt}{3pt}
+
+% Custom list styling (Fully Justified)
+\setlist[itemize]{
+    leftmargin=12pt,
+    label={--},
+    itemsep=1.8pt,
+    parsep=0pt,
+    topsep=1.5pt
+}
+
+\begin{document}
+
+%-------------------------------------------------------------------------------
+% HEADER
+%-------------------------------------------------------------------------------
+\begin{tabularx}{\textwidth}{@{} >{\raggedright\arraybackslash}X r @{}}
+  \textbf{\Huge Abhishek Mane} & \href{tel:+917020870063}{+91-7020870063} \hspace{1pt} \faPhone* \\
+  \vspace{1pt}\small B.Tech in Artificial Intelligence \& Data Science & \href{mailto:abhishek.mane.work@gmail.com}{abhishek.mane.work@gmail.com} \hspace{1pt} \faEnvelope \\
+  \small Terna Engineering College, Dharashiv & \href{https://substack.com/@abhimane}{substack.com/@abhimane} \hspace{1pt} \faGlobe \\
+  
+  
+  \small\textit{Ahmedabad, Gujarat, India} & \href{https://github.com/abhishekmane6122}{github.com/abhishekmane6122} \hspace{1pt} \faGithub \\
+  & \href{https://linkedin.com/in/abhishek-mane-aiml}{linkedin.com/in/abhishek-mane-aiml} \hspace{1pt} \faLinkedin
+\end{tabularx}
+
+\vspace{-2pt}
+
+%-------------------------------------------------------------------------------
+% CAREER OBJECTIVE / SUMMARY
+%-------------------------------------------------------------------------------
+\section{Career Objective}
+\small
+Forward-Deployed AI Engineer with 2+ years of production experience architecting, evaluating, and operating enterprise LLM and RAG systems embedded on-site with large listed conglomerates (Adani Group). Proven track record delivering 10+ production microservices under the unified central enterprise gateway, with regulatory RAG pipelines operating autonomously in production for 12+ months. Specialized in multi-backend LLM failover, FinOps token optimization, custom PostgreSQL observability, deterministic verification guardrails, and automated daily C-suite reporting.
+
+%-------------------------------------------------------------------------------
+% EXPERIENCE
+%-------------------------------------------------------------------------------
+\section{Experience}
+
+% --- COGNITBOTZ (ADANI GROUP) ---
+\noindent
+\textbf{\normalsize $\bullet$ AI Engineer (Forward-Deployed)} \hfill \textbf{September 2025 -- Present} \\
+\textbf{CognitBotz Solutions} \textbar{} \textit{Client: Adani Green Energy \& Adani Group} \hfill \textit{Ahmedabad, Gujarat} \\[2pt]
+\noindent
+\textbf{\color{projecttitle}Platform 1: Aegis — Enterprise Compliance \& Legal Intelligence Suite (6 Applications)} \\
+\textit{\small Enterprise compliance automation suite in 24/7 production for 12+ months across Corporate Legal and Secretarial teams.}
+\begin{itemize}
+    \item \textbf{Regulatory RAG Pipelines (SEBI, RBI, BSE):} Architected 3 production RAG pipelines ingesting daily exchange and central bank gazettes; built dynamic chunkers (single-turn for notices, hierarchical map-reduce for 200-page master directions), PyMuPDF OCR fallback, and multi-backend LLM orchestration (Azure OpenAI GPT-4.1-mini, Azure AI Llama-4-Maverick, self-hosted Phi-3 on on-prem Tesla T4 GPU) cutting regulatory noise by \textbf{71\%} and saving \textbf{250+ FTE hours/quarter}.
+    \item \textbf{FinOps Token Economics \& On-Prem Routing:} Routed batch summarization for \textbf{50+ group entities} to self-hosted on-prem models combined with prompt caching, slashing recurring cloud LLM API expenses by \textbf{60\%+} while maintaining sub-second inference.
+    \item \textbf{Alphanumeric Regulatory ID Search:} Eliminated BPE tokenizer subword fragmentation on statutory circular IDs through deterministic regex normalization and hybrid lexical boosting, guaranteeing 100\% rank-1 circular retrieval.
+    \item \textbf{Insider Trading \& Secretarial AI with HITL:} Engineered Databricks-backed Insider Trading surveillance pipelines, automated Director Disclosures, and an AI Board Minutes generation service featuring a \textbf{Human-in-the-Loop (HITL)} review drawer with page-level evidence citation prior to executive sign-off.
+    \item \textbf{LLM-as-Judge Evaluation \& Group ARB Clearance:} Built automated evaluation harness measuring RAGAS-aligned dimensions (Context Precision, Faithfulness, Answer Relevance, $<$1\% hallucination); authored enterprise architecture specifications and presented directly to the \textbf{Group Architecture Review Board (ARB)}, securing enterprise security and architecture clearance.
+\end{itemize}
+
+\vspace{5pt}
+
+\noindent
+\textbf{\color{projecttitle}Platform 2: Equity Dashboard — Capital Markets Intelligence Suite} \\
+\textit{\small Centralized equity intelligence portal across 7 listed entities integrating market RAG, research analytics, and investor CRM.}
+\begin{itemize}
+    \item \textbf{Shareholding Pattern (SHP) Intelligence \& AI Analyst:} Multi-tenant analytics portal tracking \textbf{3.9M+ investor records}; engineered pre-LLM deterministic entity resolver (matching dates to settlement weeks and names to master lists), 4-tier confidence gate, and BU-scoped query planner achieving p50 $\approx$ \textbf{3ms} query latency; automated daily headless PDF briefings to Business Unit CEOs.
+    \item \textbf{Sell-Side Broker Intelligence \& Research RAG:} Extracted forward estimates (Revenue, EBITDA, PAT, EPS, Target Price) from broker PDFs via Azure AI Search (Hybrid BM25 + Cohere Embed v4.0 + Semantic Reranker); built deterministic 8-point numerical verification engine (quote matching, unit normalization, cross-statement sanity checks) with dual-LLM failover.
+    \item \textbf{Equity Analytics RAG Platform:} Built conversational RAG system with zero-hallucination guarantees over BSE/NSE market and valuation data; engineered 3-tier embeddings across 10 tables evaluated on a 39-question golden benchmark.
+    \item \textbf{Institutional IR Console:} Integrated investor relations meeting tracker and engagement analytics with role-based access control.
+\end{itemize}
+
+\vspace{5pt}
+
+\noindent
+\textbf{\color{projecttitle}Platform 3: Debt Markets & Central Enterprise Infrastructure} \\
+\textit{\small High-availability reverse proxy infrastructure orchestrating 10+ microservices alongside debt capital markets backends.}
+\begin{itemize}
+    \item \textbf{Debt Markets Backend Engineering:} Developed async FastAPI backend services and PostgreSQL data schemas for Mutual Fund debt exposure mapping, Pension Fund NPS tracking, and Debt Capital Markets counterparty meeting management (MCM).
+    \item \textbf{Custom PostgreSQL Observability & Gateway Architecture:} Configured central Nginx reverse proxy with SSL termination, HTTP/2, HSTS, and SSE streaming across 10 microservices; engineered a custom in-house AI observability platform tracking distributed execution traces, latency percentiles, and token metrics natively in Azure PostgreSQL; integrated Azure AD SSO traversing corporate Zscaler and Fortinet firewalls, cutting latency from \textbf{8s to 500ms}.
+\end{itemize}
+
+\vspace{5pt}
+
+% --- COGNITBOTZ HYDERABAD ---
+\noindent
+\textbf{\normalsize $\bullet$ AI Engineer} \hfill \textbf{November 2024 -- September 2025} \\
+\textbf{CognitBotz Solutions} \hfill \textit{Hyderabad, Telangana}
+\begin{itemize}
+    \item \textbf{Production AI Platforms (DocCapture AI \& Intelligent AI):} Architected and deployed 2 live commercial platforms — \textbf{DocCapture AI} (multi-modal document intelligence and automated table/entity capture) and \textbf{Intelligent AI} (enterprise low-code platform for rapid agentic workflow orchestration).
+    \item \textbf{LLM Engineering \& Agent Deployment:} Developed and fine-tuned LLMs using LangChain and Agno with few-shot prompting; built async FastAPI microservices supporting high-throughput multi-modal web agents.
+    \item \textbf{AI Guardrails \& Responsible AI:} Enforced strict Pydantic output schemas, prompt-injection sanitization, confidence gating, and data-privacy safeguards.
+\end{itemize}
+
+\vspace{3pt}
+
+% --- INFOSYS SPRINGBOARD ---
+\noindent
+\textbf{\normalsize $\bullet$ AI Developer Intern} \hfill \textbf{September 2024 -- December 2024} \\
+\textbf{Infosys Springboard} \hfill \textit{Remote}
+\begin{itemize}
+    \item \textbf{Enterprise NLP Workflows:} Built NLP and text classification pipelines for automated document routing under Infosys's enterprise track.
+\end{itemize}
+
+%-------------------------------------------------------------------------------
+% PROJECTS
+%-------------------------------------------------------------------------------
+\section{Projects}
+
+\noindent
+\href{https://granite.rhinofoster.com/}{\textbf{\color{projecttitle}Project 1: Granite Buyer Intelligence Platform — Resilient Task Queue \& 3-Tier LLM Gateway}} \hfill \href{https://granite.rhinofoster.com/}{\textit{\small granite.rhinofoster.com}} \\
+\textit{\small Deployed B2B market intelligence platform with durable asynchronous task execution and multi-provider failover.}
+\begin{itemize}
+    \item \textbf{Durable PostgreSQL Task Queue:} Built crash-resilient asynchronous task queue with 180s leases and heartbeat recovery for automated multi-engine web discovery, qualification, and data extraction.
+    \item \textbf{3-Tier LLM Failover Gateway:} Implemented dynamic failover architecture (OpenRouter $\rightarrow$ NVIDIA Build $\rightarrow$ Groq) and lexical search, guaranteeing 100\% inference uptime and sub-second generation.
+    \item \textbf{Evidence-First Validation:} Enforced SQL check constraints separating verified facts from AI inference, with 0--100 quality scoring and audit tracking.
+\end{itemize}
+
+\vspace{6pt}
+
+\noindent
+\href{https://www.intelligentagentworks.com/}{\textbf{\color{projecttitle}Project 2: Sentinel (Ward) — AI Model Governance \& Security Platform}} \hfill \href{https://www.intelligentagentworks.com/}{\textit{\small intelligentagentworks.com}} \\
+\textit{\small Deployed auditable on-ramp for running open-source models on owned GPUs with zero LLM in the critical path.}
+\begin{itemize}
+    \item \textbf{Deterministic Pickle-Opcode Scanner:} Engineered custom AST and pickle-opcode scanner detecting unsafe deserialization exploits (RCE) prior to loading model weights into GPU memory, completely bypassing LLM overhead.
+    \item \textbf{Model Integrity \& Policy Pipeline:} Implemented SHA-256 cryptographic verification, automated Hugging Face license classification, and a multi-stage cyber/legal governance approval workflow backed by FastAPI and React.
+\end{itemize}
+
+\vspace{6pt}
+
+\noindent
+\textbf{\color{projecttitle}Project 3: PerkAI — Async Multi-Agent Subsidy \& Benefits Discovery Platform} \hfill \textit{\small Deployed on Azure VM} \\
+\textit{\small High-concurrency pure-asyncio multi-agent platform discovering cloud credits, grants, and enterprise tax subsidies.}
+\begin{itemize}
+    \item \textbf{Autonomous Multi-Agent Pipeline:} Architected pure-Python \texttt{asyncio} agent orchestrator (QueryPlanner, SearchService with circuit breakers, Extraction, Rule-Matching with geo-gating, Valuation) streaming execution via SSE to a React 19 SPA with Edge-TTS voice synthesis.
+    \item \textbf{Resilient AI Gateway:} Built unified gateway routing chat/JSON across Groq and OpenRouter with 2048-d embeddings, automated JSON schema repair, and strict verbatim-quote grounding guards.
+    \item \textbf{3-Tier Enterprise Observability:} Instrumented distributed tracing via Langfuse (prompt versioning, token metrics), Prometheus custom metrics, and Grafana/Loki log aggregation correlated by \texttt{X-Request-ID}.
+\end{itemize}
+
+%-------------------------------------------------------------------------------
+% TECHNICAL SKILLS
+%-------------------------------------------------------------------------------
+\section{Technical Skills}
+\vspace{2pt}
+\small
+\textbf{Agentic AI \& LLMs:} Multi-Agent Systems, LangGraph, LangChain, Agno, Tool/Function-Calling, State Graphs, Supervisor-Worker Patterns, Prompt Engineering, Prompt Caching, FinOps Token Optimization, Frontier Models (OpenAI, Claude, DeepSeek R1, Gemini, Azure OpenAI, Llama-4, Phi-3, Groq LPU) \\[3.5pt]
+\textbf{Advanced RAG \& Search:} Hybrid Search (Dense Vector + BM25/FTS), Cross-Encoder Reranking (FlashRank, BGE-Reranker, Cohere Rerank), Azure AI Search, Parent-Child Chunking, Dynamic Hierarchical Chunking, Vector Databases (pgvector on PostgreSQL, FAISS, ChromaDB, Weaviate), Cohere Embed v4.0 (1536-dim) \\[3.5pt]
+\textbf{AI Evals \& Observability:} LLM Evals (RAGAS, DeepEval, G-Eval, LLM-as-Judge), Observability \& Distributed Tracing (Custom PostgreSQL AI Observability, Langfuse, OpenTelemetry), Failure Mode Analysis, Guardrails (Pydantic Schema Validation, NeMo Guardrails, Confidence \& Abstention Gating, HITL Workflows) \\[3.5pt]
+\textbf{Backend, Data \& Cloud:} Python, FastAPI, Pydantic v2, PostgreSQL (Azure Database Flexible Server), Databricks, Redis, Asyncio, React, TypeScript, Vite, Nginx (Reverse Proxy / Load Balancing), Docker Compose, Playwright, Azure (OpenAI, AI Foundry, AD SSO / OAuth2, Key Vault, VM), Tesla T4 Air-Gapped Serving, Group ARB Clearance
+
+\vspace{5pt}
+
+%-------------------------------------------------------------------------------
+% AWARDS & CERTIFICATIONS
+%-------------------------------------------------------------------------------
+\section{Awards \& Certifications}
+\noindent
+\textbf{\normalsize $\bullet$ Performance of the Year Award -- GreenRatna Initiative} (2025--2026) \hfill \textbf{Adani Green Energy Limited} \\
+Conferred by the Chief Digital Officer (CDO, AGEL) and recognized across the GreenRatna initiative for high-impact production delivery of enterprise AI compliance and capital markets platforms; appreciated by Group Chairman Shri Gautam Adani. \\[3pt]
+\textbf{\normalsize $\bullet$ Certifications:} Anthropic Claude Prompt Engineering Certification \textbar{} CCSK v4.1 Foundation (Cloud Security) \textbar{} Cloud Computing Fundamentals \textbar{} AICTE-Cisco Cyber Security \textbar{} Google Cloud Bootcamp (GeeksforGeeks)
+
+\vspace{5pt}
+
+%-------------------------------------------------------------------------------
+% EDUCATION
+%-------------------------------------------------------------------------------
+\section{Education}
+\noindent
+\textbf{\normalsize $\bullet$ Bachelor of Technology in Artificial Intelligence and Data Science} \hfill \textbf{2021 -- 2025} \\
+Terna Engineering College, Osmanabad (Dharashiv), Maharashtra \hfill \textit{First Class with Distinction}
+
+\end{document}
